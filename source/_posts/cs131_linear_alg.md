@@ -41,6 +41,16 @@ $$
 \sin\theta &\cos\theta
 \end{bmatrix}
 $$
+旋转矩阵是[酉矩阵](https://zh.wikipedia.org/wiki/酉矩阵)，矩阵内的各列（或者各行）相互正交。满足如下的关系式：
+$$
+\mathbf{R}\mathbf{R^{\dagger}} = \mathbf{I}
+$$
+由于$\det{\mathbf{R}} = \det{\mathbf{R^{\dagger}}}$，所以，对于酉矩阵，$\det{\mathbf{R}} = \pm 1$
+旋转矩阵是[酉矩阵](https://zh.wikipedia.org/wiki/酉矩阵)，矩阵内的各列（或者各行）相互正交。满足如下的关系式：
+$$
+\mathbf{R}\mathbf{R^{\dagger}} = \mathbf{I}
+$$
+由于$\det{\mathbf{R}} = \det{\mathbf{R^{\dagger}}}$，所以，对于酉矩阵，$\det{\mathbf{R}} = \pm 1$.
 
 ### 齐次变换(Homogeneous Transform)
 只用上面的二维矩阵不能表达平移，使用齐次矩阵可以表达放缩，旋转和平移操作。
@@ -59,3 +69,28 @@ cx+dy+t_y\\\\
 1
 \end{bmatrix}
 $$
+
+### SVD分解
+可以将矩阵分成若干个矩阵的乘积，叫做矩阵分解，比如QR分解，满秩分解等。SVD分解，即奇异值分解，也是一种特殊的矩阵分解方法。如下式所示，是将矩阵分解成为三个矩阵的乘积：
+$$\mathbf{U}\mathbf{\Sigma}\mathbf{V^\dagger} = \mathbf{A}$$
+其中矩阵$\mathbf{A}$大小为$m\times n$，矩阵$\mathbf{U}$是大小为$m\times m$的酉矩阵，$\mathbf{V}$是大小为$n \times n$的酉矩阵，$\mathbf{\Sigma}$是大小为$m \times n$的旋转矩阵，即只有主对角元素不为0.
+
+SVD分解在主成分分析中年很有用。由于矩阵$\mathbf{\Sigma}$一般情况下是将奇异值按照从大到小的顺序摆放，所以矩阵$\mathbf{U}$中，前面的若干列被视作主成分，后面的列显得相对不这么重要。可以抛弃后面的列，进行图像压缩。
+
+如下图，是使用前10个分量对原图片进行压缩的效果。
+
+``` matlab
+im = imread('./superman.png');
+im_gray = rbg2gray(im);
+[u, s, v] = svd(double(im_gray));
+k = 10;
+uk = u(:, 1:k);
+sigma = diag(s);
+sk = diag(sigma(1:k));
+vk = v(:, 1:k);
+im_k = uk*sk*vk';
+imshow(uint8(im_k))
+```
+
+![原始图像](/img/original_superman.png)
+![压缩图像](/img/svd_superman.png)
