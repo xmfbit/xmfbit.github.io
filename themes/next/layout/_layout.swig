@@ -72,11 +72,6 @@
   {% include '_scripts/third-party/lean-analytics.swig' %}
   {% include '_scripts/baidu-push.swig' %}
   {% include '_components/algolia-search/assets.swig' %}
-  {% if page.comments %}
-    <div class="comments" id="comments">
-      {% if (config.duoshuo and config.duoshuo.shortname) or config.duoshuo_shortname %}
-        <div class="ds-thread" data-thread-key="{{ page.path }}"
-             data-title="{{ page.title }}" data-url="{{ page.permalink }}" data-author-key="{{ theme.duoshuo_info.data_author_key }}">
-        </div>
+
 </body>
 </html>
