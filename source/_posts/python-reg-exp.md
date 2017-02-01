@@ -2,7 +2,7 @@
 title: Python Regular Expressions （Python 正则表达式)
 date: 2014-07-17 19:00:00
 tags: 
-    -python
+    - python
 ---
 
 本文来自于Google Developers中对于Python的介绍。[https://developers.google.com/edu/python/regular-expressions](https://developers.google.com/edu/python/regular-expressions "Google Python Class, Regular Expression")。
