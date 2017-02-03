@@ -1,13 +1,13 @@
 ---
 title: Python Regular Expressions （Python 正则表达式)
 date: 2014-07-17 19:00:00
-tags: 
+tags:
     - python
 ---
 
 本文来自于Google Developers中对于Python的介绍。[https://developers.google.com/edu/python/regular-expressions](https://developers.google.com/edu/python/regular-expressions "Google Python Class, Regular Expression")。
 
-
+<!-- more -->
 
 ## 认识正则表达式 ##
 
@@ -20,7 +20,7 @@ Python的正则表达式是使用 **re 模块**的。
     	print 'found',match.group()
     else:
         print 'NOT Found!'
-        
+
 ```
 
 ## 正则表达式的规则 ##
@@ -90,7 +90,7 @@ Python的正则表达式是使用 **re 模块**的。
 
 ### 使用方括号 ###
 方括号里面的字符表示一个字符集合。[abc]可以被用来匹配'a'或者'b'或者'c'。\w \s等都可以用在方括号里，除了'.'以外，它只能用来表示字面意义上的‘点’。所以上面的Email规则可以扩充如下：
-    
+
 ``` py
     match = re.search('r[\w.-]+@[\w.-]+',str)
 ```
@@ -137,7 +137,7 @@ Python的正则表达式是使用 **re 模块**的。
     ##　返回了一个list
     tuples = re.findall(r'([\w\.-]+)@([\w\.-]+)', str)
     print tuples  ## [('alice', 'google.com'), ('bob', 'abc.com')]
-    ##　list中的元素是tuple 
+    ##　list中的元素是tuple
     for tuple in tuples:
       print tuple[0]  ## username
       print tuple[1]  ## host

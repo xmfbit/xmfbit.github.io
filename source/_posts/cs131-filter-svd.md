@@ -8,6 +8,7 @@ tags:
 
 数字图像可以看做$\mathbb{R}^2 \rightarrow \mathbb{R}^c$的映射，其中$c$是图像的channel数。使用信号与系统的角度来看，如果单独考察某个channel，可以将图像看做是二维离散系统。
 
+<!-- more -->
 ## 卷积
 卷积的概念不再详述，利用不同的kernel与原始图像做卷积，就是对图像进行线性滤波的过程。卷积操作时，以某一个点为中心点，最终结果是这个点以及它的邻域点的线性组合，组合系数由kernel决定。一般kernel的大小取成奇数。如下图所示。（图片来自[博客《图像卷积与滤波的一些知识点》](http://blog.csdn.net/zouxy09/article/details/49080029)）
 ![卷积操作示意图](/img/convolution.png)

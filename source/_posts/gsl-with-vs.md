@@ -1,12 +1,16 @@
 ---
 title: 使用 Visual Studio 编译 GSL 科学计算库
 date: 2016-12-16 19:00:00
-tags: 
+tags:
     - tool
     - gsl
 ---
 
-GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。[GSL 的项目主页](http://www.gnu.org/software/gsl/)提供的说明来看，它支持如下的科学计算：
+GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。
+
+<!-- more -->
+[GSL 的项目主页](http://www.gnu.org/software/gsl/)提供的说明来看，GSL支持如下的科学计算：
+
 
 （下面的这张表格的HTML使用的是[No-Cruft Excel to HTML Table Converter](http://pressbin.com/tools/excel_to_html_table/index.html)生成的）
 {% raw %}
@@ -100,7 +104,7 @@ make clean
 当完成后，你应该可以在路径下看到这样一张图，我们主要关注的文件夹是\bin，\gsl，\Debug和\Release。
 
 
-## 加入环境变量 
+## 加入环境变量
 
 修改环境变量的Path，将\GSL_Build_Path\bin\Debug加入，这主要是为了\Debug文件夹下面的gsl.dll文件。如果不进行这一步的话，一会虽然可以编译，但是却不能运行。
 

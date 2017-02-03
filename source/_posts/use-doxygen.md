@@ -1,16 +1,17 @@
 ---
 title: Windows环境下使用Doxygen生成注释文档
 date: 2016-12-16 19:00:00
-tags: 
+tags:
     - tool
     - doxygen
 ---
 
 Doxygen 是一种很好用的代码注释生成工具，然而和很多国外的工具软件一样，在中文环境下，它的使用总是会出现一些问题，也就是中文注释文档出现乱码。经过调试，终于是解决了这个问题。
 
+<!-- more -->
 ## 安装 Doxygen
 
-Doxygen 在Windows平台下的安装是简单的，[Doxygen的项目主页](http://www.doxygen.nl/)提供了下载和安装的使用说明，可以下载它们的官方使用手册进行阅读。对于Windows，提供了源代码编译安装和直接安装程序安装两种方式，可以自行选择。
+Doxygen 在Windows平台下的安装比较简单，[Doxygen的项目主页](http://www.doxygen.nl/)提供了下载和安装的使用说明，可以下载它们的官方使用手册进行阅读。对于Windows，提供了源代码编译安装和直接安装程序安装两种方式，可以自行选择。
 
 安装成功后，使用命令行命令
 
@@ -57,14 +58,14 @@ doxygen doxygen_filename
 
 ``` latex
 \begin{document}
-\begin{CJK}{UTF8}{gbsn} 
+\begin{CJK}{UTF8}{gbsn}
 ```
 
 也就是说为正文提供了CJK环境，这样中文文本就可以正常编译了。
 
 相应的，我们要将结尾的 `\end{document)`改为：
 ``` latex
-\end{CJK} 
+\end{CJK}
 \end{document}
 ```
 

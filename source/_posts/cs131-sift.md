@@ -12,6 +12,7 @@ tags:
 - 确定方向。通过计算图像的梯度图，确定key point的方向，下一步的feature operation就是在这个方向，scale和position上进行的。
 - 确定key point的描述子。使用图像的局部梯度作为key point的描述子，最终构成SIFT特征向量。
 
+<!-- more -->
 ## SIFT介绍
 上讲中介绍的Harris角点方法计算简便，并具有平移不变性和旋转不变性。特征$f$对某种变换$\mathcal{T}$具有不变性，是指在经过变换后原特征保持不变，也就是$f(I) = f(\mathcal{T}(I))$。但是Harris角点不具有尺度变换不变性，如下图所示。当图像被放大后，原图的角点被判定为了边缘点。
 ![harris的尺度变换不满足尺度不变性](/img/harris_non_scale_constant.png)
