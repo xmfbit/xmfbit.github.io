@@ -51,7 +51,7 @@ x, &\text{if}\ x > 0 \\\\
 \end{cases}
 $$
 
-很重要的一点就是定义很好的loss function，为此，作者提出了一下几点：
+很重要的问题就是定义很好的loss function，为此，作者提出了以下几点说明：
 
 - loss的形式采用误差平方和的形式（真是把回归进行到底了。。。）
 - 由于很多的grid cell没有目标物体存在，所以给有目标存在的bounding box和没有目标存在的bounding box设置了不同的比例因子进行平衡。具体来说，
@@ -192,3 +192,48 @@ if(state.train){
 ```
 
 ## YOLO V2
+YOLO V2是原作者在V1基础上做出改进后提出的。为了达到题目中所称的Better，Faster，Stronger的目标，主要改进点如下。当然，具体内容还是要深入论文。
+- 受到Faster RCNN方法的启发，引入了anchor。同时使用了K-Means方法，对anchor数量进行了讨论，在精度和速度之间做出折中；
+- 修改了网络结构，去掉了全连接层，改成了全卷积结构；
+- 引入了WordTree结构，将检测和分类问题做成了一个统一的框架，并充分利用ImageNet和COCO数据集的数据。
+
+下面，还是先把论文的摘要意译如下：
+>我们引入了YOLO 9000模型，它是实时物体检测的State of the art的工作，能够检测超过9K类目标。首先，我们对以前的工作（YOLO V1）做出了若干改进，使其成为了一种在实时检测方法内在PASCAL VOC和COCO上State of the art的效果。通过一种新颖的多尺度训练犯法（multi-scale training method）， YOLO V2适用于不同大小尺寸输入的image，在精度和效率上达到了很好地trade-off。在67fps的速度下，VOC2007上达到了76.8mAP的精度。40fps时，达到了78.6mAP，已经超过了Faster RCNN with ResNet和SSD的精度，同时比它们更快！最后，我们提出了一种能够同时进行检测任务和分类任务的联合训练方法。使用这种方法，我们在COCO detection dataset和ImageNet classification dataset上同时训练模型。这种方法使得我们能够对那些没有label上detection data的数据做出detection的预测。我们使用ImageNet的detection任务做了验证。YOLO 9000在仅有200类中44类的detection data的情况下，仍然在ImageNet datection任务中取得了19.7mAP的成绩。对于不在COCO中的156类，YOLO9000成绩为16.0mAP。我们使得YOLO9000能够在保证实时的前提下对9K类目标进行检测。
+
+下面，根据论文中提出的各条改进措施做一说明。
+
+### 改进1：引入BN层（Batch Normalization）
+Batch Normalization能够加快模型收敛，并提供一定的正则化。作者在每个conv层都加上了了BN层，同时去掉了原来模型中的drop out部分，这带来了2%的性能提升。
+
+### 改进2：高分辨率分类器（High Resolution Classifier）
+YOLO V1首先在ImageNet上以$224\times 224$大小图像作为输入进行训练，之后在检测任务中提升到$448\times 448$。这里，作者在训练完224大小的分类网络后，首先调整网络大小为$448\times 448$，然后在ImageNet上进行fine tuning（10个epoch）。也就是得到了一个高分辨率的cls。再把它用detection上训练。这样，能够提升4%。
+
+### 改进3：引入Anchor Box
+YOLO V1中直接在CNN后面街上全连接层，直接回归bounding box的参数。这里引入了Faster RCNN中的anchor box概念，不再直接回归bounding box的参数，而是相对于anchor box的参数。
+
+作者去掉后面的fc层和最后一个max pooling层，以期得到更高分辨率的feature map。同时，shrink网络接受$416\times 416$（而不是448）大小的输入image。这是因为我们想要最后的feature map大小是奇数，这样就能够得到一个center cell（比较大的目标，更有可能占据中间的位置）。由于YOLO conv-pooling的效应是将image downsamplig 32倍，所以最后feature map大小为$416/32 = 13$。
+
+与YOLO V1不同的是，我们不再对同一个grid cell下的bounding box统一产生一个数量为$C$的类别概率，而是对于每一个bounding box都产生对应的$C$类概率。和YOLO V1一样的是，我们仍然产生confidence，意义也完全一样。
+
+使用anchor后，我们的精度accuracy降低了，不过recall上来了。（这也较好理解。原来每个grid cell内部只有2个bounding box，造成recall不高。现在recall高上来了，accuracy会下降一些）。
+
+### 改进4：Dimension Cluster
+在引入anchor box后，一个问题就是如何确定anchor的位置和大小？Faster RCNN中是手工选定的，每隔stride设定一个anchor，并根据不同的面积比例和长宽比例产生9个anchor box。在本文中，作者使用了聚类方法对如何选取anchor box做了探究。这点应该是论文中很有新意的地方。
+
+这里对作者使用的方法不再过多赘述，强调以下两点：
+- 作者使用的聚类方法是K-Means；
+- 相似性度量不用欧氏距离，而是用IoU，定义如下：
+$$d(\text{box}, \text{centroid}) = 1-\text{IoU}(\text{box}, \text{centroid})$$
+
+使用不同的$k$，聚类实验结果如下，作者折中采用了$k = 5$。而且经过实验，发现当取$k=9$时候，已经能够超过Faster RCNN采用的手工固定anchor box的方法。下图右侧图是在COCO和VOC数据集上$k=5$的聚类后结果。这些box可以作为anchor box使用。
+![](/img/yolo2_cluster_result.png)
+
+### 改进5：直接位置预测（Direct Location Prediction）
+我们仍然延续了YOLO V1中的思路，预测box相对于grid cell的位置。使用sigmoid函数作为激活函数，使得最终输出值落在$[0, 1]$这个区间上。
+
+在output的feature map上，对于每个cell（共计$13\times 13$个），给出对应每个bounding box的输出$t_x$, $t_y$, $t_w$, $t_h$。每个cell共计$k=5$个bounding box。如何由这几个参数确定bounding box的真实位置呢？见下图。
+
+![确定bbox的位置](/img/yolo2_bbox_location.png)
+
+设该grid cell距离图像左上角的offset是$(c_x, c_y)$，那么bounding box的位置和宽高计算如下。注意，box的位置是相对于grid cell的，而宽高是相对于anchor box的。
+![bounding box参数的计算方法](/img/yolo2_bbox_param.png)
