@@ -237,3 +237,8 @@ $$d(\text{box}, \text{centroid}) = 1-\text{IoU}(\text{box}, \text{centroid})$$
 
 设该grid cell距离图像左上角的offset是$(c_x, c_y)$，那么bounding box的位置和宽高计算如下。注意，box的位置是相对于grid cell的，而宽高是相对于anchor box的。
 ![bounding box参数的计算方法](/img/yolo2_bbox_param.png)
+
+### 改进6：Fine-Gained Features
+这个trick是受Faster RCNN和SSD方法中使用多个不同feature map提高算法对不同分辨率目标物体的检测能力的启发，加入了一个pass-through层，直接将倒数第二层的$26\times 26$大小的feature map加进来。
+
+在具体实现时，是将higher resolution（也就是$26\times 26$）的feature map stacking在一起。比如，原大小为$26\times 26 \times 512$的feature map，因为我们要将其变为$13\times 13$大小，所以，将在空间上相近的点移到后面的channel上去，这部分可以参考Darknet中`reorg_layer`的实现。
