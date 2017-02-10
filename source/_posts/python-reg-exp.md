@@ -7,6 +7,7 @@ tags:
 
 本文来自于Google Developers中对于Python的介绍。[https://developers.google.com/edu/python/regular-expressions](https://developers.google.com/edu/python/regular-expressions "Google Python Class, Regular Expression")。
 
+![regex](/img/regex_picture.jpg)
 <!-- more -->
 
 ## 认识正则表达式 ##

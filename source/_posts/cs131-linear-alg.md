@@ -8,7 +8,8 @@ tags:
 
 CS131课程(Computer Vision: Foundations and Applications)，是斯坦福大学Li Feifei实验室开设的一门计算机视觉入门基础课程，[该课程](http://vision.stanford.edu/teaching/cs131_fall1617/index.html)目的在于为刚接触计算机视觉领域的学生提供基本原理和应用介绍。目前2016年冬季课程刚刚结束。CS131博客系列主要是关于本课的slide知识点总结与作业重点问题归纳，作为个人学习本门课程的心得体会和复习材料。
 
-由于是个人项目，所以会比较随意，只对个人感兴趣的内容做一总结。这篇文章是对课前的[线代基础](http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture2_linalg_review_cs131_2016.pdf)做一复习与整理。
+由于是个人项目，所以会比较随意，只对个人感兴趣的内容做一总结。这篇文章是对课前[线代基础](http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture2_linalg_review_cs131_2016.pdf)的复习与整理。
+![线性代数词云](/img/cs131_linear_algebra.jpg)
 
 <!-- more -->
 ## 向量与矩阵

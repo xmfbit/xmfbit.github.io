@@ -3,6 +3,7 @@ title: 在Ubuntu14.04构建Caffe
 date: 2017-02-09 20:59:05
 tags:
     - tool
+    - caffe
 ---
 Caffe作为较早的一款深度学习框架，很是流行。然而，由于依赖项众多，而且Jia Yangqing已经毕业，所以留下了不少的坑。这篇博客记录了我在一台操作系统为Ubuntu14.04.3的DELL游匣7559笔记本上编译Caffe的过程，主要是在编译python接口时遇到的import error问题的解决和找不到HDF5链接库的问题。
 

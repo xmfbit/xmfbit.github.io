@@ -8,6 +8,7 @@ tags:
 
 GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。
 
+![GSL is GNU Sentific Library](/img/gsl_picture.jpg)
 <!-- more -->
 [GSL 的项目主页](http://www.gnu.org/software/gsl/)提供的说明来看，GSL支持如下的科学计算：
 
