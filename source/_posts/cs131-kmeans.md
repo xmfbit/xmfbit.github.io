@@ -75,6 +75,142 @@ K-Means算法的流程如下所示。
 针对K-Means，也有不少相关改进工作，参考下面这幅图吧。
 ![K-Means Scaling Up](/img/kmeans_scaling_up.png)
 
+## MATLAB实验
+下面是我自己写的简单的K-Means demo。首先，在数据产生环节，确定$K = 3$个cluster的中心位置，并随机产生$N$个数据点，并使用`scatter`函数做出散点图。
+
+代码中的主要部分为`my_kmeans`函数的实现（为了不与内建的kmeans函数重名，故加上了`my`前缀）。在此函数内部，首先随机产生$K$个聚类中心，并对数据点进行初始的指定。接着，在迭代过程中，不断计算均值来更新聚类中心和assignment，当达到最大迭代次数或者相邻两次迭代中assignment的值不再变化为止，并计算对应的目标函数$J$的值。
+
+注意到该函数初始确定聚类中心时有一段注释的代码，该段代码用于debug时，指定聚类中心，去除随机性，以验证后续K-Means迭代的正确性。
+
+``` matlab
+%% generate data
+K = 3;   % number of clusters
+pos = [-5, 5; 0, 1; 3, 6];  % position of cluster centers
+N = 20;    % number of data points
+R = 3;     % radius of clusters
+data = zeros(N, 2);    % data
+class = zeros(N, 1);   % index of cluster
+
+for i = 1:N
+    idx = randi(3, 1);
+    dr = R*rand();
+    data(i, :) = pos(idx, :) + [dr*cos(rand()*2*pi), dr*sin(rand()*2*pi)];
+    class(i) = idx;
+end
+
+%% visualization data points
+figure
+hold on
+color = [1,0,0; 0,1,0; 0,0,1];
+for i = 1:K
+    x = data(class == i, 1);
+    y = data(class == i, 2);
+    scatter(x, y, 150, repmat(color(i,:), [length(x), 1]), 'filled');
+end
+
+%% K-Means
+best_J = 1E100;
+best_idx = 0;
+for times = 1:5  % 5 times experiments to choose the best result
+    [mu, assignment, J] = my_kmeans(data, K);
+    if best_J > J
+        best_idx = times;
+        best_J = J;
+    end
+    fprintf('%d experiment: J = %f\n', times, J);
+    disp(mu);
+end
+fprintf('best: %d experiment: J = %f\n', best_idx, best_J);
+
+%% basic functions
+function J = ssd(X, mu, assignment)
+% sum of square distance
+% X -- data, N*D matrix
+% mu -- centers of clusters, K*D matrix
+% assignment -- current assignment of data to clusters
+J = 0;
+K = size(mu, 1);
+for k = 1:K
+    x_k = X(assignment == k, :);
+    mu_k = mu(k, :);
+    err2 = bsxfun(@minus, x_k, mu_k).^2;
+    J = J + sum(err2(:));
+end
+J = J / size(X, 1);
+end
+
+function mu = compute_mu(X, assignment, K)
+mu = zeros(K, size(X, 2));
+for k = 1:K
+    x_k = X(assignment == k, :);
+    mu(k, :) = mean(x_k, 1);
+end
+end
+
+function assignment = assign(X, mu)
+% assign data points to clusters
+N = size(X, 1);
+assignment = zeros(N, 1);
+for i = 1:N
+    x = X(i, :);
+    err2 = bsxfun(@minus, x, mu).^2;
+    dis = sum(err2, 2);
+    [~, idx] = min(dis);
+    assignment(i) = idx;
+end
+end
+
+function [mu, assignment, J] = my_kmeans(X, K)
+N = size(X, 1);
+assignment = zeros(N, 1);
+idx = randsample(N, K);
+mu = X(idx, :);
+
+% for i = 1:K
+%     for j = 1:N
+%         if assignment_gt(j) == i
+%             mu(i,:) = X(j,:);
+%             break;
+%         end
+%     end
+% end
+figure
+hold on
+color = [1,0,0; 0,1,0; 0,0,1];
+scatter(mu(:,1), mu(:,2), 200, color, 'd');
+for iter = 1:20
+    assignment_prev = assignment;
+    assignment = assign(X, mu);
+    if assignment == assignment_prev
+        break;
+    end
+    mu_prev = mu;
+    mu = compute_mu(X, assignment, K);
+    scatter(mu(:, 1), mu(:, 2), 200, color, 'd');
+    MU = zeros(2*K, 2);
+    MU(1:2:end, :) = mu_prev;
+    MU(2:2:end, :) = mu;
+    mu_x = reshape(MU(:, 1), [], K);
+    mu_y = reshape(MU(:, 2), [], K);
+    plot(mu_x, mu_y, 'k-.');
+
+end
+for i = 1:K
+    x = X(assignment == i, 1);
+    y = X(assignment == i, 2);
+    scatter(x, y, 150, repmat(color(i,:), [length(x), 1]), 'filled');
+end
+J = ssd(X, mu, assignment);
+end
+```
+
+在demo中，随机选取初始化的聚类中心，重复进行$5$次实验。下图是产生的原始数据的散点图。用不同的颜色标明了cluster。
+![K-Means聚类](/img/kmeans_data_demo.png)
+
+下图是某次的实验结果，其中菱形和它们之间的连线指示了聚类中心的变化。注意，颜色只是用来区别不同的cluster，和上图并没有对应关系。可以看到，初始化时绿色标注的cluster的中心（也即是上图中的红色cluster）虽然偏离了很远，但是在迭代过程中也能实现纠正。
+
+![K-Means聚类](/img/kmeans_success.png)
+
 ## PS
 这里插一句与本文内容完全无关的一个tip：在Markdown中使用LaTex时，如果在内联形式（也就是行内使用两个美元符号插入公式）时，如果有多个下划线，那么Markdown有时会将下划线之间的部分认为是自己的斜体标记，如下所示：
 ```
