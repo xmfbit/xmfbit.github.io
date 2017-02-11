@@ -211,6 +211,8 @@ end
 
 ![K-Means聚类](/img/kmeans_success.png)
 
+再换个大点的数据集来做，效果貌似还不错~
+![大一些](/img/kmeans_bigger_demo.png)
 ## PS
 这里插一句与本文内容完全无关的一个tip：在Markdown中使用LaTex时，如果在内联形式（也就是行内使用两个美元符号插入公式）时，如果有多个下划线，那么Markdown有时会将下划线之间的部分认为是自己的斜体标记，如下所示：
 ```
