@@ -200,7 +200,10 @@ YOLO V2是原作者在V1基础上做出改进后提出的。为了达到题目�
 下面，还是先把论文的摘要意译如下：
 >我们引入了YOLO 9000模型，它是实时物体检测的State of the art的工作，能够检测超过9K类目标。首先，我们对以前的工作（YOLO V1）做出了若干改进，使其成为了一种在实时检测方法内在PASCAL VOC和COCO上State of the art的效果。通过一种新颖的多尺度训练犯法（multi-scale training method）， YOLO V2适用于不同大小尺寸输入的image，在精度和效率上达到了很好地trade-off。在67fps的速度下，VOC2007上达到了76.8mAP的精度。40fps时，达到了78.6mAP，已经超过了Faster RCNN with ResNet和SSD的精度，同时比它们更快！最后，我们提出了一种能够同时进行检测任务和分类任务的联合训练方法。使用这种方法，我们在COCO detection dataset和ImageNet classification dataset上同时训练模型。这种方法使得我们能够对那些没有label上detection data的数据做出detection的预测。我们使用ImageNet的detection任务做了验证。YOLO 9000在仅有200类中44类的detection data的情况下，仍然在ImageNet datection任务中取得了19.7mAP的成绩。对于不在COCO中的156类，YOLO9000成绩为16.0mAP。我们使得YOLO9000能够在保证实时的前提下对9K类目标进行检测。
 
-下面，根据论文中提出的各条改进措施做一说明。
+根据论文结构的安排，将从Better，Faster和Stronger三个方面对论文提出的各条改进措施进行介绍。
+
+## Better
+在YOLO V1的基础上，作者提出了不少的改进来进一步提升算法的性能（mAP），主要改进措施包括网络结构的改进（第1，3，5，6条）和Anchor Box的引进（第3，4，5条）以及训练方法（第2，7条）。
 
 ### 改进1：引入BN层（Batch Normalization）
 Batch Normalization能够加快模型收敛，并提供一定的正则化。作者在每个conv层都加上了了BN层，同时去掉了原来模型中的drop out部分，这带来了2%的性能提升。
@@ -242,3 +245,51 @@ $$d(\text{box}, \text{centroid}) = 1-\text{IoU}(\text{box}, \text{centroid})$$
 这个trick是受Faster RCNN和SSD方法中使用多个不同feature map提高算法对不同分辨率目标物体的检测能力的启发，加入了一个pass-through层，直接将倒数第二层的$26\times 26$大小的feature map加进来。
 
 在具体实现时，是将higher resolution（也就是$26\times 26$）的feature map stacking在一起。比如，原大小为$26\times 26 \times 512$的feature map，因为我们要将其变为$13\times 13$大小，所以，将在空间上相近的点移到后面的channel上去，这部分可以参考Darknet中`reorg_layer`的实现。
+
+使用这一扩展之后的feature map，提高了1%的性能提升。
+
+### 改进7：多尺度训练（Multi-Scale Training）
+在实际应用时，输入的图像大小有可能是变化的。我们也将这一点考虑进来。因为我们的网络是全卷积神经网络，只有conv和pooling层，没有全连接层，所以可以适应不同大小的图像输入。所以网络结构上是没问题的。
+
+具体来说，在训练的时候，我们每隔一定的epoch（例如10）就随机改变网络的输入图像大小。由于我们的网络最终降采样的比例是$32$，所以随机生成的图像大小为$32$的倍数，即$\lbrace 320, 352, \dots, 608\rbrace$。
+
+在实际使用中，如果输入图像的分辨率较低，YOLO V2可以在不错的精度下达到很快的检测速度。这可以被用应在计算能力有限的场合（无GPU或者GPU很弱）或多路视频信号的实时处理。如果输入图像的分辨率较高，YOLO V2可以作为state of the art的检测器，并仍能获得不错的检测速度。对于目前流行的检测方法（Faster RCNN，SSD，YOLO）的精度和帧率之间的关系，见下图。可以看到，作者在30fps处画了一条竖线，这是算法能否达到实时处理的分水岭。Faster RCNN败下阵来，而YOLO V2的不同点代表了不同输入图像分辨率下算法的表现。对于详细数据，见图下的表格对比（VOC 2007上进行测试）。
+
+![不同检测方法的对比](/img/yolo2_different_methods_comparation.png)
+![不同检测方法的对比](/img/yolo2_different_methods_comparation_in_table.png)
+
+### 总结
+在Better这部分的末尾，作者给出了一个表格，指出了主要提升性能的措施。例外是网络结构上改为带Anchor box的全卷积网络结构（提升了recall，但对mAP基本无影响）和使用新的网络（计算量少了~33%）。
+![不同改进措施的影响](/img/yolo2_different_methods_improvement.png)
+
+## Faster
+这部分的改进为网络结构的变化。包括Faster RCNN在内的很多检测方法都使用VGG-16作为base network。VGG-16精度够高但是计算量较大（对于大小为$224\times 224$的单幅输入图像，卷积层就需要30.69B次浮点运算）。在YOLO V1中，我们的网络结构较为简单，在精度上不如VGG-16（ImageNet测试，88.0% vs 90.0%）。
+
+在YOLO V2中，我们使用了一种新的网络结构Darknet-19（因为base network有19个卷积层）。和VGG相类似，我们的卷积核也都是$3\times 3$大小，同时每次pooling操作后channel数double。另外，在NIN工作基础上，我们在网络最后使用了global average pooling层，同时使用$1\times 1$大小的卷积核来做feature map的压缩（分辨率不变，channel减小，新的元素是原来相应位置不同channel的线性组合），同时使用了Batch Normalization技术。具体的网络结构见下表。Darknet-19计算量大大减小，同时精度超过了VGG-16。
+![Darknet-19的网络结构](/img/yolo2_dartnet_19_structure.png)
+
+在训练过程中，首先在ImageNet 1K上进行分类器的训练。使用数据增强技术（如随机裁剪、旋转、饱和度变化等）。和上面的讨论相对应，首先使用$224\times 224$大小的图像进行训练，再使用$448\times 448$的图像进行fine tuning，具体训练参数设置可以参见论文和对应的代码。这里不再多说。
+
+然后，我们对检测任务进行训练。对网络结构进行微调，去掉最后的卷积层（因为它是我们当初为了得到1K类的分类置信度加上去的），增加$3$个$3\times 3$大小，channel数为$1024$的卷积层，并每个都跟着一个$1\times 1$大小的卷积层，channel数由我们最终的检测任务需要的输出决定。对于VOC的检测任务来说，我们需要预测$5$个box，每个需要$5$个参数（相对位置，相对大小和置信度），同时$20$个类别的置信度，所以输出共$5\times(5+20)=125$。从YOLO V2的`yolo_voc.cfg`[文件](https://github.com/pjreddie/darknet/blob/master/cfg/yolo.cfg)中，我们也可以看到如下的对应结构：
+
+```
+[convolutional]
+batch_normalize=1
+size=3
+stride=1
+pad=1
+filters=1024
+activation=leaky
+
+[convolutional]
+size=1
+stride=1
+pad=1
+filters=125
+activation=linear
+```
+
+同时，加上上文提到的pass-through结构。
+
+## Stronger
+未完待续

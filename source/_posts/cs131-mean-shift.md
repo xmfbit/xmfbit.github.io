@@ -10,6 +10,7 @@ tags:
 MeanShift是一种用来寻找特征空间内[模态](https://en.wikipedia.org/wiki/Mode_(statistics))的方法。所谓模态（Mode），就是指数据集中最经常出现的数据。例如，连续随机变量概率密度函数的模态就是指函数的极大值。从概率的角度看，我们可以认为数据集（或者特征空间）内的数据点都是从某个概率分布中随机抽取出来的。这样，数据点越密集的地方就说明这里越有可能是密度函数的极大值。MeanShift就是一种能够从离散的抽样点中估计密度函数局部极大值的方法。
 ![MeanShift](/img/meanshift_basics.jpg)
 
+<!-- more -->
 ## 核密度估计
 上面提到的PAMI论文篇幅较长，且数学名词较多，我不是很理解。下面的说明过程主要参考了[这篇博客](https://saravananthirumuruganathan.wordpress.com/2010/04/01/introduction-to-mean-shift-algorithm/)和[这篇讲义](https://saravananthirumuruganathan.wordpress.com/2010/04/01/introduction-to-mean-shift-algorithm/)。
 
@@ -18,6 +19,7 @@ MeanShift是一种用来寻找特征空间内[模态](https://en.wikipedia.org/w
 
 比如高斯核函数：
 $$K(x) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{x^2}{2\sigma^2})$$。
+
 核密度估计是一种用来估计随机变量密度函数的非参数化方法。给定核函数$K$，带宽（bandwidth）参数$h$（就是指观察窗口的大小）。那么密度函数可以使用核函数进行估计，如下面的形式所示。其中，$n$是窗口内的数据点的数量。
 $$f(x) = \frac{1}{nh^d}\sum_{i=1}^{n}K(\frac{x-x_i}{h})$$
 
@@ -79,6 +81,14 @@ end
 ```
 ![](/img/meanshift_simple_demo.png)
 
+同时，我也试验了其他的kernel函数，如神似logistaic形式，效果也是相似的。
+$$K(x) = \frac{1}{e^x+e^{-x}+2}$$
+
+``` matlab
+function out = logistic_kernel(x)
+out = 1./(exp(x) + exp(-x) + 2);
+end
+```
 ## 应用
 ### 平滑滤波
 ### 图像分割
