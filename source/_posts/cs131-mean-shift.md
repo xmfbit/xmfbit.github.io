@@ -89,6 +89,3 @@ function out = logistic_kernel(x)
 out = 1./(exp(x) + exp(-x) + 2);
 end
 ```
-## 应用
-### 平滑滤波
-### 图像分割
