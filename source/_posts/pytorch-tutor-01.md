@@ -11,7 +11,7 @@ tags:
 ## PyTorch简介
 [PyTorch](https://github.com/pytorch/pytorch)是一个较新的深度学习框架。从名字可以看出，其和Torch不同之处在于PyTorch使用了Python作为开发语言，所谓“Python first”。一方面，使用者可以将其作为加入了GPU支持的`numpy`，另一方面，PyTorch也是强大的深度学习框架。
 
-目前有很多深度学习框架，PyTorch主推的功能是动态网络模型。例如在Caffe中，使用者通过编写网络结构的`prototxt`进行定义，网络结构是不能变化的。而PyTorch种网络结构不再只能是一成不变的。同时PyTorch实现了多达上百种op的自动求导（AutoGrad）。
+目前有很多深度学习框架，PyTorch主推的功能是动态网络模型。例如在Caffe中，使用者通过编写网络结构的`prototxt`进行定义，网络结构是不能变化的。而PyTorch中的网络结构不再只能是一成不变的。同时PyTorch实现了多达上百种op的自动求导（AutoGrad）。
 
 ## Tensors
 `Tensor`，即`numpy`中的多维数组。上面已经提到过，PyTorch对其加入了GPU支持。同时，PyTorch中的`Tensor`可以与`numpy`中的`array`很方便地进行互相转换。
@@ -79,7 +79,7 @@ print(a)
 print(b)            # a b的值都变为2
 ```
 
-PyTorch种使用GPU计算很简单，通过调用`.cuda()`方法，很容易实现GPU支持。
+PyTorch中使用GPU计算很简单，通过调用`.cuda()`方法，很容易实现GPU支持。
 
 ``` py
 # let us run this cell only if CUDA is available
@@ -93,7 +93,7 @@ if torch.cuda.is_available():
 ## Neural Network
 说完了数据类型`Tensor`，下一步便是如何实现一个神经网络。首先，对[自动求导](http://pytorch.org/docs/autograd.html)做一说明。
 
-我们需要关注的是`autograd.Variable`。这个东西包装了`Tensor`。一旦你完成了计算，就可以使用`.backward()`方法自动得到（以该`Variable`为叶子节点的那个）网络中参数的梯度。`Variable`有一个名叫`data`的字段，可以通过它获得被包装起来的那个原始的`Tensor`数据。同时，使用`grad`字段，可以获取梯度。
+我们需要关注的是`autograd.Variable`。这个东西包装了`Tensor`。一旦你完成了计算，就可以使用`.backward()`方法自动得到（以该`Variable`为叶子节点的那个）网络中参数的梯度。`Variable`有一个名叫`data`的字段，可以通过它获得被包装起来的那个原始的`Tensor`数据。同时，使用`grad`字段，可以获取梯度（也是一个`Variable`）。
 
 `Variable`是计算图的节点，同时`Function`实现了变量之间的变换。它们互相联系，构成了用于计算的无环图。每个`Variable`有一个`creator`的字段，表明了它是由哪个`Function`创建的（除了用户自己显式创建的那些，这时候`creator`是`None`）。
 
