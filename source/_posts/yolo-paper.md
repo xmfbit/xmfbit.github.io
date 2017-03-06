@@ -241,6 +241,79 @@ $$d(\text{box}, \text{centroid}) = 1-\text{IoU}(\text{box}, \text{centroid})$$
 设该grid cell距离图像左上角的offset是$(c_x, c_y)$，那么bounding box的位置和宽高计算如下。注意，box的位置是相对于grid cell的，而宽高是相对于anchor box的。
 ![bounding box参数的计算方法](/img/yolo2_bbox_param.png)
 
+Darknet中的具体的实现代码如下（不停切换中英文输入实在是蛋疼，所以只有用我这蹩脚的英语来注释了。。。）：
+
+``` cpp
+// get bounding box
+// x: data pointer of feature map
+// biases: data pointer of anchor box data
+// biases[2*n] = width of anchor box
+// biases[2*n+1] = height of anchor box
+// n: output bounding box for each cell in the feature map
+// index: output bounding box index in the cell
+// i: `cx` in the paper
+// j: 'cy' in the paper
+// (cx, cy) is the offset from the left top corner of the feature map
+// (w, h) is the size of feature map (do normalization in the code)
+box get_region_box(float *x, float *biases, int n, int index, int i, int j, int w, int h)
+{
+    box b;
+    // i <- cx, j <- cy
+    // index + 0: tx
+    // index + 1: ty
+    // index + 2: tw
+    // index + 3: th
+    // index + 4: to   // not used here
+    // index + 5, +6, ..., +(C+4)   // confidence of P(class c|Object), not used here
+    b.x = (i + logistic_activate(x[index + 0])) / w;    // bx = cx+sigmoid(tx)
+    b.y = (j + logistic_activate(x[index + 1])) / h;    // by = cy+sigmoid(ty)
+    b.w = exp(x[index + 2]) * biases[2*n]   / w;        // bw = exp(tw) * pw
+    b.h = exp(x[index + 3]) * biases[2*n+1] / h;        // bh = exp(th) * ph
+    // 这里都做了Normalization，论文里面貌似没有提到
+    return b;
+}
+```
+
+顺便说一下对bounding box的bp实现。具体艾玛如下：
+
+``` cpp
+// truth: ground truth
+// x: data pointer of feature map
+// biases: data pointer of anchor box data
+// n, index, i, j, w, h: same meaning with `get_region_box`
+// delta: data pointer of gradient
+// scale: just a weight, given by user
+float delta_region_box(box truth, float *x, float *biases,
+                       int n, int index, int i, int j, int w, int h,
+                       float *delta, float scale)
+{
+    box pred = get_region_box(x, biases, n, index, i, j, w, h);
+    // get iou of the bbox and truth
+    float iou = box_iou(pred, truth);
+    // ground truth of the parameters (tx, ty, tw, th)
+    float tx = (truth.x*w - i);
+    float ty = (truth.y*h - j);
+    float tw = log(truth.w*w / biases[2*n]);
+    float th = log(truth.h*h / biases[2*n + 1]);
+    // 这里是欧式距离损失的梯度回传
+    // 以tx为例。
+    // loss = 1/2*(bx^hat-bx)^2
+    // d(loss)/d(tx) = (bx^hat-bx) * d(bx)/d(tx)
+    // 前面的(bx^hat-bx)把cx约掉了（因为是同一个cell，偏移是一样的）
+    // 后面相当于是求sigmoid函数对输入自变量的梯度。
+    // 由于当初没有缓存 sigomid(tx)，所以作者又重新计算了一次 sigmoid(tx)，也就是下面的激活函数那里
+    delta[index + 0] = scale * (tx - logistic_activate(x[index + 0]))
+                             * logistic_gradient(logistic_activate(x[index + 0]));
+
+    delta[index + 1] = scale * (ty - logistic_activate(x[index + 1]))
+                             * logistic_gradient(logistic_activate(x[index + 1]));
+    // tw 相似，只不过这里的 loss = 1/2(tw^hat-tw)^2，而不是和上面一样使用bw^hat 和 bw
+    delta[index + 2] = scale * (tw - x[index + 2]);
+    delta[index + 3] = scale * (th - x[index + 3]);
+    return iou;
+}
+```
+
 ### 改进6：Fine-Gained Features
 这个trick是受Faster RCNN和SSD方法中使用多个不同feature map提高算法对不同分辨率目标物体的检测能力的启发，加入了一个pass-through层，直接将倒数第二层的$26\times 26$大小的feature map加进来。
 
