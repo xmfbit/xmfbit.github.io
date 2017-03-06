@@ -274,7 +274,7 @@ box get_region_box(float *x, float *biases, int n, int index, int i, int j, int 
 }
 ```
 
-顺便说一下对bounding box的bp实现。具体艾玛如下：
+顺便说一下对bounding box的bp实现。具体代码如下：
 
 ``` cpp
 // truth: ground truth
