@@ -269,7 +269,8 @@ box get_region_box(float *x, float *biases, int n, int index, int i, int j, int 
     b.y = (j + logistic_activate(x[index + 1])) / h;    // by = cy+sigmoid(ty)
     b.w = exp(x[index + 2]) * biases[2*n]   / w;        // bw = exp(tw) * pw
     b.h = exp(x[index + 3]) * biases[2*n+1] / h;        // bh = exp(th) * ph
-    // 这里都做了Normalization，论文里面貌似没有提到
+    // 注意这里都做了Normalization，将值化到[0, 1]，论文里面貌似没有提到
+    // 也就是说YOLO 用于detection层的bounding box大小和位置的输出参数都是相对值
     return b;
 }
 ```
@@ -297,8 +298,10 @@ float delta_region_box(box truth, float *x, float *biases,
     float th = log(truth.h*h / biases[2*n + 1]);
     // 这里是欧式距离损失的梯度回传
     // 以tx为例。
-    // loss = 1/2*(bx^hat-bx)^2
-    // d(loss)/d(tx) = (bx^hat-bx) * d(bx)/d(tx)
+    // loss = 1/2*(bx^hat-bx)^2, 其中bx = cx + sigmoid(tx)
+    // d(loss)/d(tx) = -(bx^hat-bx) * d(bx)/d(tx)
+    // 注意，Darkent中的delta存储的是负梯度数值，所以下面的delta数组内数值实际是-d(loss)/d(tx)
+    // 也就是(bx^hat-bx) * d(bx)/d(tx)
     // 前面的(bx^hat-bx)把cx约掉了（因为是同一个cell，偏移是一样的）
     // 后面相当于是求sigmoid函数对输入自变量的梯度。
     // 由于当初没有缓存 sigomid(tx)，所以作者又重新计算了一次 sigmoid(tx)，也就是下面的激活函数那里
@@ -311,6 +314,22 @@ float delta_region_box(box truth, float *x, float *biases,
     delta[index + 2] = scale * (tw - x[index + 2]);
     delta[index + 3] = scale * (th - x[index + 3]);
     return iou;
+}
+```
+
+接下来，我们看一下bp的计算。主要涉及到决定bounding box大小和位置的四个参数的回归，以及置信度$t_o$，以及$C$类分类概率。上面的代码中已经介绍了bounding box大小位置的四个参数的梯度计算。对于置信度$t_o$的计算，如下所示。
+
+``` cpp
+// 上面的代码遍历了所有的groundtruth，找出了与当前预测bounding box iou最大的那个
+// 首先，我们认为当前bounding box没有responsible for any groundtruth，
+// 那么，loss = 1/2*(0-sigmoid(to))^2
+// => d(loss)/d(to) = -(0-sigmoid(to)) * d(sigmoid)/d(to)
+// 由于之前的代码中已经将output取了sigmoid作用，所以就有了下面的代码
+// 其中，logistic_gradient(y) 是指dy/dx|(y=y0)的值。具体来说，logistic_gradient(y) = (1-y)*y
+l.delta[index + 4] = l.noobject_scale * ((0 - l.output[index + 4]) * logistic_gradient(l.output[index + 4]));
+// 如果best iou > thresh, 我们认为这个bounding box有了对应的groundtruth，把梯度直接设置为0即可
+if (best_iou > l.thresh) {
+    l.delta[index + 4] = 0;
 }
 ```
 
