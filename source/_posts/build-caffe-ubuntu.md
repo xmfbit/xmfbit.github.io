@@ -175,6 +175,12 @@ sudo ln -s libhdf5.so.7 libhdf5.so.10
 sudo ln -s libhdf5_hl.so.7 libhdf5_hl.so.10
 ```
 
+另外，在另一台机器上使用MKL库时，发现会提示找不到相关动态链接库的问题。找到MKL的安装位置，默认应该在目录`/opt/intel/mkl`下。使用`sudo`权限，在目录`/etc/ld.so.conf.d/`下建立一个名为`intel_mkl_setttings.conf`的文件，将MKL安装位置下的链接库目录添加进去，如下所示：
+```
+/opt/intel/mkl/lib/intel64_lin/
+```
+接着，运行`sudo ldconfig`命令，就可以了。
+
 ## 测试
 首先，通过`make runtest`看是否全部test可以通过。其次，可以试运行`example`下的LeNet训练。
 ```
