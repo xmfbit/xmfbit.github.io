@@ -66,7 +66,36 @@ void CtcLossLayer<double>::Backward_cpu(const vector<Blob<double>*>& top,
 使用`python`中的`h5py`模块生成`HDF5`格式的数据文件。将全部图片分为两部分，80%作为训练集，20%作为验证集。
 
 ### LSTM的输入
-在Caffe中已经有了`lstm_layer`的实现。`lstm_layer`要求输入的序列`blob`为`TxNx...`，也就是说我们需要
-### 训练
+在Caffe中已经有了`lstm_layer`的实现。`lstm_layer`要求输入的序列`blob`为`TxNx...`，也就是说我们需要将输入的image进行转置。
 
-### 结论
+Caffe中Batch的内存布局顺序为`NxCxHxW`。我们将图像中的每一列作为一个time step输入的$x$向量。所以，在代码中使用了[liuwei的SSD工作中实现的`permute_layer`](https://github.com/weiliu89/caffe/blob/ssd/include/caffe/layers/permute_layer.hpp)进行转置，将`W`维度放到最前方。与之对应的参数定义如下：
+
+```
+layer {
+    name: "permuted_data"
+    type: "Permute"
+    bottom: "data"
+    top: "permuted_data"
+    permute_param {
+        order: 3   # W
+        order: 0   # N
+        order: 1   # C
+        order: 2   # H
+    }
+}
+```
+
+另外，LSTM需要第二个输入，用于指示时序信号的起始位置。在代码中，我新加入了一个名为`ContinuationIndicator`的layer，产生对应的time indicator序列。
+
+### 训练
+在某次试验中，迭代50,000次，实验过程中的损失函数变化如下：
+
+![train loss](/img/captcha_train_loss.png)
+
+在验证集上的精度变化如下：
+
+![test accuracy](/img/captcha_test_accuracy.png)
+
+最终模型的精度在98%左右。考虑到本实验只是简单堆叠了两层的LSTM，并使用CTC Loss进行训练，能够轻易达到这一精度，可以在一定程度上说明CTC Loss的强大。
+
+至于该实验的具体细节，可以参考repo的相关具体代码实现。
