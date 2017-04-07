@@ -7,7 +7,7 @@ tags:
 ---
 [MeanShift](https://en.wikipedia.org/wiki/Mean_shift)最初由Fukunaga和Hostetler在1975年提出，但是一直到2000左右这篇PAMI的论文[Mean Shift: A Robust Approach Toward Feature Space Analysis](http://courses.csail.mit.edu/6.869/handouts/PAMIMeanshift.pdf)，将它的原理和收敛性等重新整理阐述，并应用于计算机视觉和图像处理领域之后，才逐渐为人熟知。
 
-MeanShift是一种用来寻找特征空间内[模态](https://en.wikipedia.org/wiki/Mode_(statistics))的方法。所谓模态（Mode），就是指数据集中最经常出现的数据。例如，连续随机变量概率密度函数的模态就是指函数的极大值。从概率的角度看，我们可以认为数据集（或者特征空间）内的数据点都是从某个概率分布中随机抽取出来的。这样，数据点越密集的地方就说明这里越有可能是密度函数的极大值。MeanShift就是一种能够从离散的抽样点中估计密度函数局部极大值的方法。
+MeanShift是一种用来寻找特征空间内[模态](https://en.wikipedia.org/wiki/Mode_(statistics)的方法。所谓模态（Mode），就是指数据集中最经常出现的数据。例如，连续随机变量概率密度函数的模态就是指函数的极大值。从概率的角度看，我们可以认为数据集（或者特征空间）内的数据点都是从某个概率分布中随机抽取出来的。这样，数据点越密集的地方就说明这里越有可能是密度函数的极大值。MeanShift就是一种能够从离散的抽样点中估计密度函数局部极大值的方法。
 ![MeanShift](/img/meanshift_basics.jpg)
 
 <!-- more -->
@@ -18,9 +18,9 @@ MeanShift是一种用来寻找特征空间内[模态](https://en.wikipedia.org/w
 ![kernel](/img/meanshift_kernel_function.png)
 
 比如高斯核函数：
-$$K(x) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{x^2}{2\sigma^2})$$。
+$$K(x) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{x^2}{2\sigma^2})$$
 
-核密度估计是一种用来估计随机变量密度函数的非参数化方法。给定核函数$K$，带宽（bandwidth）参数$h$（就是指观察窗口的大小）。那么密度函数可以使用核函数进行估计，如下面的形式所示。其中，$n$是窗口内的数据点的数量。
+核密度估计是一种用来估计随机变量密度函数的非参数化方法。给定核函数$K$，带宽（bandwidth）参数$h$（指观察窗口的大小）。那么密度函数可以使用核函数进行估计，如下面的形式所示。其中，$n$是窗口内的数据点的数量。
 $$f(x) = \frac{1}{nh^d}\sum_{i=1}^{n}K(\frac{x-x_i}{h})$$
 
 如果核函数是放射形状且对称的（例如高斯核函数），那么$K(x)$可以写成如下的形式，其中$c_{k,d}$是为了使得核函数满足积分为$1$的正则系数。
