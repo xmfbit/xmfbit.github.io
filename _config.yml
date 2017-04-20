@@ -40,7 +40,7 @@ future: true
 highlight:
   enable: true
   line_number: true
-  auto_detect: false
+  auto_detect: true
   tab_replace:
 
 # Category & Tag
@@ -65,7 +65,7 @@ pagination_dir: page
 
 # Third party service
 # duoshuo
-duoshuo_shortname: xmfbit
+duoshuo_shortname: 
 # search
 search:
       path: search.xml
