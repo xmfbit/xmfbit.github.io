@@ -165,3 +165,154 @@ Traceback (most recent call last):
 StopIteration
 >>>
 ```
+
+### 生成器表达式
+生成器表达式和列表相似，将`[]`换为`()`即可。如下所示：
+
+```
+for i in (x**2 for x in [1,2,3,4]):
+    print i
+# print 1 4 9 16
+```
+
+生成器的好处在于惰性求值，这样一来，我们还可以生成无限长的序列。因为生成器本来就是说明了序列的生成方式，而并没有真的生成那个序列。
+
+下面的代码使用生成器得到前10组勾股数。通过在调用`take()`方法时修改传入实参`n`的大小，该代码可以很方便地转换为求取任意多得勾股数。生成器的重要作用体现在斜边`x`的取值为$[0, \infty]$。如果不使用生成器，恐怕就需要写出好几行的循环语句加上`break`配合才可以达到相同的效果。
+
+```
+def integer(start, end=None):
+    """Generate integer sequence [start, end)
+       If `end` is not given, then [start, \infty]
+    """
+    i = start
+    while True:
+        if end is not None and i == end:
+            raise StopIteration
+        yield i
+        i += 1
+
+def take(n, g):
+    i = 0
+    while True:
+        if i < n:
+            yield g.next()
+            i += 1
+        else:
+            raise StopIteration
+
+# 假定 x>y>z，以消除两直角边互换的情况，如10, 6, 8和10, 8, 6
+tup = ((x,y,z) for x in integer(0) for y in integer(0, x) for z in integer(0, y) if x*x==y*y+z*z)
+list(take(10, tup))
+```
+
+### Problem 2
+Write a program that takes one or more filenames as arguments and prints all the lines which are longer than 40 characters.
+
+```
+def readfiles(filenames):
+    for f in filenames:
+        for line in open(f):
+            yield line
+
+def grep(lines):
+    return (line for line in lines if len(line)>40)
+
+def printlines(lines):
+    for line in lines:
+        print line,
+
+def main(filenames):
+    lines = readfiles(filenames)
+    lines = grep(lines)
+    printlines(lines)
+```
+
+### Problem 3
+Write a function `findfiles` that recursively descends the directory tree for the specified directory and generates paths of all the files in the tree.
+
+注意`get_all_file()`方法中递归中生成器的写法，见SO的[这个帖子](http://stackoverflow.com/questions/248830/python-using-a-recursive-algorithm-as-a-generator
+)。
+
+```
+import os
+
+def generate_all_file(root):
+    for item in os.listdir(root):
+        item = os.path.join(root, item)
+        if os.path.isfile(item):
+            yield os.path.abspath(item)
+        else:
+            for item in generate_all_file(item):
+                yield item
+
+def findfiles(root):
+    for item in generate_all_file(root):
+        print item
+```
+
+### Problem 4
+Write a function to compute the number of python files (.py extension) in a specified directory recursively.
+
+```
+def generate_all_py_file(root):
+    return (file for file in generate_all_file(root) if os.path.splitext(file)[-1] == '.py')
+
+print len(list(generate_all_py_file('./')))
+```
+
+### Problem 5
+Write a function to compute the total number of lines of code in all python files in the specified directory recursively.
+
+```
+def generate_all_line(root):
+    return (line for f in generate_all_py_file(root) for line in open(f))
+print len(list(generate_all_line('./')))
+```
+
+### Problem 6
+Write a function to compute the total number of lines of code, ignoring empty and comment lines, in all python files in the specified directory recursively.
+
+```
+def generate_all_no_empty_and_comment_line(root):
+    return (line for line in generate_all_line(root) if not (line=='' or line.startswith('#')))
+
+print len(list(generate_all_no_empty_and_comment_line('./')))
+```
+
+### Problem 7
+Write a program `split.py`, that takes an integer `n` and a `filename` as command line arguments and splits the `file` into multiple small files with each having `n` lines.
+
+```
+def get_numbered_line(filename):
+    i = 0
+    for line in open(filename):
+        yield i, line
+        i += 1
+
+def split(file_name, n):
+    i = 0
+    f = open('output-%d.txt' %i, 'w')
+    for idx, line in get_numbered_line(file_name):
+        f.write(line)
+        if (idx+1) % n == 0:
+            f.close()
+            i += 1
+            f = open('output-%d.txt' %i, 'w')
+
+    f.close()
+```
+
+### Problem 9
+The built-in function `enumerate` takes an `iteratable` and returns an `iterator` over pairs ``(index, value)`` for each value in the source.
+
+Write a function `my_enumerate` that works like `enumerate`.
+
+```
+def my_enumerate(iterable):
+    i = 0
+    seq = iter(iterable)
+    while True:
+        val = seq.next()
+        yield i, val
+        i += 1
+```
