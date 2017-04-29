@@ -266,7 +266,8 @@ mathjax:
 
 # Duoshuo ShortName
 #duoshuo_shortname:
-
+# support for livere 
+livere_uid: MTAyMC8yODMwOS80ODgx
 # Disqus
 #disqus_shortname:
 

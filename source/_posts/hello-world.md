@@ -60,4 +60,5 @@ print 'HelloWorld'
 Mass-energy equation by Einstein: $E = mc^2$
 
 a linear equation:
-    $$\mathbf{A}\mathbf{v} = \mathbf{y}$$
+
+$$\mathbf{A}\mathbf{v} = \mathbf{y}$$
