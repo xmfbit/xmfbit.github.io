@@ -26,7 +26,7 @@ C++相信程序员，将内存等底层资源毫无保留地献给程序员使�
 
 如下面的例子，我们将对不同的底层资源使用情景给出不同的解决方案。
 
-```
+``` cpp
 // Lock是互斥锁的资源管理类
 class Lock {
 public:
@@ -39,7 +39,8 @@ private:
 };
 ```
 这样，我们期望能够使用`Lock`对象实现对互斥锁的自动管理。
-```
+
+``` cpp
 Mutex m;   // 互斥锁
 // ...
 {
@@ -73,16 +74,19 @@ Lock ml(&m);
 书中给出了一个例子，是由于逗号表达式的执行顺序不定造成的。
 
 如下面的函数声明：
-```
+
+``` cpp
 int priority() { /*some code*/}
 void process(shared_ptr<Widget> pw, int priority) { /*some code*/}
 ```
 在使用时，也许你会这样调用`process`函数。
-```
+
+``` cpp
 process(new Widget(), priority());
 ```
-首先，这样是不能通过编译器的。因为`shared_ptr`的构造函数是`explicit`的，不能够隐式将原始指针转换为`shared_ptr`对象。但是改为下面的代码就没问题了吗？：
-```
+首先，这样是不能通过编译器的。因为`shared_ptr`的构造函数是`explicit`的，不能够隐式将原始指针转换为`shared_ptr`对象。但是改为下面的代码就没问题了吗？
+
+``` cpp
 process(shared_ptr<Widget>(new Widget()), priority());
 ```
 
@@ -93,7 +97,8 @@ process(shared_ptr<Widget>(new Widget()), priority());
 - 构造`shared_ptr`对象
 
 问题已经很明确了。所以我们应该首先确保资源确实被智能指针获取到了，使用下面的独立语句更好。
-```
+
+``` cpp
 auto pw = shared_ptr<Widget>(new Widget());
 process(pw, priority());
 ```

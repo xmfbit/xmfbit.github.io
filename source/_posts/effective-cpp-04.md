@@ -56,7 +56,7 @@ C++11中引入的移动构造也许是解决这个问题的可行之道，以后
 作者举出自定义的有理数类与整型数做乘法的例子。首先，我们不将构造函数声明为`explicit`，可以完成整形到有理数类的隐式类型转换。
 
 重载乘法的运算符可以被声明为有理数类的成员函数，如下所示：
-```
+``` cpp
 class Rational {
 // ...
 public:
@@ -68,7 +68,7 @@ public:
 然而，这样做的话，`auto res = 2*Rational(4,5)`就无法通过编译，因为`int`并没有实现`operator*(const Rational&)`操作。
 
 更好的方法是将其作为non-member函数，
-```
+```cpp
 const Rational operator*(const Rational& lhs, const Rational& rhs) {
     //...
 }
@@ -78,7 +78,7 @@ const Rational operator*(const Rational& lhs, const Rational& rhs) {
 这一条款更像是模板特化规则的大杂烩。
 
 STL中的`swap()`函数是交换两个对象内容的不错选择。它的实现大致如下（平淡无奇）：
-```
+```cpp
 namespace std {
 template <typename T>
 void swap(T& a, T&b) {
@@ -93,7 +93,7 @@ void swap(T& a, T&b) {
 如何对我们的对象`Widget`实现特化？
 
 如果`Widget`不是模板类，那么我们需要进行全特化。加入以下：
-```
+``` cpp
 namespace std {
 template <>
 void swap<Widget>(Widget& a, Widget& b) {
@@ -104,7 +104,7 @@ void swap<Widget>(Widget& a, Widget& b) {
 更好的解决方法是先将`swap()`定义为`Widget`类的公共成员函数，然后再全特化标准库的`swap()`方法时调用。这样与STL的约定保持一致。STL中`vector`等容器即是这样的。一方面提供了公开方法进行交换，另一方面特化了`std`名字空间的`swap()`方法。
 
 当`Widget`是模板类时，需要进行偏特化。也许看上去是这样：
-```
+``` cpp
 namespace std {
 template <typename T>
 void swap(Widget<T>& a, Widget<T>& b) {
