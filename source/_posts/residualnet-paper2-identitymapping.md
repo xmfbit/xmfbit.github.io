@@ -2,6 +2,8 @@
 title: Residual Net论文阅读 - Identity Mapping in Deep Residual Networks
 date: 2017-03-07 16:16:48
 tags:
+    - paper
+    - deep learning
 ---
 这篇文章是He Kaiming继最初的那篇ResidualNet的论文后又发的一篇。这篇论文较为详细地探讨了由第一篇文章所引入的Identity Mapping，结合具体实验，测试了很多不同的组合结构，从实践方面验证了Identity Mapping的重要性。同时，也试图对Identity Mapping如此好的作用做一解释。尤其是本文在上篇文章的基础上，提出了新的残差单元结构，并指出这种新的结构具有更优秀的性能。
 <!-- more -->

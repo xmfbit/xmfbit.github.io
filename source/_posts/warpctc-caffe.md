@@ -3,6 +3,7 @@ title: 在Caffe中使用Baidu warpctc实现CTC Loss的计算
 date: 2017-02-22 15:34:32
 tags:
      - caffe
+     - deep learning
 ---
 CTC(Connectionist Temporal Classification) Loss 函数多用于序列有监督学习，优点是不需要对齐输入数据及标签。本文内容并不涉及CTC Loss的原理介绍，而是关于如何在Caffe中移植Baidu美研院实现的[warp-ctc](https://github.com/baidu-research/warp-ctc)，并利用其实现一个LSTM + CTC Loss的验证码识别demo。下面这张图引用自warp-ctc的[项目页面](https://github.com/baidu-research/warp-ctc)。本文介绍内容的相关代码可以参见我的GitHub项目[warpctc-caffe](https://github.com/xmfbit/warpctc-caffe)
 ![CTC Loss](/img/warpctc_intro.png)

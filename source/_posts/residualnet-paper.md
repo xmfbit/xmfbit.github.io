@@ -3,6 +3,7 @@ title: Residual Net论文阅读 - Deep Residual Learning for Image Recongnition
 date: 2017-03-05 22:12:21
 tags:
     - paper
+    - deep learning
 ---
 Residuel Net是MSRA HeKaiming组的作品，斩获了ImageNet挑战赛的所有项目的第一，并荣获CVPR的best paper，成为state of the ar的网络结构。这篇文章记录了阅读最初论文“Deep Residual Learning for Image Recongnition”的重点。
 ![ResidualNet Unit](/img/residualnet_unit.png)
