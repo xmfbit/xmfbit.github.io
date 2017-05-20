@@ -53,3 +53,18 @@ ssserver -c /etc/shadowsocks.json -d start  # 这里的json文件名要相对应
 
 ## 客户端配置
 客户端使用ss，编辑服务器，按照json文件中的内容填写即可。注意密码相对应。
+
+## IOS平台设置
+终于把Pad上的翻墙搞定了。。。参考资料为GitHub的相关页面，基本为傻瓜式操作。
+
+- [IPsec VPN 服务器一键安装脚本](https://github.com/hwdsl2/setup-ipsec-vpn/blob/master/README-zh.md)
+- [配置 IPsec/L2TP VPN 客户端](https://github.com/hwdsl2/setup-ipsec-vpn/blob/master/docs/clients-zh.md)
+
+首先，使用如下命令在VPN服务器上搭建IPsec服务：
+
+```
+wget https://git.io/vpnsetup -O vpnsetup.sh && sudo sh vpnsetup.sh
+```
+
+然后按照下面的步骤在IOS平台上进行设置。
+![](/img/ipsec_ios_vpn_setting.png)
