@@ -11,7 +11,7 @@ tags:
 ## 迭代器
 使用`for`循环时，常常遇到迭代器。如下所示，可能是最常用的一种方式。
 
-```
+``` py
 for i in range(100):
     # do something 100 times
 ```
@@ -20,7 +20,7 @@ for i in range(100):
 
 同样，也有很多函数接受的参数为可迭代对象。例如`list()`和`tuple()`，当传入的参数为刻碟带对象时，返回的是由迭代返回值组成的列表或者元组。例如
 
-```
+``` py
 list({'x':1, 'y':2})  # => ['x', 'y']
 ```
 
@@ -30,7 +30,7 @@ list({'x':1, 'y':2})  # => ['x', 'y']
 
 如下面的例子，`yrange_iter`是`yrange`的一个迭代器。`yrange`实现了`__iter__()`方法，是一个可迭代对象。调用`iter(yrange object)`的结果就是返回一个`yrange_iter`的对象实例。
 
-```
+``` py
 # Version 1.0 使用迭代器类
 class yrange_iter(object):
     def __init__(self, yrange):
@@ -52,7 +52,7 @@ print type(iter(yrange(5))) # <class '__main__.yrange_iter'>
 
 而不停地调用迭代器的`next()`方法，就能够不断输出迭代序列。如下所示：
 
-```
+``` py
 In [3]: yiter = iter(yrange(5))
 
 In [4]: yiter.next()
@@ -67,7 +67,7 @@ Out[6]: 2
 
 其实，上面的代码略显复杂。在代码量很小，不是很在意代码可复用性时，我们完全可以去掉`yrange_iter`，直接让`yrange.__iter__()`方法返回其自身实例。这样，我们只需要在`yrange`类中实现`__iter__()`方法和`next()`方法即可。如下所示：
 
-```
+``` py
 # Version2.0 简化版，迭代器是本身
 class yrange(object):
     def __init__(self, n):
@@ -96,7 +96,7 @@ Out[11]: 2
 
 我们只需要加入判断条件，当超出序列边界时，抛出Python内建的`StopIteration`异常即可。
 
-```
+``` py
 # Version3.0 加入边界判断，生成有限长度序列
 class yrange(object):
     def __init__(self, n):
@@ -118,7 +118,7 @@ for i in yrange(5):
 ### Problem 1
 Write an iterator class `reverse_iter`, that takes a `list` and iterates it from the reverse direction.
 
-```
+``` py
 class reverse_iter(object):
     def __init__(self, alist):
         self.container = alist
@@ -135,7 +135,7 @@ it = reverse_iter([1, 2, 3, 4])
 ## 生成器
 生成器是一种方法，他指定了如何生成序列中的元素，生成器内部包含特殊的`yield`语句。此外，生成器函数是懒惰求值，只有当调用`next()`方法时，生成器才开始顺序执行，直到遇到`yield`语句。`yield`语句就像`return`，但是并未退出，而是打上断电，等待下一次`next()`方法的调用，再从上一次的断点处开始执行。我直接贴出教程中的代码示例。
 
-```
+``` py
 >>> def foo():
         print "begin"
         for i in range(3):
@@ -169,7 +169,7 @@ StopIteration
 ### 生成器表达式
 生成器表达式和列表相似，将`[]`换为`()`即可。如下所示：
 
-```
+``` py
 for i in (x**2 for x in [1,2,3,4]):
     print i
 # print 1 4 9 16
@@ -179,7 +179,7 @@ for i in (x**2 for x in [1,2,3,4]):
 
 下面的代码使用生成器得到前10组勾股数。通过在调用`take()`方法时修改传入实参`n`的大小，该代码可以很方便地转换为求取任意多得勾股数。生成器的重要作用体现在斜边`x`的取值为$[0, \infty]$。如果不使用生成器，恐怕就需要写出好几行的循环语句加上`break`配合才可以达到相同的效果。
 
-```
+``` py
 def integer(start, end=None):
     """Generate integer sequence [start, end)
        If `end` is not given, then [start, \infty]
@@ -208,7 +208,7 @@ list(take(10, tup))
 ### Problem 2
 Write a program that takes one or more filenames as arguments and prints all the lines which are longer than 40 characters.
 
-```
+``` py
 def readfiles(filenames):
     for f in filenames:
         for line in open(f):
@@ -233,7 +233,7 @@ Write a function `findfiles` that recursively descends the directory tree for th
 注意`get_all_file()`方法中递归中生成器的写法，见SO的[这个帖子](http://stackoverflow.com/questions/248830/python-using-a-recursive-algorithm-as-a-generator
 )。
 
-```
+``` py
 import os
 
 def generate_all_file(root):
@@ -253,7 +253,7 @@ def findfiles(root):
 ### Problem 4
 Write a function to compute the number of python files (.py extension) in a specified directory recursively.
 
-```
+``` py
 def generate_all_py_file(root):
     return (file for file in generate_all_file(root) if os.path.splitext(file)[-1] == '.py')
 
@@ -263,7 +263,7 @@ print len(list(generate_all_py_file('./')))
 ### Problem 5
 Write a function to compute the total number of lines of code in all python files in the specified directory recursively.
 
-```
+``` py
 def generate_all_line(root):
     return (line for f in generate_all_py_file(root) for line in open(f))
 print len(list(generate_all_line('./')))
@@ -272,7 +272,7 @@ print len(list(generate_all_line('./')))
 ### Problem 6
 Write a function to compute the total number of lines of code, ignoring empty and comment lines, in all python files in the specified directory recursively.
 
-```
+``` py
 def generate_all_no_empty_and_comment_line(root):
     return (line for line in generate_all_line(root) if not (line=='' or line.startswith('#')))
 
@@ -282,7 +282,7 @@ print len(list(generate_all_no_empty_and_comment_line('./')))
 ### Problem 7
 Write a program `split.py`, that takes an integer `n` and a `filename` as command line arguments and splits the `file` into multiple small files with each having `n` lines.
 
-```
+``` py
 def get_numbered_line(filename):
     i = 0
     for line in open(filename):
@@ -307,7 +307,7 @@ The built-in function `enumerate` takes an `iteratable` and returns an `iterator
 
 Write a function `my_enumerate` that works like `enumerate`.
 
-```
+``` py
 def my_enumerate(iterable):
     i = 0
     seq = iter(iterable)
