@@ -133,8 +133,8 @@ font:
 # Key is the link label showing to end users.
 # Value is the target link (E.g. GitHub: https://github.com/iissnan)
 social:
-    GitHub: https://github.com/xmfbit 
-
+    GitHub: https://github.com/xmfbit
+    微博: http://weibo.com/2629935075/
 # Social Links Icons
 # Icon Mapping:
 #   Map a menu item to a specific FontAwesome icon name.
@@ -266,7 +266,7 @@ mathjax:
 
 # Duoshuo ShortName
 #duoshuo_shortname:
-# support for livere 
+# support for livere
 livere_uid: MTAyMC8yODMwOS80ODgx
 # Disqus
 #disqus_shortname:
