@@ -6,6 +6,9 @@ tags:
     - deep learning
 ---
 这是第二周的课程内容，主要介绍了几种神经网络的分类，详细地介绍了感知机这一最简单的模型。
+
+![Perceptron](/img/hinton_02_perceptron_gragh.png)
+
 <!-- more -->
 ## Different neural network archs
 ### Feed-forward neural network 前馈神经网络

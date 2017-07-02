@@ -1,12 +1,16 @@
 ---
-title: Neural Network for Machine Learning - Lecture 06
+title: Neural Network for Machine Learning - Lecture 06 神经网络的“调教”方法
 date: 2017-06-25 13:48:31
 tags:
     - 公开课
     - deep learning
+    - pytorch
 ---
-第六周的课程主要讲解了用于神经网络训练的梯度下降方法，首先对比了SGD，full batch GD和mini batch SGD方法，然后给出了几个用于神经网络训练的trick，主要包括输入数据预处理（零均值，单位方差以及PCA解耦），学习率的自适应调节以及网络权重的初始化方法（可以参考各大框架中实现的Xavier初始化方法等）。这篇文章主要记录了后续讲解的几种GD变种方法，如何合理利用梯度信息达到更好的训练效果。
+第六周的课程主要讲解了用于神经网络训练的梯度下降方法，首先对比了SGD，full batch GD和mini batch SGD方法，然后给出了几个用于神经网络训练的trick，主要包括输入数据预处理（零均值，单位方差以及PCA解耦），学习率的自适应调节以及网络权重的初始化方法（可以参考各大框架中实现的Xavier初始化方法等）。这篇文章主要记录了后续讲解的几种GD变种方法，如何合理利用梯度信息达到更好的训练效果。由于Hinton这门课确实时间已经很久了，所以文章末尾会结合一篇不错的总结性质的[博客](http://sebastianruder.com/optimizing-gradient-descent/index.html)和对应的[论文](https://arxiv.org/abs/1609.04747)以及PyTorch中的相关代码，对目前流行的梯度下降方法做个总结。
 
+下图即来自上面的这篇博客。
+
+![几种优化方法的可视化](/img/contours_evaluation_optimizers.gif)
 <!-- more -->
 
 ## Momentum
@@ -51,11 +55,111 @@ $$\text{MeanSquare}(w, t) = 0.9 \text{MeanSquare}(w, t-1) + 0.1g_t^2$$
 RMSProp还有一些变种，列举如下：
 ![Otehr RMSProp](/img/hinton_06_rmsprop_improvement.png)
 
-## 总结
+## 课程总结
 - 对于小数据集，使用full batch GD（LBFGS或adaptive learning rate如rprop）。
 - 对于较大数据集，使用mini batch SGD。并可以考虑加上momentmum和RMSProp。
 
 如何选择学习率是一个较为依赖经验的任务（网络结构不同，任务不同）。
 ![总结](/img/hinton_06_summary.png)
 
-此外，[这里](https://arxiv.org/abs/1609.04747)有一篇不错的各种学习方法的总结，可以一看。
+## “Modern” SGD
+
+从本部分开始，我将转向总结摘要中提到的那篇博客中的主要内容。首先，给出当前基于梯度的优化方法的一些问题。可以看到，之后人们提出的改进方法就是想办法解决对应问题的。由于与Hinton课程相比，这些方法提出时间（也许称之为流行时间更合适？做数学的那帮人可能很早就知道这些优化方法了吧？）较短，所以这里仿照Modern C++之称呼，就把它们统一叫做Modern SGD吧。。。
+
+- 学习率通常很难确定。学习率太大？容易扯到蛋（loss直接爆炸）；学习率太小，训练到天荒地老。。。
+- 学习率如何在训练中调整。目前常用的方法是退火，要么是固定若干次迭代之后把学习率调小，要么是观察loss到某个阈值后把学习率调小。总之，都是在训练开始前，人工预先定义好的。而这没有考虑到数据集自身的特点。
+- 学习率对每个网络参数都一样。这点在上面课程中Hinton已经提到，引出了自适应学习率的方法。
+- 高度非凸函数的优化难题。以前人们多是认为网络很容易收敛到局部极小值。后来有人提出，网络之所以难训练，更多是由于遇到了鞍点。也就是某个方向上它是极小值；而另一个方向却是极大值（高数中介绍过的，马鞍面）
+
+![马鞍面](/img/hinton_06_maanmian.jpg)
+
+### Adagrad
+[Adagrad](http://jmlr.org/papers/v12/duchi11a.html)对不同的参数采用不同的学习率，也是其Ada（Adaptive）的名字得来。我们记时间步$t$时标号为$i$的参数对应的梯度为$g_{i}$，即：
+$$g_{i} = \bigtriangledown_{\theta_i} J(\theta)$$
+
+Adagrad使用一个系数来为不同的参数修正学习率，如下：
+$$\hat{g_i} = \frac{1}{\sqrt{G_i+\epsilon}}g_i$$
+
+其中，$G_i$是截止到当前时间步$t$时，参数$\theta_i$对应梯度$g_i$的平方和。
+
+我们可以把上面的式子写成矩阵形式。其中，$\odot$表示逐元素的矩阵相乘（element-wise product）。同时，$G_t = g_t \odot g_t$。
+
+$$\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{G_t+\epsilon}}\odot g_t$$
+
+我们再来看PyTorch中的相关实现：
+
+``` py
+# for each gradient of parameters:
+# addcmul(t, alpha, t1, t2): t = t1*t2*alpha + t
+# let epsilon = 1E-10
+state['sum'].addcmul_(1, grad, grad)   # 计算 G
+std = state['sum'].sqrt().add_(1e-10)  # 计算 \sqrt(G)
+p.data.addcdiv_(-clr, grad, std)       # 更新
+```
+
+由于Adagrad对不同的梯度给了不同的学习率修正值，所以使用这种方法时，我们可以不用操心学习率，只是给定一个初始值（如$0.01$）就够了。尤其是对稀疏的数据，Adagrad方法能够自适应调节其梯度更新信息，给那些不常出现（非零）的梯度对应更大的学习率。PyTorch中还为稀疏数据特别优化了更新算法。
+
+Adagrad的缺点在于由于$G_t$矩阵是平方和，所以分母会越来越大，造成训练后期学习率会变得很小。下面的Adadelta方法针对这个问题进行了改进。
+
+### Adadelta
+[Adadelta](https://arxiv.org/abs/1212.5701)给出的改进方法是不再记录所有的历史时刻的$g$的平方和，而是最近一个有限的观察窗口$w$的累积梯度平方和。在实际使用时，这种方法使用了一个参数$\gamma$（如$0.9$）作为遗忘因子，对$E[g_t^2]$进行统计。
+
+$$E[g_t^2] = \gamma E[g_{t-1}^2] + (1-\gamma)g_t^2$$
+
+由于$\sqrt{E[g_t^2]}$就是$g$的均方根RMS，所以，修正后的梯度如下。注意到，这正是Hinton在课上所讲到的RMSprop的优化方法。
+
+$$\hat{g}_t = \frac{1}{\text{RMS}[g]}g_t$$
+
+作者还观察到，这样更新的话，其实$\theta$和$\Delta \theta$的单位是不一样的（此时$\Delta \theta$是无量纲数）。所以，作者提出再乘上一个$\text{RMS}[\Delta \theta]$来平衡（同时去掉了学习率$\eta$），所以，最终的参数更新如下：
+
+$$\theta_{t+1} = \theta_t - \frac{\text{RMS}[\Delta \theta]}{\text{RMS}[g]}g_t$$
+
+这种方法甚至不再需要学习率。下面是PyTorch中的实现，其中仍然保有学习率`lr`这一参数设定，默认值为$1.0$。代码注释中，我使用`MS`来指代$E[x^2]$。即，$\text{RMS}[x] = \sqrt{\text{MS}[x]+\epsilon}$。
+``` py
+# update: MS[g] = MS[g]*\rho + g*g*(1-\rho)
+square_avg.mul_(rho).addcmul_(1 - rho, grad, grad)
+# current RMS[g] = sqrt(MS[g] + \epsilon)
+std = square_avg.add(eps).sqrt_()
+# \Delta \theta = RMS[\Delta \theta] / RMS[g]) * g
+delta = acc_delta.add(eps).sqrt_().div_(std).mul_(grad)
+# update parameter: \theta -= lr * \Delta \theta
+p.data.add_(-group['lr'], delta)
+# update MS[\Delta \theta] = MS[\Delta \theta] * \rho + \Delta \theta^2 * (1-\rho)
+acc_delta.mul_(rho).addcmul_(1 - rho, delta, delta)
+```
+
+### Adam
+[Adaptive momen Estimation（Adam，自适应矩估计）](https://arxiv.org/abs/1412.6980)，是另一种为不同参数自适应设置不同学习率的方法。Adam方法不止存储过往的梯度平方均值（二阶矩）信息，还存储过往的梯度均值信息（一阶矩）。
+$$\begin{aligned}m_t&=\beta_1 m_{t-1}+(1-\beta_1)g_t\\v_t&=\beta_2 v_{t-1}+(1-\beta_2)g_t^2\end{aligned}$$
+
+作者观察到上述估计是有偏的（biase towards $0$），所以给出如下修正：
+$$\begin{aligned}\hat{m} &= \frac{m}{1-\beta_1}\\ \hat{v}&=\frac{v}{1-\beta_2}\end{aligned}$$
+
+参数的更新如下：
+$$\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v_t} + \epsilon}}\hat{m_t}$$
+
+作者给出$\beta_1 = 0.9$，$\beta_2=0.999$，$\epsilon=10^{-8}$。
+
+为了更好地理解PyTorch中的实现方式，需要对上式进行变形：
+$$\Delta \theta = \frac{\sqrt{1-\beta_2}}{1-\beta_1}\eta \frac{m_t}{\sqrt{v_t}}$$
+
+代码中令$\text{step_size} =  \frac{\sqrt{1-\beta_2}}{1-\beta_1}\eta$。同时，$\beta$也要以指数规律衰减，即：$\beta_t = \beta_0^t$。
+
+``` py
+# exp_avg is `m`: expected average of g
+exp_avg.mul_(beta1).add_(1 - beta1, grad)
+# exp_avg_sq is `v`: expected average of g's square
+exp_avg_sq.mul_(beta2).addcmul_(1 - beta2, grad, grad)
+
+# \sqrt{v_t + \epsilon}
+denom = exp_avg_sq.sqrt().add_(group['eps'])
+
+# 1 - \beta_1^t
+bias_correction1 = 1 - beta1 ** state['step']
+# 1 - \beta_2^t
+bias_correction2 = 1 - beta2 ** state['step']
+# get step_size
+step_size = group['lr'] * math.sqrt(bias_correction2) / bias_correction1
+# delta = -step_size * m / sqrt(v)
+p.data.addcdiv_(-step_size, exp_avg, denom)
+```
