@@ -163,3 +163,36 @@ step_size = group['lr'] * math.sqrt(bias_correction2) / bias_correction1
 # delta = -step_size * m / sqrt(v)
 p.data.addcdiv_(-step_size, exp_avg, denom)
 ```
+
+### AdaMax
+上面Adam中，实际上我们是用梯度$g$的$2$范数（$\sqrt{\hat{v_t}}$）去对$g$进行Normalization。那么为什么不用其他形式的范数$p$来试试呢？然而，对于$1$范数和$2$范数，数值是稳定的。对于再大的$p$，数值不稳定。不过，当取无穷范数的时候，又是稳定的了。
+
+由于无穷范数就是求绝对值最大的分量，所以这种方法叫做[AdaMax](https://arxiv.org/abs/1412.6980)。其对应的$\hat{v_t}$为（这里为了避免混淆，使用$u_t$指代）：
+$$u_t = \beta_2^\infty u_{t-1} + (1-\beta_2^\infty) g_t^\infty$$
+
+我们将$u\_t$按照时间展开，可以得到（直接摘自论文的图）。其中最后一步递推式的得来：根据$u\_t$把$u\_{t-1}$的展开形式也写出来，就不难发现最下面的递推形式。
+
+![Adamax中ut的推导](/img/hinton_06_adamax.png)
+
+相应的更新权重操作为：
+$$\theta_{t+1} = \theta_t -\frac{\eta}{u_t}\hat{m}_t$$
+
+在PyTorch中的实现如下：
+``` py
+# Update biased first moment estimate, which is \hat{m}_t
+exp_avg.mul_(beta1).add_(1 - beta1, grad)
+# 下面这种用来逐元素求取 max(A, B) 的方法可以学习一个
+# Update the exponentially weighted infinity norm.
+norm_buf = torch.cat([
+    exp_inf.mul_(beta2).unsqueeze(0),
+    grad.abs().add_(eps).unsqueeze_(0)
+], 0)
+## 找到 exp_inf 和 g之间的较大者（只需要在刚刚聚合的这个维度上找即可~）
+torch.max(norm_buf, 0, keepdim=False, out=(exp_inf, exp_inf.new().long()))
+
+## beta1 correction
+bias_correction = 1 - beta1 ** state['step']
+clr = group['lr'] / bias_correction
+
+p.data.addcdiv_(-clr, exp_avg, exp_inf)
+```
