@@ -5,6 +5,7 @@ tags:
      - cpp
 ---
 本系列是《Effective C++》一书的阅读摘记，分章整理各个条款。
+![写C++需要人品](/img/effectivecpp_01_cpp_rely_on_renpin.jpg)
 <!-- more-->
 
 ### 01 将C++视作语言联邦
