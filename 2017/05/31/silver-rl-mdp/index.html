@@ -1,0 +1,976 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="reinforcement learning," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Silver在英国UCL讲授强化学习的slide总结。背景介绍部分略去不表，第一篇首先介绍强化学习中重要的数学基础-马尔科夫决策过程（MDP）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Silver RL课程 - MDP">
+<meta property="og:url" content="https://xmfbit.github.io/2017/05/31/silver-rl-mdp/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="Silver在英国UCL讲授强化学习的slide总结。背景介绍部分略去不表，第一篇首先介绍强化学习中重要的数学基础-马尔科夫决策过程（MDP）。">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_mdp_value_function.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_bellman_equation_figure.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_bellman_equation_matrix.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_bellman_equation_solution.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp_vq_relationship.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp_vq_relationship2.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp_vv_relationship.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp_qq_relationship.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp_optimal_policy.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp_optimal_vq_relationship.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp_optimal_vq_relationship2.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp_optimal_vv_relationship.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/silver_rl_mdp_optimal_qq_relationship.png">
+<meta property="og:updated_time" content="2017-08-10T05:22:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Silver RL课程 - MDP">
+<meta name="twitter:description" content="Silver在英国UCL讲授强化学习的slide总结。背景介绍部分略去不表，第一篇首先介绍强化学习中重要的数学基础-马尔科夫决策过程（MDP）。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/silver_rl_mdp.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2017/05/31/silver-rl-mdp/"/>
+
+
+
+
+
+  <title> Silver RL课程 - MDP | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/05/31/silver-rl-mdp/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Silver RL课程 - MDP
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-31T13:03:31+08:00">
+                2017-05-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Silver在英国UCL讲授强化学习的slide总结。背景介绍部分略去不表，第一篇首先介绍强化学习中重要的数学基础-马尔科夫决策过程（MDP）。<br><img src="/img/silver_rl_mdp.png" alt="MDP"><br><a id="more"></a></p>
+<h2 id="马尔科夫性质"><a href="#马尔科夫性质" class="headerlink" title="马尔科夫性质"></a>马尔科夫性质</h2><p>不严谨地来说，马尔科夫性质是指未来与过去无关，只与当前的状态有关。我们说某个State是Markov的，等价于下面的等式成立：</p>
+<script type="math/tex; mode=display">P[S_{t+1}|S_t] = P[S_{t+1}|S_1, \dots, S_t]</script><p>定义状态转移概率（State Transition Probability）如下：</p>
+<script type="math/tex; mode=display">P_{ss^\prime} = P[S_{t+1}=s^\prime|S_t=s]</script><p>前后两个时刻的状态不同取值的状态转移概率可以写成一个矩阵的形式。矩阵中的任意元素$P_{i,j}$表示$t$时刻状态$i$在$t+1$时刻转移到状态$j$的概率。矩阵满足行和为$1$的约束。</p>
+<p>下面，我们从马尔科夫性质展开，逐步地加入一些额外的参量，一步步引出强化学习中的马尔科夫决策过程。</p>
+<h2 id="马尔科夫过程"><a href="#马尔科夫过程" class="headerlink" title="马尔科夫过程"></a>马尔科夫过程</h2><p>马尔科夫过程（或者叫做马尔科夫链）是指随机过程中的状态满足马尔科夫性质。我们可以使用二元组$(S, P)$来描述马氏过程。其中，</p>
+<ul>
+<li>$S$是一个有限状态集合。</li>
+<li>$P$是状态转移矩阵，定义如上。</li>
+</ul>
+<h2 id="马尔科夫奖赏过程"><a href="#马尔科夫奖赏过程" class="headerlink" title="马尔科夫奖赏过程"></a>马尔科夫奖赏过程</h2><p>马尔科夫奖赏过程（不知道如何翻译，Markov reward process）在马氏过程基础上加上了状态转移过程中的奖赏reward。可以使用四元组$(S, P, R, \gamma)$来表示。其中，</p>
+<ul>
+<li>$R$代表奖励函数，$R_s = E[R_{t+1}|S_t=s]$，是指当前状态为$s$时，下一步状态转移过程中的期望奖励。</li>
+<li>$\gamma$是折旧率（discount），$\gamma \in [0,1]$</li>
+</ul>
+<p>定义回报（Return）为当前时刻往后得到的折旧总奖励，即：</p>
+<script type="math/tex; mode=display">G_t = R_{t+1}+\gamma R_{t+2}+... = \sum_{k=0}^{\infty}\gamma^kR_{t+k+1}</script><p>折旧率的引入，有以下几点考虑：</p>
+<ul>
+<li>在有环存在的马氏过程中，避免了无穷大回报的出现。</li>
+<li>未来的不确定性对当前的影响较小。</li>
+<li>事实上的考虑，例如投资市场上，即时的奖励比迟滞的奖励能够有更多的利息。</li>
+<li>人类行为倾向于即时奖励。</li>
+<li>如果马氏过程是存在终止的，有的时候也可以使用$\gamma=1$，也就是不打折。</li>
+</ul>
+<h2 id="值函数"><a href="#值函数" class="headerlink" title="值函数"></a>值函数</h2><p>值函数（Value function）的意义是以期望的形式（条件期望）给出了状态$s$的长期回报，如下：</p>
+<script type="math/tex; mode=display">v(s) = E[G_t|S_t=s]</script><p>值函数可以分为两个部分，即时奖励$R_{t+1}$和后续状态的折旧值函数。如下所示：<br><img src="/img/silver_mdp_value_function.png" alt="推导过程"></p>
+<p>最后一步推导时，第二项的变形从直觉上推断还是比较容易的，但是还是把比较严格的推导过程写在下面：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+E[G_{t+1}|S_t = s]  &= \sum_{s^\prime\in S}E[G_{t+1}|S_{t+1}=s^\prime]P(S_{t+1}=s^\prime|S_t=s)\\
+&=\sum_{s^\prime}v(S_{t+1}=s^\prime)P(S_{t+1}=s^\prime|S_t=s)\\
+&=E[v(S_{t+1})|S_t=s]
+\end{aligned}</script><p>上面的结论就是贝尔曼方程，它给出了计算值函数的递归公式。如下图所示，状态节点$s$处的值函数可以分为两个部分，分别是转换到状态$s^\prime$过程中收到的奖励$r$，和从新的状态$s^\prime$出发，得到的值函数。我们想要知道$t$时刻某个状态$s$的值函数，只需要从后向前遍历，递归地去计算。<br><img src="/img/silver_rl_bellman_equation_figure.png" alt="值函数的递归过程可视化"></p>
+<p>把上面形式求期望的过程展开，可以得到下面的等价形式（更像上面补充的证明过程的思路）。其中，后面一项就是状态转移构成的树结构中以当前状态节点$s$为父节点的所有子节点的值函数，用转移概率进行加权。这个比上式更为直观。</p>
+<script type="math/tex; mode=display">v(s) = R_s + \gamma\sum_{s^\prime \in S}P_{ss^\prime}v(s^\prime)</script><p>或者写成下面的矩阵形式，更加紧凑：</p>
+<script type="math/tex; mode=display">v = R+\gamma Pv</script><p><img src="/img/silver_rl_bellman_equation_matrix.png" alt="bellman方程的矩阵形式"></p>
+<p>当我们对系统模型（包括奖励函数和概率转换矩阵）全部知道时，可以直接求解贝尔曼方程如下：<br><img src="/img/silver_rl_bellman_equation_solution.png" alt="Bellman方程求解"></p>
+<p>对于含有$n$个状态的系统，求解复杂度是$\mathcal{O}(n^3)$。当$n$较大时，常用的替代的迭代求解方法有：</p>
+<ul>
+<li>动态规划 DP</li>
+<li>蒙特卡洛仿真（Monte-Carlo evaluation）</li>
+<li>时间差分学习（Temporal Difference Learning）</li>
+</ul>
+<h2 id="马尔科夫决策过程"><a href="#马尔科夫决策过程" class="headerlink" title="马尔科夫决策过程"></a>马尔科夫决策过程</h2><p>马尔科夫决策过程（MDP）是带有决策的马尔科夫奖励过程。其中有一个env（环境），其状态量满足马尔科夫性质。MDP可以用五元组$(S,A,P,R,\gamma)$描述。其中，</p>
+<ul>
+<li>$A$是一个有限决策集合。</li>
+<li>$P_{ss^\prime}^a = P(S_{t+1}=s^\prime|S_t=s, A_t=a)$是状态转移概率矩阵。</li>
+<li>$R_{s}^a = E[R_{t+1}|S_t=s, A_t=a]$是奖励函数（与动作也挂钩）</li>
+</ul>
+<h3 id="策略"><a href="#策略" class="headerlink" title="策略"></a>策略</h3><p>策略（Policy）$\pi$是指在给定状态情况下，采取动作的概率分布，如下：</p>
+<script type="math/tex; mode=display">\pi(a|s)=P(A_t=a|S_t=s)</script><p>对于一个智能体，如果策略确定了，那么它对环境的表现也就决定了。MDP的策略与历史无关，只与当前的状态有关。同时，策略是平稳过程，与时间无关。例如，无论在开局，还是终局，只要棋盘上的落子一样（也就是状态一样），那么围棋程序应该给出相同的落子动作决策。</p>
+<p>当我们给定一个MDP和相应的策略$\pi$时，状态转移过程$S_1,S_2,\dots$是一个马氏过程$(S, P^\pi)$（上标$\pi$表示$P$由$\pi$决定）。而状态和奖励构成的过程$S_1,R_1,\dots$是一个马氏奖赏过程$(S, P^\pi, R^\pi, \gamma)$。具体来说，如下（就是全概率公式）：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+P_{ss^\prime}^\pi &= \sum_{a\in A}\pi(a|s)P_{ss^\prime}^a\\
+R_s^\pi &=\sum_{a\in A}\pi(a|s)R_s^a
+\end{aligned}</script><h3 id="值函数-1"><a href="#值函数-1" class="headerlink" title="值函数"></a>值函数</h3><p>MDP的值函数$v_\pi(s)$是指在当前状态$s$出发，使用策略$\pi$得到的回报期望，即，</p>
+<script type="math/tex; mode=display">v_\pi(s) = E_\pi[G_t|S_t=s]</script><p>引入“动作-值”函数（action-value function）$q_\pi(s,a)$，意义是从当前状态$s$出发，执行动作$a$，再使用策略$\pi$得到的回报期望，即，</p>
+<script type="math/tex; mode=display">q_\pi(s,a) = E_\pi[G_t|S_t=s,A_t=a]</script><h3 id="贝尔曼方程"><a href="#贝尔曼方程" class="headerlink" title="贝尔曼方程"></a>贝尔曼方程</h3><p>两者的关系如下如所示（通过全概率公式联系）：<br><img src="/img/silver_rl_mdp_vq_relationship.png" alt="Q函数和值函数的关系"></p>
+<p>注意上图描述的是$t$时刻的状态$s$下，$v(s)$和$q(s,a)$的关系。我们继续顺着状态链往前，可以得到下图所示$q(s,a)$和$t+1$时刻的状态$s^\prime$的值函数$v(s^\prime)$之间的关系。同样是一个全概率公式：<br><img src="/img/silver_rl_mdp_vq_relationship2.png" alt="相邻时刻Q函数和值函数的关系"></p>
+<p>综合上面两幅图中给出的关系，我们有相邻时刻值函数$v(s)$和$v(s^\prime)$的关系：<br><img src="/img/silver_rl_mdp_vv_relationship.png" alt="相邻时刻值函数关系"></p>
+<p>同样，相邻时刻Q函数的关系：<br><img src="/img/silver_rl_mdp_qq_relationship.png" alt="相邻时刻Q函数关系"></p>
+<p>写成紧凑的矩阵形式：</p>
+<script type="math/tex; mode=display">v_\pi = R^\pi + \gamma P^\pi v_\pi</script><p>这个方程的解是：</p>
+<script type="math/tex; mode=display">v_\pi = (1-\gamma P^\pi)^{-1}R^\pi</script><p>和上面对策略函数的分解类似，我们有下面两式成立：</p>
+<script type="math/tex; mode=display">v_\pi(s) = E_\pi[R_{t+1} + \gamma v_\pi(sS_{t+1})]</script><h3 id="最优值函数"><a href="#最优值函数" class="headerlink" title="最优值函数"></a>最优值函数</h3><p>最优的值函数是指在所有的策略中，使得$v_\pi(s)$取得最大值的那个，即：</p>
+<script type="math/tex; mode=display">v_\ast(s) = \max_\pi v_\pi(s)</script><p>最优Q函数的定义同理：</p>
+<script type="math/tex; mode=display">q_\ast(s,a) = \max_\pi q_\pi(s,a)</script><p>定义策略$\pi$集合上的一个偏序为</p>
+<script type="math/tex; mode=display">\pi > \pi^\prime \quad \text{if} \quad v_\pi(s) > v_{\pi^\prime}(s), \forall s</script><p>如果我们已经知道了最优的值函数，那么我们可以在每一步选取动作的时候，选取那个使得当前Q函数取得最大值的动作即可。这很straight forward，用数学语言表达就是：</p>
+<p><img src="/img/silver_rl_mdp_optimal_policy.png" alt="最优策略的取法"><br>同样地，对于最优值函数，也有贝尔曼递归方程成立。下面是一个形象化的推导，和上面导出贝尔曼方程的思路是一样的。<br><img src="/img/silver_rl_mdp_optimal_vq_relationship.png" alt=""><br><img src="/img/silver_rl_mdp_optimal_vq_relationship2.png" alt=""><br><img src="/img/silver_rl_mdp_optimal_vv_relationship.png" alt=""><br><img src="/img/silver_rl_mdp_optimal_qq_relationship.png" alt=""></p>
+<p>常用的求解方法包括：</p>
+<ul>
+<li>值迭代（Value Iteration）</li>
+<li>策略迭代（Policy Iteration）</li>
+<li>Q Learning</li>
+<li>Sarsa</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/reinforcement-learning/" rel="tag"># reinforcement learning</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/25/hinton-nnml-02/" rel="next" title="Neural Network for Machine Learning - Lecture 02">
+                <i class="fa fa-chevron-left"></i> Neural Network for Machine Learning - Lecture 02
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/06/silver-rl-dp/" rel="prev" title="Silver RL课程 - DP Planning">
+                Silver RL课程 - DP Planning <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/liumengli.jpg"
+               alt="一个脱离了高级趣味的人" />
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#马尔科夫性质"><span class="nav-number">1.</span> <span class="nav-text">马尔科夫性质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#马尔科夫过程"><span class="nav-number">2.</span> <span class="nav-text">马尔科夫过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#马尔科夫奖赏过程"><span class="nav-number">3.</span> <span class="nav-text">马尔科夫奖赏过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#值函数"><span class="nav-number">4.</span> <span class="nav-text">值函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#马尔科夫决策过程"><span class="nav-number">5.</span> <span class="nav-text">马尔科夫决策过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#策略"><span class="nav-number">5.1.</span> <span class="nav-text">策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#值函数-1"><span class="nav-number">5.2.</span> <span class="nav-text">值函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#贝尔曼方程"><span class="nav-number">5.3.</span> <span class="nav-text">贝尔曼方程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最优值函数"><span class="nav-number">5.4.</span> <span class="nav-text">最优值函数</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

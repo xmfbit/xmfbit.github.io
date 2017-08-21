@@ -1,0 +1,905 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="pytorch," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本篇文章介绍了使用PyTorch在MNIST数据集上训练MLP和CNN，并记录自己实现过程中的若干问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="toy demo - PyTorch + MNIST">
+<meta property="og:url" content="https://xmfbit.github.io/2017/03/04/pytorch-mnist-example/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="本篇文章介绍了使用PyTorch在MNIST数据集上训练MLP和CNN，并记录自己实现过程中的若干问题。">
+<meta property="og:image" content="https://xmfbit.github.io/img/mnist_example.png">
+<meta property="og:updated_time" content="2017-08-10T05:22:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="toy demo - PyTorch + MNIST">
+<meta name="twitter:description" content="本篇文章介绍了使用PyTorch在MNIST数据集上训练MLP和CNN，并记录自己实现过程中的若干问题。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/mnist_example.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2017/03/04/pytorch-mnist-example/"/>
+
+
+
+
+
+  <title> toy demo - PyTorch + MNIST | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/03/04/pytorch-mnist-example/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                toy demo - PyTorch + MNIST
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-04T22:37:44+08:00">
+                2017-03-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇文章介绍了使用PyTorch在MNIST数据集上训练MLP和CNN，并记录自己实现过程中的若干问题。<br><img src="/img/mnist_example.png" alt="MNIST"><br><a id="more"></a></p>
+<h2 id="加载MNIST数据集"><a href="#加载MNIST数据集" class="headerlink" title="加载MNIST数据集"></a>加载MNIST数据集</h2><p>PyTorch中提供了MNIST，CIFAR，COCO等常用数据集的加载方法。<code>MNIST</code>是<code>torchvision.datasets</code>包中的一个类，负责根据传入的参数加载数据集。如果自己之前没有下载过该数据集，可以将<code>download</code>参数设置为<code>True</code>，会自动下载数据集并解包。如果之前已经下载好了，只需将其路径通过<code>root</code>传入即可。</p>
+<p>在加载图像后，我们常常需要对图像进行若干预处理。比如减去RGB通道的均值，或者裁剪或翻转图像实现augmentation等，这些操作可以在<code>torchvision.transforms</code>包中找到对应的操作。在下面的代码中，通过使用<code>transforms.Compose()</code>，我们构造了对数据进行预处理的复合操作序列，<code>ToTensor</code>负责将PIL图像转换为Tensor数据（RGB通道从<code>[0, 255]</code>范围变为<code>[0, 1]</code>）， <code>Normalize</code>负责对图像进行规范化。这里需要注意，虽然MNIST中图像都是灰度图像，通道数均为1，但是仍要传入<code>tuple</code>。</p>
+<p>之后，我们通过<code>DataLoader</code>返回一个数据集上的可迭代对象。一会我们通过<code>for</code>循环，就可以遍历数据集了。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> torch</div><div class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</div><div class="line"><span class="keyword">from</span> torch.autograd <span class="keyword">import</span> Variable</div><div class="line"><span class="keyword">import</span> torchvision.datasets <span class="keyword">as</span> dset</div><div class="line"><span class="keyword">import</span> torchvision.transforms <span class="keyword">as</span> transforms</div><div class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</div><div class="line"><span class="keyword">import</span> torch.optim <span class="keyword">as</span> optim</div><div class="line"></div><div class="line">trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize((<span class="number">0.5</span>,), (<span class="number">1.0</span>,))])</div><div class="line"></div><div class="line">train_set = dset.MNIST(root=root, train=<span class="keyword">True</span>, transform=trans, download=download)</div><div class="line">test_set = dset.MNIST(root=root, train=<span class="keyword">False</span>, transform=trans)</div><div class="line"></div><div class="line">batch_size = <span class="number">128</span></div><div class="line">kwargs = &#123;<span class="string">'num_workers'</span>: <span class="number">1</span>, <span class="string">'pin_memory'</span>: <span class="keyword">True</span>&#125;</div><div class="line">train_loader = torch.utils.data.DataLoader(</div><div class="line">                 dataset=train_set,</div><div class="line">                 batch_size=batch_size,</div><div class="line">                 shuffle=<span class="keyword">True</span>, **kwargs)</div><div class="line">test_loader = torch.utils.data.DataLoader(</div><div class="line">                dataset=test_set,</div><div class="line">                batch_size=batch_size,</div><div class="line">                shuffle=<span class="keyword">False</span>, **kwargs)</div></pre></td></tr></table></figure>
+<h2 id="网络构建"><a href="#网络构建" class="headerlink" title="网络构建"></a>网络构建</h2><p>在进行网络构建时，主要通过<code>torch.nn</code>包中的已经实现好的卷积层、池化层等进行搭建。例如下面的代码展示了一个具有一个隐含层的MLP网络。<code>nn.Linear</code>负责构建全连接层，需要提供输入和输出的通道数，也就是<code>y = wx+b</code>中<code>x</code>和<code>y</code>的维度。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MLPNet</span><span class="params">(nn.Module)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(MLPNet, self).__init__()</div><div class="line">        self.fc1 = nn.Linear(<span class="number">28</span>*<span class="number">28</span>, <span class="number">500</span>)</div><div class="line">        self.fc2 = nn.Linear(<span class="number">500</span>, <span class="number">256</span>)</div><div class="line">        self.fc3 = nn.Linear(<span class="number">256</span>, <span class="number">10</span>)</div><div class="line">        self.ceriation = nn.CrossEntropyLoss()</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x, target)</span>:</span></div><div class="line">        x = x.view(<span class="number">-1</span>, <span class="number">28</span>*<span class="number">28</span>)</div><div class="line">        x = F.relu(self.fc1(x))</div><div class="line">        x = F.relu(self.fc2(x))</div><div class="line">        x = F.relu(self.fc3(x))</div><div class="line">        loss = self.ceriation(x, target)</div><div class="line">        <span class="keyword">return</span> x, loss</div></pre></td></tr></table></figure>
+<p>由于PyTorch可以实现自动求导，所以我们只需实现<code>forward</code>过程即可。这里由于池化层和非线性变换都没有参数，所以使用了<code>nn.functionals</code>中的对应操作实现。通过看文档，可以发现，一般<code>nn</code>里面的各种层，都会在<code>nn.functionals</code>里面有其对应。例如卷积层的对应实现，如下所示，需要传入卷积核的权重。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># With square kernels and equal stride</span></div><div class="line">filters = autograd.Variable(torch.randn(<span class="number">8</span>,<span class="number">4</span>,<span class="number">3</span>,<span class="number">3</span>))</div><div class="line">inputs = autograd.Variable(torch.randn(<span class="number">1</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">5</span>))</div><div class="line">F.conv2d(inputs, filters, padding=<span class="number">1</span>)</div></pre></td></tr></table></figure>
+<p>同样地，我们可以实现LeNet的结构如下。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MLPNet</span><span class="params">(nn.Module)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(MLPNet, self).__init__()</div><div class="line">        self.fc1 = nn.Linear(<span class="number">28</span>*<span class="number">28</span>, <span class="number">500</span>)</div><div class="line">        self.fc2 = nn.Linear(<span class="number">500</span>, <span class="number">256</span>)</div><div class="line">        self.fc3 = nn.Linear(<span class="number">256</span>, <span class="number">10</span>)</div><div class="line">        self.ceriation = nn.CrossEntropyLoss()</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x, target)</span>:</span></div><div class="line">        x = x.view(<span class="number">-1</span>, <span class="number">28</span>*<span class="number">28</span>)</div><div class="line">        x = F.relu(self.fc1(x))</div><div class="line">        x = F.relu(self.fc2(x))</div><div class="line">        x = F.relu(self.fc3(x))</div><div class="line">        loss = self.ceriation(x, target)</div><div class="line">        <span class="keyword">return</span> x, loss</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">name</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> <span class="string">'mlpnet'</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">LeNet</span><span class="params">(nn.Module)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        super(LeNet, self).__init__()</div><div class="line">        self.conv1 = nn.Conv2d(<span class="number">1</span>, <span class="number">20</span>, <span class="number">5</span>, <span class="number">1</span>)</div><div class="line">        self.conv2 = nn.Conv2d(<span class="number">20</span>, <span class="number">50</span>, <span class="number">5</span>, <span class="number">1</span>)</div><div class="line">        self.fc1 = nn.Linear(<span class="number">4</span>*<span class="number">4</span>*<span class="number">50</span>, <span class="number">500</span>)</div><div class="line">        self.fc2 = nn.Linear(<span class="number">500</span>, <span class="number">10</span>)</div><div class="line">        self.ceriation = nn.CrossEntropyLoss()</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x, target)</span>:</span></div><div class="line">        x = self.conv1(x)</div><div class="line">        x = F.max_pool2d(x, <span class="number">2</span>, <span class="number">2</span>)</div><div class="line">        x = F.relu(x)</div><div class="line">        x = self.conv2(x)</div><div class="line">        x = F.max_pool2d(x, <span class="number">2</span>, <span class="number">2</span>)</div><div class="line">        x = F.relu(x)</div><div class="line">        x = x.view(<span class="number">-1</span>, <span class="number">4</span>*<span class="number">4</span>*<span class="number">50</span>)</div><div class="line">        x = self.fc1(x)</div><div class="line">        x = self.fc2(x)</div><div class="line">        loss = self.ceriation(x, target)</div><div class="line">        <span class="keyword">return</span> x, loss</div></pre></td></tr></table></figure>
+<h2 id="训练与测试"><a href="#训练与测试" class="headerlink" title="训练与测试"></a>训练与测试</h2><p>在训练时，我们首先应确定优化方法。这里我们使用带动量的<code>SGD</code>方法。下面代码中的<code>optim.SGD</code>初始化需要接受网络中待优化的<code>Parameter</code>列表（或是迭代器），以及学习率<code>lr</code>，动量<code>momentum</code>。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">optimizer = optim.SGD(model.parameters(), lr=<span class="number">0.01</span>, momentum=<span class="number">0.9</span>)</div></pre></td></tr></table></figure>
+<p>接下来，我们只需要遍历数据集，同时在每次迭代中清空待优化参数的梯度，前向计算，反向传播以及优化器的迭代求解即可。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">model = MLPNet().cuda()   <span class="comment"># 以MLP为例</span></div><div class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> xrange(<span class="number">10</span>):</div><div class="line">    <span class="comment"># trainning</span></div><div class="line">    <span class="keyword">for</span> batch_idx, (x, target) <span class="keyword">in</span> enumerate(train_loader):</div><div class="line">        optimizer.zero_grad()     <span class="comment">#每次都要清空上一步中参数的grad，否则会出错的~</span></div><div class="line">        x, target = Variable(x.cuda()), Variable(target.cuda())</div><div class="line">        _, loss = model(x, target)   <span class="comment">#得到loss</span></div><div class="line">        loss.backward()              <span class="comment">#bp</span></div><div class="line">        optimizer.step()             <span class="comment">#优化器迭代</span></div><div class="line">        <span class="keyword">if</span> batch_idx % <span class="number">100</span> == <span class="number">0</span>:</div><div class="line">            <span class="keyword">print</span> <span class="string">'==&gt;&gt;&gt; epoch: &#123;&#125;, batch index: &#123;&#125;, train loss: &#123;:.6f&#125;'</span>.format(epoch, batch_idx, loss.data[<span class="number">0</span>])</div><div class="line">    <span class="comment"># testing</span></div><div class="line">    correct_cnt, ave_loss = <span class="number">0</span>, <span class="number">0</span></div><div class="line">    <span class="keyword">for</span> batch_idx, (x, target) <span class="keyword">in</span> enumerate(test_loader):</div><div class="line">        x, target = Variable(x.cuda(), volatile=<span class="keyword">True</span>), Variable(target.cuda(), volatile=<span class="keyword">True</span>)</div><div class="line">        score, loss = model(x, target)</div><div class="line">        _, pred_label = torch.max(score.data, <span class="number">1</span>)</div><div class="line">        correct_cnt += (pred_label == target.data).sum()</div><div class="line">        ave_loss += loss.data[<span class="number">0</span>]</div><div class="line">    accuracy = correct_cnt*<span class="number">1.0</span>/len(test_loader)/batch_size</div><div class="line">    ave_loss /= len(test_loader)</div></pre></td></tr></table></figure>
+<p>当优化完毕后，需要保存模型。这里<a href="http://pytorch.org/docs/notes/serialization.html#recommend-saving-models" target="_blank" rel="external">官方文档</a>给出了推荐的方法，如下所示：<br><figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">torch.save(model.state_dict(), PATH)   <span class="comment">#保存网络参数</span></div><div class="line">the_model = TheModelClass(*args, **kwargs)</div><div class="line">the_model.load_state_dict(torch.load(PATH))  <span class="comment">#读取网络参数</span></div></pre></td></tr></table></figure></p>
+<p>该博客的完整代码可以见：<a href="https://gist.github.com/xmfbit/b27cdbff68870418bdb8cefa86a2d558" target="_blank" rel="external">PyTorch MNIST demo</a>。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pytorch/" rel="tag"># pytorch</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/26/jupyternotebook-remote-useage/" rel="next" title="远程登录Jupyter笔记本">
+                <i class="fa fa-chevron-left"></i> 远程登录Jupyter笔记本
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/05/residualnet-paper/" rel="prev" title="Residual Net论文阅读 - Deep Residual Learning for Image Recongnition">
+                Residual Net论文阅读 - Deep Residual Learning for Image Recongnition <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/liumengli.jpg"
+               alt="一个脱离了高级趣味的人" />
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#加载MNIST数据集"><span class="nav-number">1.</span> <span class="nav-text">加载MNIST数据集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络构建"><span class="nav-number">2.</span> <span class="nav-text">网络构建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练与测试"><span class="nav-number">3.</span> <span class="nav-text">训练与测试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

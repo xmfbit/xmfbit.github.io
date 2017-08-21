@@ -1,0 +1,935 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="cs131,公开课," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="边缘(Edge)在哺乳动物的视觉中有重要意义。在由若干卷积层构成的深度神经网络中，较低层的卷积层就被训练成为对特定形状的边缘做出响应。边缘检测也是计算机视觉和图像处理领域中一个重要的问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CS131-边缘检测">
+<meta property="og:url" content="https://xmfbit.github.io/2017/01/24/cs131-edge-detection/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="边缘(Edge)在哺乳动物的视觉中有重要意义。在由若干卷积层构成的深度神经网络中，较低层的卷积层就被训练成为对特定形状的边缘做出响应。边缘检测也是计算机视觉和图像处理领域中一个重要的问题。">
+<meta property="og:image" content="https://xmfbit.github.io/img/edge_camera_man.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/edge_deriative.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/fun_noise.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/dog_x.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/dog_different_size.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/canny_nms.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/canny_linking.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/ransac_step.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/ransac_line_fit.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/line_fit_demo.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/ransac_k.png">
+<meta property="og:updated_time" content="2017-08-10T05:22:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CS131-边缘检测">
+<meta name="twitter:description" content="边缘(Edge)在哺乳动物的视觉中有重要意义。在由若干卷积层构成的深度神经网络中，较低层的卷积层就被训练成为对特定形状的边缘做出响应。边缘检测也是计算机视觉和图像处理领域中一个重要的问题。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/edge_camera_man.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2017/01/24/cs131-edge-detection/"/>
+
+
+
+
+
+  <title> CS131-边缘检测 | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/01/24/cs131-edge-detection/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                CS131-边缘检测
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-24T10:42:47+08:00">
+                2017-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>边缘(Edge)在哺乳动物的视觉中有重要意义。在由若干卷积层构成的深度神经网络中，较低层的卷积层就被训练成为对特定形状的边缘做出响应。边缘检测也是计算机视觉和图像处理领域中一个重要的问题。</p>
+<p><img src="/img/edge_camera_man.png" alt="边缘检测图示"><br><a id="more"></a></p>
+<h2 id="边缘的产生"><a href="#边缘的产生" class="headerlink" title="边缘的产生"></a>边缘的产生</h2><p>若仍采取将图像视作某一函数的观点，边缘是指这个函数中的不连续点。边缘检测是后续进行目标检测和形状识别的基础，也能够在立体视觉中恢复视角等。边缘的来源主要有以下几点：</p>
+<ul>
+<li>物体表面不平造成灰度值的不连续；</li>
+<li>深度值不同造成灰度值不连续；</li>
+<li>物体表面颜色的突变造成灰度值不连续</li>
+</ul>
+<h2 id="朴素思想"><a href="#朴素思想" class="headerlink" title="朴素思想"></a>朴素思想</h2><p>利用边缘是图像中不连续点的这一性质，可以通过计算图像的一阶导数，再找到一阶导数的极大值，即认为是边缘点。如下图所示，在白黑交界处，图像一阶导数的值非常大，表明此处灰度值变化剧烈，是边缘。<br><img src="/img/edge_deriative.png" alt="边缘点处导数很大"></p>
+<p>问题转换为如何求取图像的一阶导数（或梯度）。由于图像是离散的二元函数，所以下文不再区分求导与差分。</p>
+<p>在$x$方向上，令$g_x = \frac{\partial f}{\partial x}$；在$y$方向上，令$g_y = \frac{\partial f}{\partial y}$。梯度的大小和方向为</p>
+<script type="math/tex; mode=display">g = \lbrack g_x, g_y\rbrack, \theta = \arctan(g_y/g_x)</script><p>通过和Sobel算子等做卷积，可以求取两个正交方向上图像的一阶导数，并计算梯度，之后检测梯度的局部极大值就能够找出边缘点了。</p>
+<p>只是这种方法很容易受到噪声影响。如图所示，真实的边缘点被湮没在了噪声中。<br><img src="/img/fun_noise.png" alt="噪声影响湮没了边缘点"></p>
+<h2 id="改进1：先平滑"><a href="#改进1：先平滑" class="headerlink" title="改进1：先平滑"></a>改进1：先平滑</h2><p>改进措施1，可以首先对图像进行高斯平滑，再按照上面的方法求取边缘点。根据卷积的性质，有：</p>
+<script type="math/tex; mode=display">\frac{d}{dx}(f\ast g) = f\ast\frac{d}{dx}g</script><p>所以我们可以先求取高斯核的一阶导数，再和原始图像直接做一次卷积就可以一举两得了。这样，引出了DoG(Deriative of Gaussian)。$x$方向的DoG如图所示。<br><img src="/img/dog_x.png" alt="x方向的DoG"></p>
+<p>进行高斯平滑不可避免会使图像中原本的细节部分模糊，所以需要在克服噪声和引入模糊之间做好折中。<br><img src="/img/dog_different_size.png" alt="不同"></p>
+<h2 id="改进2：Canny检测子"><a href="#改进2：Canny检测子" class="headerlink" title="改进2：Canny检测子"></a>改进2：Canny检测子</h2><p>改进措施2，使用Canny检测子进行检测。Canny检测方法同样基于梯度，其基本原理如下：</p>
+<ul>
+<li>使用DoG计算梯度幅值和方向。</li>
+<li>非极大值抑制，这个过程需要根据梯度方向做线性插值。如图，沿着点$q$的梯度方向找到了$p$和$r$两个点。这两个点的梯度幅值需要根据其临近的两点做插值得到。</li>
+<li>利用梯度方向和边缘线互相垂直这一性质，如图，若已经确定点$p$为边缘点，则向它的梯度方向正交方向上寻找下一个边缘点（点$r$或$s$）。这一步也叫edge linking。</li>
+</ul>
+<p><img src="/img/canny_nms.png" alt="nms示意图"><br><img src="/img/canny_linking.png" alt="linking示意图"></p>
+<p>同时，为了提高算法性能，Canny中采用了迟滞阈值的方法，设定<code>low</code>和<code>high</code>两个阈值，来判定某个点是否属于<strong>强</strong>或<strong>弱</strong>边缘点。在做edge linking的时候，从强边缘点开始，如果遇到了弱边缘点，则继续，直到某点的梯度幅值甚至比<code>low</code>还要小，则在此停止。</p>
+<h2 id="改进3：RANSAC方法"><a href="#改进3：RANSAC方法" class="headerlink" title="改进3：RANSAC方法"></a>改进3：RANSAC方法</h2><p>有的时候，我们并不是想要找到所有的边缘点，可能只是想找到图像中水平方向的某些边缘。这时候可以考虑采用RANSAC方法。</p>
+<p>RANSAC方法的思想在于，认为已有的feature大部分都是<strong>好的</strong>。这样，每次随机抽取出若干feature，建立model，再在整个feature集合上进行验证。那么由那些好的feature得到的model一定是得分较高的。（世界上还是好人多啊！）这样就剔除了离群点的影响。</p>
+<p>以直线拟合为例，在下图中，给出了使用RANSAC方法拟合直线的步骤。如图1所示，由于离群点的存在，如果直接使用最小二乘法进行拟合，拟合结果效果会很不理想。由于确定一条直线需要两个点，所以从点集中选取两个点，并计算拟合直线。并计算点集中的点在这条直线附近的个数，作为对模型好坏的判定，这些点是新的内点。找出最优的那条直线，使用其所有内点再进行拟合，重复上述操作，直至迭代终止。<br><img src="/img/ransac_step.png" alt="ransac step"></p>
+<p>上述RANSAC方法进行直线拟合的过程可以总结如下：<br><img src="/img/ransac_line_fit.png" alt="ransac line fit alg"></p>
+<p>按照上述思想，我分别使用最小二乘法和RANSAC方法尝试进行直线拟合。在下面的代码中，我首先产生了正常受到一定高斯噪声污染的数据（图中的红色点），这些点的真值都落在直线$y = 2x+1$上。而后，我随机变化了斜率和截距，以期产生一些离群点（图中的蓝色点）。当然，由于随机性，这种方法生成的点有可能仍然是内点。</p>
+<p>而后，我分别使用上述两种方法进行拟合。可以从结果图中看出，RANSAC（绿色线）能够有效避免离群点的干扰，获得更好的拟合效果。在某次实验中，两种方法的拟合结果如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">least square: a = 3.319566, b = -1.446528</div><div class="line">ransac method: a = 1.899640, b= 1.298608</div></pre></td></tr></table></figure></p>
+<p><img src="/img/line_fit_demo.png" alt="demo result"></p>
+<p>实验使用的MATLAB代码如下：<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line"><span class="comment">%% generate data</span></div><div class="line">x = <span class="number">0</span>:<span class="number">1</span>:<span class="number">10</span>;</div><div class="line">y_gt = <span class="number">2</span>*x+<span class="number">1</span>;</div><div class="line">y = y_gt + <span class="built_in">randn</span>(<span class="built_in">size</span>(y_gt));</div><div class="line">scatter(x, y, [], [<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>]);</div><div class="line">hold on</div><div class="line">out_x = <span class="number">0</span>:<span class="number">1</span>:<span class="number">10</span>;</div><div class="line">out_y = <span class="number">5</span>*<span class="built_in">rand</span>(<span class="built_in">size</span>(out_x)).*out_x + <span class="number">4</span>*<span class="built_in">rand</span>(<span class="built_in">size</span>(out_x));</div><div class="line">scatter(out_x, out_y, [], [<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>]);</div><div class="line">X = [x, out_x]';</div><div class="line">Y = [y, out_y]';</div><div class="line">X = [X, ones(length(X), <span class="number">1</span>)];</div><div class="line">[a, b] = ls_fit(X, Y);</div><div class="line">plot(x, a*x+b, <span class="string">'linestyle'</span>, <span class="string">'--'</span>, <span class="string">'color'</span>, <span class="string">'r'</span>);</div><div class="line"></div><div class="line">[ra, rb] = ransac_fit(X, Y, <span class="number">100</span>, <span class="number">2</span>, <span class="number">0.5</span>, <span class="number">3</span>);</div><div class="line">plot(x, ra*x+rb, <span class="string">'linestyle'</span>, <span class="string">'-.'</span>, <span class="string">'color'</span>, <span class="string">'g'</span>);</div><div class="line">fprintf(<span class="string">'least square: a = %f, b = %f\n'</span>,a, b);</div><div class="line">fprintf(<span class="string">'ransac method: a = %f, b= %f\n'</span>, ra, rb)</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="params">[a, b]</span> = <span class="title">ransac_fit</span><span class="params">(X, Y, k, n, t ,d)</span></span></div><div class="line"><span class="comment">% ransac fit</span></div><div class="line"><span class="comment">% k -- maximum iteration number</span></div><div class="line"><span class="comment">% n -- smallest point numer required</span></div><div class="line"><span class="comment">% t -- threshold to identify a point is fit well</span></div><div class="line"><span class="comment">% d -- the number of nearby points to assert a model is fine</span></div><div class="line">data = [X, Y];</div><div class="line">N = <span class="built_in">size</span>(data, <span class="number">1</span>);</div><div class="line">best_good_cnt = <span class="number">-1</span>;</div><div class="line">best_a = <span class="number">0</span>;</div><div class="line">best_b = <span class="number">0</span>;</div><div class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:k</div><div class="line">    <span class="comment">% sample point</span></div><div class="line">    idx = randsample(N, n);</div><div class="line">    data_sampled = data(idx, :);</div><div class="line">    <span class="comment">% fit with least square</span></div><div class="line">    [a, b] = ls_fit(data_sampled(:, <span class="number">1</span>:<span class="number">2</span>), data_sampled(:, <span class="number">3</span>));</div><div class="line">    <span class="comment">% test model</span></div><div class="line">    not_sampled = <span class="built_in">ones</span>(N, <span class="number">1</span>);</div><div class="line">    not_sampled(idx) = <span class="number">0</span>;</div><div class="line">    not_sampled_data = data(not_sampled == <span class="number">1</span>, :);</div><div class="line">    distance = <span class="built_in">abs</span>(not_sampled_data(:, <span class="number">1</span>:<span class="number">2</span>) * [a; b] - not_sampled_data(:, <span class="number">3</span>)) / <span class="built_in">sqrt</span>(a^<span class="number">2</span>+<span class="number">1</span>);</div><div class="line">    inner_flag = distance &lt; t;</div><div class="line">    good_cnt = sum(inner_flag);</div><div class="line">    <span class="keyword">if</span> good_cnt &gt;= d &amp;&amp; good_cnt &gt; best_good_cnt</div><div class="line">        best_good_cnt = good_cnt;</div><div class="line">        data_refine = data(<span class="built_in">find</span>(inner_flag), :);</div><div class="line">        [a, b] = ls_fit(data_refine(:, <span class="number">1</span>:<span class="number">2</span>), data_refine(:, <span class="number">3</span>));</div><div class="line">        best_a = a;</div><div class="line">        best_b = b;</div><div class="line">    <span class="keyword">end</span></div><div class="line">    fprintf(<span class="string">'iteration %d, best_a = %f, best_b = %f\n'</span>, <span class="built_in">i</span>, best_a, best_b);</div><div class="line"><span class="keyword">end</span></div><div class="line">a = best_a;</div><div class="line">b = best_b;</div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="params">[a, b]</span> = <span class="title">ls_fit</span><span class="params">(X, Y)</span></span></div><div class="line"><span class="comment">% least square fit</span></div><div class="line">A = X'*X\X'*Y;</div><div class="line">a = A(<span class="number">1</span>);</div><div class="line">b = A(<span class="number">2</span>);</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
+<p>我们对RANSAC稍作分析，可以大概了解试验次数$k$的确定方法。</p>
+<p>仍然使用上述直线拟合的例子。如果所有点中内点所占的比例为$\omega$，每次挑选$n$个点尝试（上述demo代码中取$n=2$）。那么每次挑选的两个点全部是内点的概率为$\omega^n$。当选取的$n$个点全部为内点时，视为有效实验。那么，重复$k$次实验，有效实验次数为0的概率为$(1-\omega^n)^k$。由于底数小于1，所以我们只需尽量增大$k$，就能够降低这种倒霉的概率。下图是不同$n$和$\omega$情况下为了使得实验成功的概率大于0.99所需的$k$的分布。<br><img src="/img/ransac_k.png" alt="k"></p>
+<p>RANSAC方法的有点在于能够较为鲁棒地估计模型的参数，而且实现简单。缺点在于当离群点比例较大时，为保证实验成功所需的$k$值较大。这时候，可能Hough变换等基于投票的方法更适合用于图像中的直线检测问题。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cs131/" rel="tag"># cs131</a>
+          
+            <a href="/tags/公开课/" rel="tag"># 公开课</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/23/cs131-filter-svd/" rel="next" title="CS131-线性滤波器和矩阵的SVD分解">
+                <i class="fa fa-chevron-left"></i> CS131-线性滤波器和矩阵的SVD分解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/25/cs131-finding-features/" rel="prev" title="CS131-描述图像的特征(Harris 角点)">
+                CS131-描述图像的特征(Harris 角点) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/liumengli.jpg"
+               alt="一个脱离了高级趣味的人" />
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#边缘的产生"><span class="nav-number">1.</span> <span class="nav-text">边缘的产生</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#朴素思想"><span class="nav-number">2.</span> <span class="nav-text">朴素思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改进1：先平滑"><span class="nav-number">3.</span> <span class="nav-text">改进1：先平滑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改进2：Canny检测子"><span class="nav-number">4.</span> <span class="nav-text">改进2：Canny检测子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改进3：RANSAC方法"><span class="nav-number">5.</span> <span class="nav-text">改进3：RANSAC方法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

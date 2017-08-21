@@ -84,42 +84,19 @@
 
 
 
-<meta name="description" content="GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。GSL 的项目主页提供的说明来看，它支持如下的科学计算：
-（下面的这张表格的HTML使用的是No-Cruft Excel to HTML Table Converter生成的）
-
-   
-      Complex Numbers 
-      Roots of Polynomials
-   
-   
-      Special Fu">
+<meta name="description" content="GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用 Visual Studio 编译 GSL 科学计算库">
-<meta property="og:url" content="http://yoursite.com/2016/12/16/gsl-with-vs/index.html">
+<meta property="og:url" content="https://xmfbit.github.io/2016/12/16/gsl-with-vs/index.html">
 <meta property="og:site_name" content="来呀，快活呀~">
-<meta property="og:description" content="GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。GSL 的项目主页提供的说明来看，它支持如下的科学计算：
-（下面的这张表格的HTML使用的是No-Cruft Excel to HTML Table Converter生成的）
-
-   
-      Complex Numbers 
-      Roots of Polynomials
-   
-   
-      Special Fu">
+<meta property="og:description" content="GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。">
+<meta property="og:image" content="https://xmfbit.github.io/img/gsl_picture.jpg">
 <meta property="og:image" content="http://i.imgur.com/uXhVvwS.jpg">
-<meta property="og:updated_time" content="2017-01-23T04:18:46.000Z">
+<meta property="og:updated_time" content="2017-08-10T05:22:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用 Visual Studio 编译 GSL 科学计算库">
-<meta name="twitter:description" content="GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。GSL 的项目主页提供的说明来看，它支持如下的科学计算：
-（下面的这张表格的HTML使用的是No-Cruft Excel to HTML Table Converter生成的）
-
-   
-      Complex Numbers 
-      Roots of Polynomials
-   
-   
-      Special Fu">
-<meta name="twitter:image" content="http://i.imgur.com/uXhVvwS.jpg">
+<meta name="twitter:description" content="GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/gsl_picture.jpg">
 
 
 
@@ -147,7 +124,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/12/16/gsl-with-vs/"/>
+  <link rel="canonical" href="https://xmfbit.github.io/2016/12/16/gsl-with-vs/"/>
 
 
 
@@ -246,6 +223,16 @@
           </a>
         </li>
       
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
 
       
         <li class="menu-item menu-item-search">
@@ -298,7 +285,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/16/gsl-with-vs/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2016/12/16/gsl-with-vs/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -351,16 +338,6 @@
 
           
             
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/12/16/gsl-with-vs/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/16/gsl-with-vs/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
           
 
           
@@ -383,7 +360,8 @@
       
 
       
-        <p>GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。<a href="http://www.gnu.org/software/gsl/" target="_blank" rel="external">GSL 的项目主页</a>提供的说明来看，它支持如下的科学计算：</p>
+        <p>GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。</p>
+<p><img src="/img/gsl_picture.jpg" alt="GSL is GNU Sentific Library"><br><a id="more"></a><br><a href="http://www.gnu.org/software/gsl/" target="_blank" rel="external">GSL 的项目主页</a>提供的说明来看，GSL支持如下的科学计算：</p>
 <p>（下面的这张表格的HTML使用的是<a href="http://pressbin.com/tools/excel_to_html_table/index.html" target="_blank" rel="external">No-Cruft Excel to HTML Table Converter</a>生成的）<br>
 <table>
    <tr>
@@ -513,8 +491,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/12/16/hello-world/" rel="prev" title="Hello World">
-                Hello World <i class="fa fa-chevron-right"></i>
+              <a href="/2017/01/22/cs131-linear-alg/" rel="prev" title="CS131-线代基础">
+                CS131-线代基础 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -556,7 +534,7 @@
     </div>
   </div>
 
-          
+
           </div>
           
 
@@ -564,9 +542,7 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/12/16/gsl-with-vs/"
-           data-title="使用 Visual Studio 编译 GSL 科学计算库" data-url="http://yoursite.com/2016/12/16/gsl-with-vs/">
-      </div>
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
     
   </div>
 
@@ -612,7 +588,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">43</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -623,7 +599,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -634,6 +610,26 @@
         
 
         <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
           
         </div>
 
@@ -775,39 +771,47 @@
 
 
 
-  
-
-  
     
-  
-
-  <script type="text/javascript">
-    var duoshuoQuery = {short_name:"xmfbit"};
-    (function() {
-      var ds = document.createElement('script');
-      ds.type = 'text/javascript';ds.async = true;
-      ds.id = 'duoshuo-script';
-      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-      ds.charset = 'UTF-8';
-      (document.getElementsByTagName('head')[0]
-      || document.getElementsByTagName('body')[0]).appendChild(ds);
-    })();
-  </script>
-
-  
-    
-    
-    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
-    <script src="/js/src/hook-duoshuo.js"></script>
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
 
 
 
+  
 
 
 
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
 
 
 

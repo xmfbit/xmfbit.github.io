@@ -84,23 +84,21 @@
 
 
 
-<meta name="description" content="数字图像可以看做$\mathbb{R}^2 \rightarrow \mathbb{R}^c$的映射，其中$c$是图像的channel数。使用信号与系统的角度来看，如果单独考察某个channel，可以将图像看做是二维离散系统。
-卷积卷积的概念不再详述，利用不同的kernel与原始图像做卷积，就是对图像进行线性滤波的过程。卷积操作时，以某一个点为中心点，最终结果是这个点以及它的邻域点的线性组合，组合">
+<meta name="description" content="数字图像可以看做$\mathbb{R}^2 \rightarrow \mathbb{R}^c$的映射，其中$c$是图像的channel数。使用信号与系统的角度来看，如果单独考察某个channel，可以将图像看做是二维离散系统。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CS131-线性滤波器和矩阵的SVD分解">
-<meta property="og:url" content="http://yoursite.com/2017/01/23/cs131-filter-svd/index.html">
+<meta property="og:url" content="https://xmfbit.github.io/2017/01/23/cs131-filter-svd/index.html">
 <meta property="og:site_name" content="来呀，快活呀~">
-<meta property="og:description" content="数字图像可以看做$\mathbb{R}^2 \rightarrow \mathbb{R}^c$的映射，其中$c$是图像的channel数。使用信号与系统的角度来看，如果单独考察某个channel，可以将图像看做是二维离散系统。
-卷积卷积的概念不再详述，利用不同的kernel与原始图像做卷积，就是对图像进行线性滤波的过程。卷积操作时，以某一个点为中心点，最终结果是这个点以及它的邻域点的线性组合，组合">
-<meta property="og:image" content="http://yoursite.com/img/convolution.png">
-<meta property="og:image" content="http://yoursite.com/img/svd_ranking.png">
-<meta property="og:image" content="http://yoursite.com/img/svd_flower.png">
-<meta property="og:updated_time" content="2017-01-23T08:53:16.000Z">
+<meta property="og:description" content="数字图像可以看做$\mathbb{R}^2 \rightarrow \mathbb{R}^c$的映射，其中$c$是图像的channel数。使用信号与系统的角度来看，如果单独考察某个channel，可以将图像看做是二维离散系统。">
+<meta property="og:image" content="https://xmfbit.github.io/img/svd_picture.jpg">
+<meta property="og:image" content="https://xmfbit.github.io/img/convolution.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/svd_ranking.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/svd_flower.png">
+<meta property="og:updated_time" content="2017-08-10T05:22:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CS131-线性滤波器和矩阵的SVD分解">
-<meta name="twitter:description" content="数字图像可以看做$\mathbb{R}^2 \rightarrow \mathbb{R}^c$的映射，其中$c$是图像的channel数。使用信号与系统的角度来看，如果单独考察某个channel，可以将图像看做是二维离散系统。
-卷积卷积的概念不再详述，利用不同的kernel与原始图像做卷积，就是对图像进行线性滤波的过程。卷积操作时，以某一个点为中心点，最终结果是这个点以及它的邻域点的线性组合，组合">
-<meta name="twitter:image" content="http://yoursite.com/img/convolution.png">
+<meta name="twitter:description" content="数字图像可以看做$\mathbb{R}^2 \rightarrow \mathbb{R}^c$的映射，其中$c$是图像的channel数。使用信号与系统的角度来看，如果单独考察某个channel，可以将图像看做是二维离散系统。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/svd_picture.jpg">
 
 
 
@@ -128,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/01/23/cs131-filter-svd/"/>
+  <link rel="canonical" href="https://xmfbit.github.io/2017/01/23/cs131-filter-svd/"/>
 
 
 
@@ -227,6 +225,16 @@
           </a>
         </li>
       
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
 
       
         <li class="menu-item menu-item-search">
@@ -279,7 +287,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/23/cs131-filter-svd/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/01/23/cs131-filter-svd/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -332,16 +340,6 @@
 
           
             
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/01/23/cs131-filter-svd/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/23/cs131-filter-svd/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
           
 
           
@@ -365,6 +363,8 @@
 
       
         <p>数字图像可以看做$\mathbb{R}^2 \rightarrow \mathbb{R}^c$的映射，其中$c$是图像的channel数。使用信号与系统的角度来看，如果单独考察某个channel，可以将图像看做是二维离散系统。</p>
+<p><img src="/img/svd_picture.jpg" alt="SVD图示"></p>
+<a id="more"></a>
 <h2 id="卷积"><a href="#卷积" class="headerlink" title="卷积"></a>卷积</h2><p>卷积的概念不再详述，利用不同的kernel与原始图像做卷积，就是对图像进行线性滤波的过程。卷积操作时，以某一个点为中心点，最终结果是这个点以及它的邻域点的线性组合，组合系数由kernel决定。一般kernel的大小取成奇数。如下图所示。（图片来自<a href="http://blog.csdn.net/zouxy09/article/details/49080029" target="_blank" rel="external">博客《图像卷积与滤波的一些知识点》</a>）<br><img src="/img/convolution.png" alt="卷积操作示意图"></p>
 <p>在卷积操作时，常常需要对图像做padding，常用的padding方法有：</p>
 <ul>
@@ -486,6 +486,10 @@ u_1 & u_2 &\vdots  &u_n
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2017/01/24/cs131-edge-detection/" rel="prev" title="CS131-边缘检测">
+                CS131-边缘检测 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -525,7 +529,7 @@ u_1 & u_2 &\vdots  &u_n
     </div>
   </div>
 
-          
+
           </div>
           
 
@@ -533,9 +537,7 @@ u_1 & u_2 &\vdots  &u_n
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/01/23/cs131-filter-svd/"
-           data-title="CS131-线性滤波器和矩阵的SVD分解" data-url="http://yoursite.com/2017/01/23/cs131-filter-svd/">
-      </div>
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
     
   </div>
 
@@ -581,7 +583,7 @@ u_1 & u_2 &\vdots  &u_n
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">43</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -592,7 +594,7 @@ u_1 & u_2 &\vdots  &u_n
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -603,6 +605,26 @@ u_1 & u_2 &\vdots  &u_n
         
 
         <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
           
         </div>
 
@@ -744,39 +766,47 @@ u_1 & u_2 &\vdots  &u_n
 
 
 
-  
-
-  
     
-  
-
-  <script type="text/javascript">
-    var duoshuoQuery = {short_name:"xmfbit"};
-    (function() {
-      var ds = document.createElement('script');
-      ds.type = 'text/javascript';ds.async = true;
-      ds.id = 'duoshuo-script';
-      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-      ds.charset = 'UTF-8';
-      (document.getElementsByTagName('head')[0]
-      || document.getElementsByTagName('body')[0]).appendChild(ds);
-    })();
-  </script>
-
-  
-    
-    
-    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
-    <script src="/js/src/hook-duoshuo.js"></script>
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
 
 
 
+  
 
 
 
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
 
 
 

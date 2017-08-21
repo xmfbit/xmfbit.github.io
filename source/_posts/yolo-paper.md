@@ -334,6 +334,18 @@ if (best_iou > l.thresh) {
 }
 ```
 
+这里额外要说明的是，阅读代码可以发现，分类loss的计算方法和V1不同，不再使用MSELoss，而是使用了交叉熵损失函数。对应地，梯度计算的方法如下所示。不过这点在论文中貌似并没有体现。
+```
+// for each class
+for(n = 0; n < classes; ++n){
+    // P_i = \frac{exp^out_i}{sum of exp^out_j}
+    // SoftmaxLoss = -logP(class)
+    // ∂SoftmaxLoss/∂output = -(1(n==class)-P)
+    delta[index + n] = scale * (((n == class)?1 : 0) - output[index + n]);
+    if(n == class) *avg_cat += output[index + n];
+}
+```
+
 ### 改进6：Fine-Gained Features
 这个trick是受Faster RCNN和SSD方法中使用多个不同feature map提高算法对不同分辨率目标物体的检测能力的启发，加入了一个pass-through层，直接将倒数第二层的$26\times 26$大小的feature map加进来。
 

@@ -1,0 +1,959 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="cs131,公开课," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="数字图像是现实世界的物体通过光学成像设备在感光材料上的投影。在3D到2D的转换过程中，深度信息丢失。如何从单幅或者多幅图像中恢复出有用的3D信息，需要使用立体视觉的知识进行分析。如下图所示。这篇博客对课程讲义中立体视觉部分做一整理，分别介绍了针孔相机模型和对极集合的基础知识。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CS131-立体视觉基础">
+<meta property="og:url" content="https://xmfbit.github.io/2017/02/02/cs131-camera/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="数字图像是现实世界的物体通过光学成像设备在感光材料上的投影。在3D到2D的转换过程中，深度信息丢失。如何从单幅或者多幅图像中恢复出有用的3D信息，需要使用立体视觉的知识进行分析。如下图所示。这篇博客对课程讲义中立体视觉部分做一整理，分别介绍了针孔相机模型和对极集合的基础知识。">
+<meta property="og:image" content="https://xmfbit.github.io/img/camera_geometry_application.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/projective_geometry_property_1.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/projective_geometry_property_2.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/pinhole_camera_model.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/qicizuobiao.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/qicizuobiao_transform.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/camera_skew.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/case_1_m.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/case_2_m.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/case_3_m.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/case_4_m.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/camera_translation_rotation.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/case_m_5.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/rotation_matrix.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/case_6_m.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/generic_projection_matrix.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/camera_model_things_to_remember.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/epipolar_fig.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/epipolar_constraint_1.png">
+<meta property="og:updated_time" content="2017-08-10T05:22:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CS131-立体视觉基础">
+<meta name="twitter:description" content="数字图像是现实世界的物体通过光学成像设备在感光材料上的投影。在3D到2D的转换过程中，深度信息丢失。如何从单幅或者多幅图像中恢复出有用的3D信息，需要使用立体视觉的知识进行分析。如下图所示。这篇博客对课程讲义中立体视觉部分做一整理，分别介绍了针孔相机模型和对极集合的基础知识。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/camera_geometry_application.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2017/02/02/cs131-camera/"/>
+
+
+
+
+
+  <title> CS131-立体视觉基础 | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/02/02/cs131-camera/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                CS131-立体视觉基础
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-02T20:38:55+08:00">
+                2017-02-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>数字图像是现实世界的物体通过光学成像设备在感光材料上的投影。在3D到2D的转换过程中，深度信息丢失。如何从单幅或者多幅图像中恢复出有用的3D信息，需要使用立体视觉的知识进行分析。如下图所示。这篇博客对课程讲义中立体视觉部分做一整理，分别介绍了针孔相机模型和对极集合的基础知识。<br><img src="/img/camera_geometry_application.png" alt="立体视觉应用"><br><a id="more"></a></p>
+<h2 id="针孔相机模型（Pinhole-Camera）"><a href="#针孔相机模型（Pinhole-Camera）" class="headerlink" title="针孔相机模型（Pinhole Camera）"></a>针孔相机模型（Pinhole Camera）</h2><p>针孔相机是简化的相机模型。光线沿直线传播。物体反射的光线，通过针孔，在成像面形成倒立的影像。针孔与成像面的距离，称为焦距。一般而言，针孔越小，影像越清晰，但针孔太小，会导致衍射，反而令影像模糊。</p>
+<h3 id="投影几何的重要性质"><a href="#投影几何的重要性质" class="headerlink" title="投影几何的重要性质"></a>投影几何的重要性质</h3><p>在对针孔相机详细说明之前，首先介绍投影几何（Projective Geometry）的几条性质。</p>
+<p>在投影变换前后，长度和角度信息丢失，但直线仍然保持是直线。如下图所示。原来垂直和平行的台球桌面的边不再保持原有的角度和相对长度，但是仍然是直线。<br><img src="/img/projective_geometry_property_1.png" alt="性质1"></p>
+<p>另一方面，虽然3D世界中的平行线在投影变换后相交（我们将交点称为Vanishing point），但是3D世界中互相平行的线，在2D平面上的Vanishing point为同一点。而所有平行线的Vanishing point又在同一条直线上。如下图所示（竖直的绿色平行线在投影变换后仍然保持平行，实际上并不想交，但我们这里认为其交于无穷远的某点）。<br><img src="/img/projective_geometry_property_2.png" alt="性质2"></p>
+<h3 id="针孔相机模型"><a href="#针孔相机模型" class="headerlink" title="针孔相机模型"></a>针孔相机模型</h3><p>如下图所示，为针孔相机成像原理示意图。外部世界的一点$P$发出（或反射）的光线，经过小孔$O$，成像在在像平面$\Pi^\prime$的点$P^\prime$处。通过简单的相似三角形知识，可以得到图上的关系式。<br><img src="/img/pinhole_camera_model.png" alt="针孔相机模型示意图"></p>
+<p>由上图可以知道，3D空间的一点$P$与成像平面上的对应点$P^\prime$坐标之间的数量关系为：</p>
+<script type="math/tex; mode=display">\left\{\begin{matrix}
+x^\prime = fx/z \\
+y^\prime = fy/z
+\end{matrix}\right.</script><p>可是，由于变量$z$位于分母的位置，也就是说如果直接写成变换矩阵的话，这个矩阵是和变量$z$有关的，我们不想这样，而是想得到一个完全由相机本身确定的变换矩阵。所以，我们借鉴齐次矩阵的思想，将原来的点增加一个维度，转换为齐次坐标。如下图的两个例子所示。<br><img src="/img/qicizuobiao.png" alt="齐次坐标"></p>
+<p>这样，我们可以将3D和2D之间的变换写成下面的形式。当实际计算的时候，我们首先将3D点转换为4维向量（在末尾补1），然后左乘变换矩阵。最后将得到的结果化为末尾元素为1的形式，这样，前面两个元素就代表了变换后2D点的坐标。这样做，使得变换矩阵$M$完全由相机参数（即焦距$f$）决定。<br><img src="/img/qicizuobiao_transform.png" alt=""></p>
+<p>上面的式子只是理想情况下的相机模型，成立的假设条件较强，主要有以下几点假设：</p>
+<ol>
+<li>内假设（和相机本身有关）<ul>
+<li>不同方向上焦距相同；</li>
+<li>光学中心在相平面的坐标原点$(0, 0)$</li>
+<li>没有倾斜（no skew）</li>
+</ul>
+</li>
+<li>外假设（和相机位姿有关，和相机本身参数无关）<ul>
+<li>相机没有旋转（坐标轴与世界坐标系方向重合）</li>
+<li>相机没有平移（相机中心与世界坐标系中心重合）</li>
+</ul>
+</li>
+</ol>
+<p>其中，no skew情形我也不知道中文应该如何翻译。这种情况如图所示，由于剪切变形，成像平面的坐标轴并不是严格正交，使得两个轴之间实际存在一个很小的夹角。<br><img src="/img/camera_skew.png" alt="what is &quot;skew&quot;?"></p>
+<p>下面，按照slide的顺序逐渐将上述假设移去，分析变换矩阵$M$应该如何修正。</p>
+<h4 id="理想情况"><a href="#理想情况" class="headerlink" title="理想情况"></a>理想情况</h4><p>理想情况以上假设全部满足，矩阵$M$如下所示。<br><img src="/img/case_1_m.png" alt="case 1: M"></p>
+<h4 id="光学中心不在像平面的坐标原点"><a href="#光学中心不在像平面的坐标原点" class="headerlink" title="光学中心不在像平面的坐标原点"></a>光学中心不在像平面的坐标原点</h4><p>假设光学中心位于像平面内坐标为$(u_0, v_0)$的位置。则需要在理想情况计算的坐标基础上加上这个偏移量。所以，矩阵$M$被修正为：<br><img src="/img/case_2_m.png" alt="case 2: M"></p>
+<h4 id="像素非正方形"><a href="#像素非正方形" class="headerlink" title="像素非正方形"></a>像素非正方形</h4><p>由于透镜在$x$和$y$方向上的焦距不同，使得两个方向上的比例因子不同，不能再使用同一个$f$计算。修正如下：<br><img src="/img/case_3_m.png" alt="case 3: M"></p>
+<h4 id="no-skew"><a href="#no-skew" class="headerlink" title="no skew"></a>no skew</h4><p>这时候$x$方向上其实有$y$轴坐标的分量，所以修正如下：<br><img src="/img/case_4_m.png" alt="case 4: M"></p>
+<h4 id="相机的旋转和平移"><a href="#相机的旋转和平移" class="headerlink" title="相机的旋转和平移"></a>相机的旋转和平移</h4><p>相机外部姿态很可能经过了旋转和平移，从而不与世界坐标系完全重合。如图所示。<br><img src="/img/camera_translation_rotation.png" alt="相机旋转和平移"></p>
+<p>所以我们需要先对世界坐标系内的3D点做一个齐次变换，将其变换为一个中间坐标系，这个中间坐标系和相机坐标系是重合的。也就是我们的变换矩阵应该是下面这个形式的，其中，$H$是表征旋转和平移的齐次矩阵，$H\in \mathbb{R}^{3\times 4}$。</p>
+<script type="math/tex; mode=display">P^\prime = MHP</script><p>首先考虑较为简单的平移。所做的修正如下所示，也就是将原来的$\mathbb{0}$矩阵变为了一个平移向量。<br><img src="/img/case_m_5.png" alt="case 5: M"></p>
+<p>进一步考虑旋转时，我们将旋转分解为绕三个坐标轴的三次旋转，单次旋转矩阵如下所示：<br><img src="/img/rotation_matrix.png" alt="绕单轴的旋转矩阵"></p>
+<p>将它们按照旋转顺序左乘起来，可以得到修正后的变换形式如下：<br><img src="/img/case_6_m.png" alt="case 6: M"></p>
+<h4 id="最终形式"><a href="#最终形式" class="headerlink" title="最终形式"></a>最终形式</h4><p>综上所示，变换矩阵的最终形式为：<br><img src="/img/generic_projection_matrix.png" alt="最终的投影变换矩阵"></p>
+<p>其中，内参数矩阵中有5个自由度，外参数矩阵中有6个自由度（3平移，3旋转）。</p>
+<p>上面的内容总结起来，如下图所示。<br><img src="/img/camera_model_things_to_remember.png" alt="things to remember"></p>
+<h2 id="对极几何"><a href="#对极几何" class="headerlink" title="对极几何"></a>对极几何</h2><h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><p>如下图所示，给出了对极几何中的几个基本概念。两个相机的中心分别位于$O$点和$O^{‘}$点，被观察物体位于$P$点。</p>
+<p><img src="/img/epipolar_fig.png" alt="对极几何概念图示"></p>
+<ul>
+<li>极点：$e$和$e^\prime$点分别是$OO^\prime$连线与两个成像平面的交点，也是相机中心在另一台相机成像平面上对应的像。</li>
+<li>极平面：点$O$，$O^\prime$，$P$点共同确定的平面（灰色）</li>
+<li>极线：极平面与两个成像平面的交线，即$pe$和$p^\prime e^\prime$（蓝色）</li>
+<li>基线：两个相机中心的连线（黄色）</li>
+</ul>
+<h3 id="极线约束"><a href="#极线约束" class="headerlink" title="极线约束"></a>极线约束</h3><p>从上图可以看出，如果两台相机已经给定，那么给定物体点在左边相机像平面内的成像点，则右边相机成像平面内的点被唯一确定。如何能够找到这个对应点呢？或者换种说法，在对极几何中，如何描述这种不同相机成像点的约束关系呢？</p>
+<p>如下图所示，从上面的讨论我们已经知道，物点$P$在左右两个相机成像平面的坐标可以使用由相机内参数矩阵和外参数矩阵确定的齐次变换矩阵得到（下图在标注时，右侧相机的点应被标注为$p^\prime$）。为了简化问题，在下面的讨论时，我们假定相机都是理想的针孔相机模型，也就是说，变换矩阵只和外参数矩阵（也即是相机的位姿决定）。再做简化，认为世界坐标系与左侧相机的相机坐标系重合。那么，就得到了图上所示的变换矩阵$M$和$M^\prime$。其中，$R$是左右两个相机之间的旋转矩阵，$T$是$OO^\prime$有向线段，表明相机中心的位移。<br><img src="/img/epipolar_constraint_1.png" alt="极线约束1"></p>
+<p>（下面的推导参考了<a href="http://www.cnblogs.com/gemstone/articles/2294551.html" target="_blank" rel="external">博客：计算机视觉基础4——对极几何</a>）。在下面的推导中，我们使用$p^\prime$表示在相机$O^\prime$下的向量$O\prime P$，符号$p$同理。那么，有如下关系成立：<br>$R(p-T) = p^\prime$</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cs131/" rel="tag"># cs131</a>
+          
+            <a href="/tags/公开课/" rel="tag"># 公开课</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/30/cs131-sift/" rel="next" title="CS131-描述图像的特征(SIFT)">
+                <i class="fa fa-chevron-left"></i> CS131-描述图像的特征(SIFT)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/04/yolo-paper/" rel="prev" title="YOLO 论文阅读">
+                YOLO 论文阅读 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/liumengli.jpg"
+               alt="一个脱离了高级趣味的人" />
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#针孔相机模型（Pinhole-Camera）"><span class="nav-number">1.</span> <span class="nav-text">针孔相机模型（Pinhole Camera）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#投影几何的重要性质"><span class="nav-number">1.1.</span> <span class="nav-text">投影几何的重要性质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#针孔相机模型"><span class="nav-number">1.2.</span> <span class="nav-text">针孔相机模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#理想情况"><span class="nav-number">1.2.1.</span> <span class="nav-text">理想情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#光学中心不在像平面的坐标原点"><span class="nav-number">1.2.2.</span> <span class="nav-text">光学中心不在像平面的坐标原点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#像素非正方形"><span class="nav-number">1.2.3.</span> <span class="nav-text">像素非正方形</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#no-skew"><span class="nav-number">1.2.4.</span> <span class="nav-text">no skew</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#相机的旋转和平移"><span class="nav-number">1.2.5.</span> <span class="nav-text">相机的旋转和平移</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#最终形式"><span class="nav-number">1.2.6.</span> <span class="nav-text">最终形式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对极几何"><span class="nav-number">2.</span> <span class="nav-text">对极几何</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础概念"><span class="nav-number">2.1.</span> <span class="nav-text">基础概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#极线约束"><span class="nav-number">2.2.</span> <span class="nav-text">极线约束</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
