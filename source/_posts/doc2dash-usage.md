@@ -4,9 +4,11 @@ date: 2017-08-26 19:32:00
 tags:
     - tool
 ---
-Dash是Mac上一款超棒的应用，提供了诸如C/C++/Python甚至是OpenCV/Vim等软件包或工具软件的参考文档。只要使用App的“Download Docsets”功能，就能轻松下载相应文档。使用的时候只需在Dash的搜索框内输入相应位置，Dash会在所有文档中进行搜索，给出相关内容的列表。点击我们要寻找的条款，就能够直接在本地阅读文档。在Ubuntu/Windows平台上，Dash也有对应的替代品，例如[zeal](https://zealdocs.org)就是一款Windows/Linux平台通用的Dash替代软件。
+Dash是Mac上一款超棒的应用，提供了诸如C/C++/Python甚至是OpenCV/Vim等软件包或工具软件的参考文档。只要使用App的“Download Docsets”功能，就能轻松下载相应文档。使用的时候只需在Dash的搜索框内输入相应关键词，Dash会在所有文档中进行搜索，给出相关内容的列表。点击我们要寻找的条款，就能够直接在本地阅读文档。在Ubuntu/Windows平台上，Dash也有对应的替代品，例如[zeal](https://zealdocs.org)就是一款Windows/Linux平台通用的Dash替代软件。
 
-这样强大的软件，如果只能使用官方提供的文档岂不是有些大材小用？[doc2dash](https://doc2dash.readthedocs.io/en/stable/)就是一款能够自动生成Dash兼容docset文件的工具。例如，可以使用它为PyTorch生成本地化的docset文件，并导入Dash/zeal中，在本地进行搜索阅读。本文章是基于doc2dash的官方介绍，对其使用进行的总结。
+这样强大的软件，如果只能使用官方提供的文档岂不是有些大材小用？[doc2dash](https://doc2dash.readthedocs.io/en/stable/)就是一款能够自动生成Dash兼容docset文件的工具。例如，可以使用它为PyTorch生成本地化的docset文件，并导入Dash/zeal中，在本地进行搜索阅读。这不是美滋滋？
+
+本文章是基于doc2dash的官方介绍，对其使用进行的总结。
 ![Demo](/img/doc2dash_pytorch_example.jpg)
 
 <!-- more -->
@@ -42,7 +44,7 @@ make html
 doc2dash -n pytorch $PYTORCH/docs/build/html
 ```
 
-之后，把生成的`pytorch.docset`导入到Dash中即可。如下图所示，点击“+”使用找到文件添加即可。
+之后，把生成的`pytorch.docset`导入到Dash中即可。如下图所示，点击“+”找到文件添加即可。
 ![添加docset](/img/doc2dash_how_to_add_docset.jpg)
 
 ## 在Ubuntu上安装zeal
