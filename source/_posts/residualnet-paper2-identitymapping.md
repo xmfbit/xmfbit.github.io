@@ -52,4 +52,8 @@ $$\frac{\partial \epsilon}{\partial x_l} = \frac{\partial \epsilon} {\partial x_
 所以，Identity Mapping是坠吼的！
 
 ## 花式跑实验
-论文的后半部分，作者开始花式做实验，调研了很多不同的结构，具体实验方案和对比结果可以参看原论文。这里不再罗列了。
+论文的后半部分，作者开始花式做实验，调研了很多不同的结构，具体实验方案和对比结果可以参看原论文。这里不再罗列了。附上自己用PyTorch实现的164层ResNet在CIFAR10上的训练代码：[Gist Code: ResNet-164 training experiment on CIFAR10 using PyTorch](https://gist.github.com/xmfbit/67c407e34cbaf56e7820f09e774e56d8)。
+
+下面的可视化结果由[DMLC/tensorboard](https://github.com/dmlc/tensorboard)实现。图上在$30K$次迭代附近有明显的性能提升，对应于学习率的调整，变为原来的$0.1$。
+![训练集损失和精度](/img/resnet-164layer-cifar10-training.jpg)
+![测试集损失和精度](/img/resnet-164layer-cifar10-testing.jpg)
