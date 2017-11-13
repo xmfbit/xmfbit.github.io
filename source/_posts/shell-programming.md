@@ -117,3 +117,39 @@ cat ori.txt | tr "[a-z]" "A-Z"
 ```
 
 会将`ori.txt`中的小写字母转换为大写，并在终端输出。
+
+### 过滤器（Filter）
+
+Filter是指那些输入和输出都是控制台的命令。通过Filter和输入输出重定向，可以很方便地对文件内容进行整理。例如：
+
+``` bash
+sort < names.txt | uniq > u_names.txt
+```
+
+`uniq`命令可以实现去重，但是需要首先对输入数据进行排序。上面的Filter可以将输入文件`names.txt`中的行文本去重后输出到`u_names.txt`中去。
+
+## 控制流
+
+### if 条件控制
+
+在bash中使用`if`条件控制的语法和MATLAB等很像，要在末尾加上类似`end`的指示符，如下：
+
+``` bash
+if condition
+then 
+XXX
+fi
+```
+
+那么，如何做逻辑运算呢？需要借助`test`关键字。
+
+对于整数来说，我们可以使用`if test op1 oprator op2`的方式，判断操作数`op1`和`op2`的大小关系。其中，`operator`可以是`-gt`，`-eq`等。
+
+或者另一种写法：`if [ op1 operator op2 ]`，但是注意后者`[]`与操作数之间有空格。
+如下表所示（点击可放大）：
+
+![比较整数的逻辑运算](/img/shell-programming-if-operators.jpg)
+
+对于字符串，支持的逻辑判断如下：
+![比较字符串的逻辑运算](/img/bash-programming-comparing-string.jpg)
+
