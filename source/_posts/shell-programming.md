@@ -11,7 +11,9 @@ tags:
 
 ## 变量
 
-变量是代码的基本组成元素。shell中的变量可以分为两类：系统变量和用户自定义变量。下面分别进行介绍。
+变量是代码的基本组成元素。可以认为shell中的变量类型都是字符串。
+
+shell中的变量可以分为两类：系统变量和用户自定义变量。下面分别进行介绍。
 
 在代码中使用变量值的时候，需要在前面加上`$`。`echo`命令可以在控制台打印相应输出。所以使用`echo $var`就可以输出变量`var`的值。
 
@@ -28,6 +30,22 @@ tags:
 # 注意不要在等号两边插入空格
 name=value
 # 如 n=10
+```
+
+### 局部变量和全局变量
+局部变量是指在当前代码块内可见的变量，使用`local`声明。例如下面的代码，将依次输出：111, 222, 111.
+```bash
+#! /bin/sh
+num=111 # 全局变量
+func1()
+{
+  local num=222 # 局部变量
+  echo $num
+}
+
+echo "before---$num"
+func1
+echo "after---$num"
 ```
 
 ### 变量之间的运算
@@ -54,6 +72,14 @@ echo a
 # output: expr 10 \* 3
 a="expr 10 \* 3"
 echo $a
+```
+
+另外，使用""（双引号）括起来的字符串会发生变量替换，而用''（单引号）括起来的字符串则不会。
+
+``` bash
+a=1
+echo "$a"  # 输出 1
+echo '$a'  # 输出 $a
 ```
 
 ### 读取输入
@@ -141,6 +167,19 @@ XXX
 fi
 ```
 
+或者加上`else`，使用如下的形式：
+``` bash
+if condition
+then
+    do something
+elif condition
+then
+    do something
+else
+    do something
+fi
+```
+
 那么，如何做逻辑运算呢？需要借助`test`关键字。
 
 对于整数来说，我们可以使用`if test op1 oprator op2`的方式，判断操作数`op1`和`op2`的大小关系。其中，`operator`可以是`-gt`，`-eq`等。
@@ -152,4 +191,20 @@ fi
 
 对于字符串，支持的逻辑判断如下：
 ![比较字符串的逻辑运算](/img/bash-programming-comparing-string.jpg)
+
+举个例子，我们想判断输入的值是否为1或2，可以使用如下的脚本。注意`[]`的两边一定要加空格。
+``` bash
+#! /bin/bash
+a=1
+if [ $1=$a ]
+then
+    echo "you input 1"
+elif [ $1=2 ]
+then
+    echo "you input 2"
+else
+    echo "you input $1"
+fi
+```
+
 

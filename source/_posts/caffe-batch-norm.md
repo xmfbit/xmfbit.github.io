@@ -99,7 +99,7 @@ BN层的SetUp代码如下。首先，会根据当前处于train还是test决定�
 
 这里有一个地方容易迷惑。BN中要对样本的均值和方差进行统计，即我们需要两个blob来存储。但是从下面的代码可以看到，BN一共有3个blob作为参数。这里做一解释，主要参考了wiki的[moving average条目](https://wiki2.org/en/Moving_average)。
 
-```
+``` cpp
 template <typename Dtype>
 void BatchNormLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
@@ -171,7 +171,7 @@ var = blobs_[1] / blobs_[2]
 
 ### Forward
 下面是Forward CPU的代码。主要应该注意当前batch的mean和var的求法。
-```
+``` cpp
 template <typename Dtype>
 void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
@@ -292,7 +292,7 @@ $$BN(x) = \frac{x-\mu}{\sqrt{Var}}$$
 $$\frac{\partial L}{\partial x} = \frac{1}{\sqrt{Var}}\frac{\partial L}{\partial y}$$
 
 对应的代码如下。其中，`temp_`是broadcasting之后的输入`x`的标准差（见上面`Forward`部分的代码最后），做逐元素的除法即可。
-```
+``` cpp
 if (use_global_stats_) {
   caffe_div(temp_.count(), top_diff, temp_.cpu_data(), bottom_diff);
   return;
@@ -304,7 +304,7 @@ if (use_global_stats_) {
 
 我们使用$y$来代替上面的$\hat{x_i}$，并且上下同时除以$m$，就可以得到Caffe BN代码中所给的BP式子：
 $$\frac{\partial f}{\partial x_i} = \frac{\frac{\partial f}{\partial y}-E[\frac{\partial f}{\partial y}]-yE[\frac{\partial f}{\partial y}y]}{\sqrt{\sigma^2+\epsilon}}$$
-```
+``` cpp
   // if Y = (X-mean(X))/(sqrt(var(X)+eps)), then
   //
   // dE(Y)/dX =
@@ -317,3 +317,12 @@ $$\frac{\partial f}{\partial x_i} = \frac{\frac{\partial f}{\partial y}-E[\frac{
   // equation, the operations allow for expansion (i.e. broadcast) along all
   // dimensions except the channels dimension where required.
 ```
+下面的代码部分就是实现上面这个式子的内容，注释很详细，要解决的一个比较棘手的问题就是broadcasting，这个有兴趣可以看一下。对Caffe中BN的介绍就到这里。下面介绍与BN经常成对出现的Scale层。
+
+## Scale层的实现
+Caffe中将后续的线性变换使用单独的Scale层实现。Caffe中的Scale可以根据需要配置成不同的模式：
+- 当输入blob为两个时，计算输入blob的逐元素乘的结果（维度不相同时，第二个blob可以做broadcasting）。
+- 当输入blob为一个时，计算输入blob与一个可学习参数`gamma`的按元素相乘结果。
+- 当设置`bias_term: true`时，添加一个偏置项。
+
+用于BN的线性变换的计算方法很直接，这里不再多说了。
