@@ -19,10 +19,108 @@ Caffe中的`Blob`在实现的时候，使用了`SyncedMem`管理内存，并在�
 ``` cpp
 // in SyncedMem
 enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
-SuncedHead head_;
+// 使用过Git吗？ 在Git中那个标志着repo最新版本状态的变量就叫 HEAD
+// 这里也是一样，标志着最新的数据位于哪里
+SyncedHead head_;
 ```
 
-这样，利用`head_`变量，就可以构建一个状态转移图，在不同状态下进行必要的同步操作等。
+这样，利用`head_`变量，就可以构建一个状态转移图，在不同状态切换时进行必要的同步操作等。
 ![状态转换图](/img/caffe_syncedmem_transfer.png)
 
 ## 具体实现
+`SyncedMem`的类声明如下：
+
+``` cpp
+/**
+ * @brief Manages memory allocation and synchronization between the host (CPU)
+ *        and device (GPU).
+ *
+ * TODO(dox): more thorough description.
+ */
+class SyncedMemory {
+ public:
+  SyncedMemory();
+  explicit SyncedMemory(size_t size);
+  ~SyncedMemory();
+  // 获取CPU data指针
+  const void* cpu_data();
+  // 设置CPU data指针
+  void set_cpu_data(void* data);
+  // 获取GPU data指针
+  const void* gpu_data();
+  // 设置GPU data指针
+  void set_gpu_data(void* data);
+  // 获取CPU data指针，并在后续将改变指针所指向内存的值
+  void* mutable_cpu_data();
+  // 获取GPU data指针，并在后续将改变指针所指向内存的值
+  void* mutable_gpu_data();
+  // CPU 和 GPU的同步状态：未初始化，在CPU（未同步），在GPU（未同步），已同步
+  enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
+  SyncedHead head() { return head_; }
+  // 内存大小
+  size_t size() { return size_; }
+
+#ifndef CPU_ONLY
+  void async_gpu_push(const cudaStream_t& stream);
+#endif
+
+ private:
+  void check_device();
+
+  void to_cpu();
+  void to_gpu();
+  void* cpu_ptr_;
+  void* gpu_ptr_;
+  size_t size_;
+  SyncedHead head_;
+  bool own_cpu_data_;
+  bool cpu_malloc_use_cuda_;
+  bool own_gpu_data_;
+  // GPU设备编号
+  int device_;
+
+  DISABLE_COPY_AND_ASSIGN(SyncedMemory);
+};  // class SyncedMemory
+```
+
+我们以`to_cpu()`为例，看一下是如何在不同状态之间切换的。
+
+``` cpp
+inline void SyncedMemory::to_gpu() {
+  // 检查设备状态（使用条件编译，只在DEBUG中使能）
+  check_device();
+#ifndef CPU_ONLY
+  switch (head_) {
+  case UNINITIALIZED:
+    // 还没有初始化呢~所以内存啥的还没开
+    // 先在GPU上开块显存吧~
+    CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+    caffe_gpu_memset(size_, 0, gpu_ptr_);
+    // 接着，改变状态标志
+    head_ = HEAD_AT_GPU;
+    own_gpu_data_ = true;
+    break;
+  case HEAD_AT_CPU:
+    // 数据在CPU上~如果需要，先在显存上开内存
+    if (gpu_ptr_ == NULL) {
+      CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+      own_gpu_data_ = true;
+    }
+    // 数据拷贝
+    caffe_gpu_memcpy(size_, cpu_ptr_, gpu_ptr_);
+    // 改变状态变量
+    head_ = SYNCED;
+    break;
+  // 已经在GPU或者已经同步了，什么都不做
+  case HEAD_AT_GPU:
+  case SYNCED:
+    break;
+  }
+#else
+  // NO_GPU 是一个宏，打印FATAL ERROR日志信息
+  // 编译选项没有开GPU支持，只能说 无可奉告
+  NO_GPU;
+#endif
+}
+```
+
