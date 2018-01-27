@@ -83,7 +83,7 @@ class SyncedMemory {
 };  // class SyncedMemory
 ```
 
-我们以`to_cpu()`为例，看一下是如何在不同状态之间切换的。
+我们以`to_cpu()`为例，看一下如何在不同状态之间切换。
 
 ``` cpp
 inline void SyncedMemory::to_gpu() {
@@ -123,4 +123,8 @@ inline void SyncedMemory::to_gpu() {
 #endif
 }
 ```
+
+注意到，除了`head_`以外，`SyncedMemory`中还有`own_gpu_data_`（同样，也有`own_cpu_data_`）的成员。这个变量是用来标志当前CPU或GPU上有没有分配内存，从而当我们使用`set_c/gpu_data`或析构函数被调用的时候，能够正确释放内存/显存的。
+
+
 

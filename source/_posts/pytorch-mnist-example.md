@@ -24,21 +24,24 @@ import torchvision.transforms as transforms
 import torch.nn.functional as F
 import torch.optim as optim
 
+# use cuda or not
+use_cuda = torch.cuda.is_available()
+
 trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (1.0,))])
 
 train_set = dset.MNIST(root=root, train=True, transform=trans, download=download)
 test_set = dset.MNIST(root=root, train=False, transform=trans)
 
 batch_size = 128
-kwargs = {'num_workers': 1, 'pin_memory': True}
+
 train_loader = torch.utils.data.DataLoader(
                  dataset=train_set,
                  batch_size=batch_size,
-                 shuffle=True, **kwargs)
+                 shuffle=True)
 test_loader = torch.utils.data.DataLoader(
                 dataset=test_set,
                 batch_size=batch_size,
-                shuffle=False, **kwargs)
+                shuffle=False)
 
 ```
 
@@ -52,14 +55,12 @@ class MLPNet(nn.Module):
         self.fc1 = nn.Linear(28*28, 500)
         self.fc2 = nn.Linear(500, 256)
         self.fc3 = nn.Linear(256, 10)
-        self.ceriation = nn.CrossEntropyLoss()
-    def forward(self, x, target):
+    def forward(self, x):
         x = x.view(-1, 28*28)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
-        loss = self.ceriation(x, target)
-        return x, loss
+        return x
 ```
 由于PyTorch可以实现自动求导，所以我们只需实现`forward`过程即可。这里由于池化层和非线性变换都没有参数，所以使用了`nn.functionals`中的对应操作实现。通过看文档，可以发现，一般`nn`里面的各种层，都会在`nn.functionals`里面有其对应。例如卷积层的对应实现，如下所示，需要传入卷积核的权重。
 
@@ -73,7 +74,6 @@ F.conv2d(inputs, filters, padding=1)
 同样地，我们可以实现LeNet的结构如下。
 
 ``` py
-
 class LeNet(nn.Module):
     def __init__(self):
         super(LeNet, self).__init__()
@@ -81,8 +81,8 @@ class LeNet(nn.Module):
         self.conv2 = nn.Conv2d(20, 50, 5, 1)
         self.fc1 = nn.Linear(4*4*50, 500)
         self.fc2 = nn.Linear(500, 10)
-        self.ceriation = nn.CrossEntropyLoss()
-    def forward(self, x, target):
+
+    def forward(self, x):
         x = F.relu(self.conv1(x))
         x = F.max_pool2d(x, 2, 2)
         x = F.relu(self.conv2(x))
@@ -90,8 +90,7 @@ class LeNet(nn.Module):
         x = x.view(-1, 4*4*50)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
-        loss = self.ceriation(x, target)
-        return x, loss
+        return x
 ```
 
 ## 训练与测试
@@ -105,27 +104,50 @@ optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 接下来，我们只需要遍历数据集，同时在每次迭代中清空待优化参数的梯度，前向计算，反向传播以及优化器的迭代求解即可。
 
 ``` py
-model = MLPNet().cuda()   # 以MLP为例
+## training
+model = LeNet()
+
+if use_cuda:
+    model = model.cuda()
+
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+
+ceriation = nn.CrossEntropyLoss()
+
 for epoch in xrange(10):
     # trainning
+    ave_loss = 0
     for batch_idx, (x, target) in enumerate(train_loader):
-        optimizer.zero_grad()     #每次都要清空上一步中参数的grad，否则会出错的~
-        x, target = Variable(x.cuda()), Variable(target.cuda())
-        _, loss = model(x, target)   #得到loss
-        loss.backward()              #bp
-        optimizer.step()             #优化器迭代
-        if batch_idx % 100 == 0:
-            print '==>>> epoch: {}, batch index: {}, train loss: {:.6f}'.format(epoch, batch_idx, loss.data[0])
+        optimizer.zero_grad()
+        if use_cuda:
+            x, target = x.cuda(), target.cuda()
+        x, target = Variable(x), Variable(target)
+        out = model(x)
+        loss = ceriation(out, target)
+        ave_loss = ave_loss * 0.9 + loss.data[0] * 0.1
+        loss.backward()
+        optimizer.step()
+        if (batch_idx+1) % 100 == 0 or (batch_idx+1) == len(train_loader):
+            print '==>>> epoch: {}, batch index: {}, train loss: {:.6f}'.format(
+                epoch, batch_idx+1, ave_loss)
     # testing
     correct_cnt, ave_loss = 0, 0
+    total_cnt = 0
     for batch_idx, (x, target) in enumerate(test_loader):
-        x, target = Variable(x.cuda(), volatile=True), Variable(target.cuda(), volatile=True)
-        score, loss = model(x, target)
-        _, pred_label = torch.max(score.data, 1)
+        if use_cuda:
+            x, targe = x.cuda(), target.cuda()
+        x, target = Variable(x, volatile=True), Variable(target, volatile=True)
+        out = model(x)
+        loss = ceriation(out, target)
+        _, pred_label = torch.max(out.data, 1)
+        total_cnt += x.data.size()[0]
         correct_cnt += (pred_label == target.data).sum()
-        ave_loss += loss.data[0]
-    accuracy = correct_cnt*1.0/len(test_loader)/batch_size
-    ave_loss /= len(test_loader)
+        # smooth average
+        ave_loss = ave_loss * 0.9 + loss.data[0] * 0.1
+        
+        if(batch_idx+1) % 100 == 0 or (batch_idx+1) == len(test_loader):
+            print '==>>> epoch: {}, batch index: {}, test loss: {:.6f}, acc: {:.3f}'.format(
+                epoch, batch_idx+1, ave_loss, correct_cnt * 1.0 / total_cnt)
 
 ```
 

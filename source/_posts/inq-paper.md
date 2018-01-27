@@ -30,7 +30,7 @@ $$n_1 = \lfloor \log_2(4s/3) \rfloor$$
 之后做最近舍入就可以了。对于小于最小分辨力$2^{n_2}$的那些权重，将其直接截断为$0$。
 
 ## 训练方法
-量化完成周，网络的精度必然会下降。我们需要对其进行调整，使其精度能够恢复原始模型的水平。为此，作者提出了三个主要步骤，迭代地进行。即 weight partition（权重划分）, group-wise quantization（分组量化） 和re-training（训练）。
+量化完成后，网络的精度必然会下降。我们需要对其进行调整，使其精度能够恢复原始模型的水平。为此，作者提出了三个主要步骤，迭代地进行。即 weight partition（权重划分）, group-wise quantization（分组量化） 和re-training（训练）。
 
 re-training好理解，就是量化之后要继续做finetuning。前面两个名词解释如下：weight partition是指我们不是对整个权重一股脑地做量化，而是将其划分为两个不相交的集合。group-wise quantization是指对其中一个集合中的权重做量化，另一组集合中的权重不变，仍然为FP32。注意，在re-training中，我们只对没有量化的那组参数做参数更新。下面是论文中的表述。
 
