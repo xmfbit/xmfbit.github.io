@@ -2,7 +2,7 @@
 title: Caffe中的BatchNorm实现
 date: 2018-01-08 20:12:44
 tags:
-     - cafe
+     - caffe
 ---
 这篇博客总结了Caffe中BN的实现。
 <!-- more -->
