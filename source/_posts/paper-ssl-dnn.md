@@ -65,3 +65,12 @@ $$E(W) = E_D(W) + \lambda_s \sum_{l=1}^{L}(\sum_{c_l=1}^{C_l}\sum_{m_l=1}^{M_l}\
 $$E(W) = E_D(W) + \lambda_d \sum_{l=1}^{L}\Vert W^{(l)}\Vert_g$$
 
 不过要注意的是，某个layer被稀疏掉了，会切断信息的流通。所以受ResNet启发，加上了short-cut结构。即使SSL移去了该layer所有的filter，上层的feature map仍然可以传导到后面。
+
+## 实验
+分别在MNIST，CIFAR10和ImageNet上做了实验，使用公开的模型做baseline，并以此为基础使用SSL训练。
+### LeNet&MLP@MNIST
+分别使用Caffe中实现的LeNet和MLP做实验。
+
+#### LeNet
+限制SSL为filter-wise和channel-wise稀疏化，来惩罚不重要的filter。下表中，LeNet-1是baseline，2和3是使用不同强度得到的稀疏化结果。可以看到，精度基本没有损失($0.1%$)，但是filter和channel数量都有了较大减少，FLOP大大减少，加速效果比较明显。
+![实验结果1](/img/paper-ssldnn-lenet-penalizing-unimportant-filter-channel.png)
