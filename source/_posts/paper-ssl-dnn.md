@@ -66,6 +66,15 @@ $$E(W) = E_D(W) + \lambda_d \sum_{l=1}^{L}\Vert W^{(l)}\Vert_g$$
 
 不过要注意的是，某个layer被稀疏掉了，会切断信息的流通。所以受ResNet启发，加上了short-cut结构。即使SSL移去了该layer所有的filter，上层的feature map仍然可以传导到后面。
 
+### 两类特殊的稀疏规则
+特意提出下面两种稀疏规则，下面的实验即是基于这两种特殊的稀疏结构。
+
+#### 2D filter sparsity
+卷积层中的3D卷积可以看做是2D卷积的组合（做卷积的时候spatial和channel是不相交的）。这种结构化稀疏是将该卷积层中的每个2D的filter，$W^{(l)}_{n_l,c_l,:,:}$，看做一个group，做group LASSO。这相当于是上述filter-wise和channel-wise的组合。
+
+#### filter-wise和shape-wise的组合加速GEMM
+在Caffe中，3D的权重tensor是reshape成了一个行向量，然后$N_l$个filter的行向量堆叠在一起，就成了一个2D的矩阵。这个矩阵的每一列对应的是$W^{(l)}_{:,c_l,m_l,k_l}$，称为shape sparsity。两者组合，矩阵的零行和零列可以被抽去，相当于GEMM的矩阵行列数少了，起到了加速的效果。
+
 ## 实验
 分别在MNIST，CIFAR10和ImageNet上做了实验，使用公开的模型做baseline，并以此为基础使用SSL训练。
 ### LeNet&MLP@MNIST
@@ -74,3 +83,6 @@ $$E(W) = E_D(W) + \lambda_d \sum_{l=1}^{L}\Vert W^{(l)}\Vert_g$$
 #### LeNet
 限制SSL为filter-wise和channel-wise稀疏化，来惩罚不重要的filter。下表中，LeNet-1是baseline，2和3是使用不同强度得到的稀疏化结果。可以看到，精度基本没有损失($0.1%$)，但是filter和channel数量都有了较大减少，FLOP大大减少，加速效果比较明显。
 ![实验结果1](/img/paper-ssldnn-lenet-penalizing-unimportant-filter-channel.png)
+
+将网络`conv1`的filter可视化如下。可以看到，对于LeNet2来说，大多数filter都被稀疏掉了。
+![LeNet的实验结果](/img/paper-ssldnn-experiment-on-lenet.png)
