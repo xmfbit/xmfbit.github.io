@@ -49,7 +49,7 @@ message NetParameter {
 ```
 
 ### Input的定义
-在`train`和`deploy`的时候，输入的定义常常是不同的。在`train`时，我们需要提供数据$x$和真实值$y$，这样网络的输出$\hat{y} = \mathcal{F}_\theta (x)$与真实值$y$计算损失，完成bp，更新网络参数$\theta$。
+在`train`和`deploy`的时候，输入的定义常常是不同的。在`train`时，我们需要提供数据$x$和真实值$y$，这样网络的输出$\hat{y} = \mathcal{F}_\theta (x)$与真实值$y$计算损失，bp，更新网络参数$\theta$。
 
 
 在`deploy`时，推荐使用`InputLayer`定义网络的输入，下面是`$CAFFE/models/bvlc_alexnet/deploy.prototxt`中的输入定义：
