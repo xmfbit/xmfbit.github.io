@@ -73,6 +73,7 @@ $$I_xu+I_yv+I_t=0$$
 $$I_t = (1-t)I_0+tI_1$$
 
 这种方法称为"cross-fading"。效果如下。可以看到有较多的模糊抖动。
+![动图](/img/cs131_opticalflow_assignment_crossfade.gif)
 ![简单粗暴法效果](/img/cs131_opticalflow_assignment_crossfade.png)
 
 ### 基于光流法
@@ -89,9 +90,31 @@ for y =1:height
     end
 end
 ```
+这种方法叫做"ForwardWarpping"。效果如下。可以看到，与上一种方法对比，画面有了明显的提升。
+![动图](/img/cs131_opticalflow_assignment_forwardwarped.gif)
+![逐帧](/img/cs131_opticalflow_assignment_forwardwarped.png)
+
 
 ### 改进
-上面的式子假定光流不变，但是实际上光流很可能也是改变的。考虑到光流的变化，下式的计算应该更加接近：
+上面的方法我们假设光流一直保持不变，用$t=1$时刻的光流去代替之间所有时刻的光流。但实际上光流一定是在实时变化的。使用*backward warpping*改进，使用$t$时刻的光流反推。
 $$I_t(x,y) = I_0(x-tu_t(x,y), y-tv_t(x,y))$$
 
-然而，我们并不能得到$u_t$和$v_t$的准确值。我们使用下面的方法近似求解。
+然而，我们并不能得到$t$时刻光流$u_t$和$v_t$的准确值，只能近似计算。方法如下：
+
+$$u_t(\hat{x},\hat{y}) = u_0(x,y)$$
+$$v_t(\hat{x},\hat{y}) = v_0(x,y)$$
+
+其中，$x^\prime = x+u_0t$，$y^\prime = y+v_0t$，$\hat{x}\in\lbrace\text{floor}(x^\prime), \text{ceil}(x^\prime)\rbrace$，$\hat{y}\in\lbrace\text{floor}(y^\prime), \text{ceil}(y^\prime)\rbrace$。
+
+这在一定程度上补偿了光流计算的误差。
+
+如果某个点$(\hat{x}, \hat{y})$被多个初始点$(x, y)$对应，那么我们选取使得下面的式子取得最小值的那个点$(x, y)$，也就是选取那个亮度变化最小的点。
+
+$$\vert I_0(x, y) − I_1(x + u_0(x, y), y + v_0(x, y))\vert$$
+
+如果某个点没有找到相对应的初始点，那么我们使用线性插值方法为其填充光流。
+
+下面是这种方法的效果示意。
+
+![动图](/img/cs131_opticalflow_assignment_flowwarped.gif)
+![逐帧](/img/cs131_opticalflow_assignment_flowwarped.png)

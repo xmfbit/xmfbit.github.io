@@ -121,7 +121,7 @@ sudo apt-get autoremove
 在这个过程中，作者提到登录界面会出现两次，再次重启之后没有这个问题了。我也遇到了相同的情况。所以，不要慌！
 
 ## 测试CUDA
-我们来测试一下CUDA。首先，依照你使用shell的不同，将环境变量加入到`~/.bashrc`或者`~/.zshrc`中去（不过我相信在经历完这些安装之后应该还没有闲心去搞oh-my-zsh。。。）。
+我们来测试一下CUDA。首先，依照你使用shell的不同，将环境变量加入到`~/.bashrc`或者`~/.zshrc`（如果使用zsh）中去。
 ``` sh
 export PATH="$PATH:/usr/local/cuda-8.0/bin"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda-8.0/lib"
@@ -141,5 +141,5 @@ make -j12
 ```
 
 ## Last But Not Least
-安装玩CUDA之后，不要随便更新系统！！！否则可能会损坏你的Kernel和Xserver。
+安装完CUDA之后，不要随便更新系统！！！否则可能会损坏你的Kernel和Xserver。
 ![微笑就好](/img/install_ubuntu_in_dell_weixiaojiuhao.jpg)
