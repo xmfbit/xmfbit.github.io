@@ -31,11 +31,11 @@ $$\begin{aligned}\nabla_\theta J(\theta) &= \frac{1}{2}\nabla_\theta (\theta^T x
 上面的梯度下降只是对单个样本来做的。实际上，我们可以取整个训练集或者训练集的一部分，计算平均损失函数$J(\theta) = \frac{1}{N}\sum_{i=1}^{N}J_i(\theta)$，做梯度下降，道理是一样的，只不过相差了常数因子$\frac{1}{N}$。
 
 ### 正则方程
-除了梯度下降方法之外，上述问题还存在着解析解。我们将所有的样本输入$x^{(i)}$作为行向量，构成矩阵$X \in \mathbb{R}^{N\times m}$。其中，$N$为样本总数，$d$为单个样本的特征个数。那么，对于参数$\theta\in\mathbb{R}^{d\times 1}$来说，$X\theta$的第$i$行就可以给出模型对第$i$个样本的预测结果。我们将ground truth排成一个$N\times 1$的矩阵，那么，损失函数可以写作：
+除了梯度下降方法之外，上述问题还存在着解析解。我们将所有的样本输入$x^{(i)}$作为行向量，构成矩阵$X \in \mathbb{R}^{N\times d}$。其中，$N$为样本总数，$d$为单个样本的特征个数。那么，对于参数$\theta\in\mathbb{R}^{d\times 1}$来说，$X\theta$的第$i$行就可以给出模型对第$i$个样本的预测结果。我们将ground truth排成一个$N\times 1$的矩阵，那么，损失函数可以写作：
 $$J(\theta) = \frac{1}{2N} \Vert X\theta-y \Vert_2^2$$
 
 将$\Vert x\Vert_2^2$写作$x^T x$，同时略去常数项，我们有：
-$$\begin{aligned}J &= (X\theta - y)^T (X\theta - y)
+$$\begin{aligned}J &= (X\theta - y)^T (X\theta - y) \\
 &= \theta^T X^T X\theta - 2\theta^T x^T y +y^T y\end{aligned}$$
 
 对其求导，有：
@@ -55,7 +55,7 @@ $$\theta^* = (X^TX)^{-1}X^T y$$
 $$L(\theta) = \prod_{i=1}^{N}P(y^{(i)}|x^{(i)};\theta)$$
 
 假设线性模型的预测结果和ground truth之间的误差服从Gaussian分布，也就是说，
-$$y - \theta^T x  =  \epsilon \sim \mathcal{N}$$
+$$y - \theta^T x  =  \epsilon \sim \mathcal{N}(0, \sigma^2)$$
 
 那么上面的似然函数可以写作：
 $$L(\theta) = \prod_{i=1}^{N}\frac{1}{\sqrt{2\pi\sigma}}\exp(\frac{(y^{(i)}-\theta^T x^{(i)})^2}{2\sigma^2})$$
@@ -63,7 +63,7 @@ $$L(\theta) = \prod_{i=1}^{N}\frac{1}{\sqrt{2\pi\sigma}}\exp(\frac{(y^{(i)}-\the
 如何估计参数$\theta$呢？我们可以认为，参数$\theta$使得出现样本点$(x^{(i)}, y^{(i)})$的概率变大，所以才能被我们观测到。自然，我们需要使得似然函数$L(\theta)$取得极大值，也就是说：
 $$\theta^* = \arg\max L(\theta)$$
 
-通过引入$\log(\cdot)$，可以将连乘变成连加，这样，实际上我们操作的是对数似然函数$\log L(\theta)$。有：
+通过引入$\log(\cdot)$，可以将连乘变成连加，同时不改变函数的单调性。这样，实际上我们操作的是对数似然函数$\log L(\theta)$。有：
 $$\begin{aligned} \mathcal{l} &= \log L(\theta) \\
 &= \sum_{i=1}^{N}\log \frac{1}{\sqrt{2\pi\sigma^2}} \exp (\frac{(y^{(i)}-\theta^T x^{(i)})^2}{2\sigma^2})\\
 &= N\log\frac{1}{\sqrt{2\pi\sigma^2}} -\frac{1}{\sigma^2}\frac{1}{2}\sum_{i=1}^{N}(y^{(i)}-\theta^T x^{(i)})^2 \end{aligned}$$
@@ -92,12 +92,12 @@ $$\begin{aligned}P(y=1|x) &= h_\theta(x) \\
 P(y=0|x) &= 1-h_\theta(x) \end{aligned}$$
 
 或者我们写的更紧凑些：
-$$P(y|x) = (h_\theta(x))^y (1-h_\theta(x))*(1-y)$$
+$$P(y|x) = (h_\theta(x))^y (1-h_\theta(x))^(1-y)$$
 
 我们仍然使用上述极大似然的估计方法，求取参数$\theta$，为求简练，隐去了上标$(i)$。
 
-$$\begin{aligned}L(\theta) &= \prod_{i=1}^{N}P(y|x;\theta)
-&=\prod (h_\theta(x))^y (1-h_\theta(x))*(1-y) \end{aligned}$$
+$$\begin{aligned}L(\theta) &= \prod_{i=1}^{N}P(y|x;\theta) \\
+&=\prod (h_\theta(x))^y (1-h_\theta(x))^(1-y) \end{aligned}$$
 
 取对数：
 $$\log L(\theta) = \sum_{i=1}^{N}y\log(h(x)) + (1-y)\log(1-h(x))$$
