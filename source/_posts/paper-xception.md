@@ -1,5 +1,5 @@
 ---
-title: 论文 - Xception(Deep Learning with Depthwise separable Convolution)
+title: 论文 - Xception, Deep Learning with Depthwise separable Convolution
 date: 2018-03-22 09:44:38
 tags:
     - paper
