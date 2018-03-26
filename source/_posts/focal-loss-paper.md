@@ -5,11 +5,14 @@ tags:
     - paper
     - deep learning
 ---
-Focal Loss这篇文章是He Kaiming和Ross发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的[讨论](https://www.zhihu.com/question/63581984)。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。
+Focal Loss这篇文章是He Kaiming和RBG发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的[讨论](https://www.zhihu.com/question/63581984)。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。
 
 下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型。不过图上没有加入YOLO的对比。YOLO的速度仍然是其一大优势，但是精度和其他方法相比，仍然不高。
 
 ![不同模型关于精度和速度的比较](/img/focal_loss_different_model_comparison.jpg)
+
+Update@2018.03.26 YOLO更新了v3版本，见[项目主页](https://pjreddie.com/darknet/yolo/)，并“点名”与有Focal Loss加持的Retina Net相比较，见下图。
+![YOLO v3](/img/yolov3-comparision-with-retina.png)
 <!-- more -->
 
 ## 为什么要有Focal Loss？
@@ -51,6 +54,50 @@ $$\text{FL}(p_t) = -(1-p_t)^\gamma\log(p_t)$$
 
 在实际实验中，作者使用的是加权之后的Focal Loss，作者发现这样能够带来些微的性能提升。
 
+## 实现
+这里给出PyTorch中第三方给出的[Focal Loss的实现](https://github.com/DingKe/pytorch_workplace/blob/master/focalloss/loss.py)。在下面的代码中，首先实现了`one-hot`编码，给定类别总数`classes`和当前类别`index`，生成one-hot向量。那么，Focal Loss可以用下面的式子计算（可以对照交叉损失熵使用onehot编码的计算）。其中，$\odot$表示element-wise乘法。
+
+$$L = -\sum_{i}^{C}\text{onehot}\odot (1-P_i)^\gamma \log P_i$$
+
+``` py
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd import Variable
+
+
+def one_hot(index, classes):
+    size = index.size() + (classes,)
+    view = index.size() + (1,)
+
+    mask = torch.Tensor(*size).fill_(0)
+    index = index.view(*view)
+    ones = 1.
+
+    if isinstance(index, Variable):
+        ones = Variable(torch.Tensor(index.size()).fill_(1))
+        mask = Variable(mask, volatile=index.volatile)
+
+    return mask.scatter_(1, index, ones)
+
+
+class FocalLoss(nn.Module):
+    def __init__(self, gamma=0, eps=1e-7):
+        super(FocalLoss, self).__init__()
+        self.gamma = gamma
+        self.eps = eps
+
+    def forward(self, input, target):
+        y = one_hot(target, input.size(-1))
+        logit = F.softmax(input)
+        logit = logit.clamp(self.eps, 1. - self.eps)
+
+        loss = -1 * y * torch.log(logit) # cross entropy
+        loss = loss * (1 - logit) ** self.gamma # focal loss
+
+        return loss.sum()
+```
+
 ## 模型初始化
 对于一般的分类网络，初始化之后，往往其输出的预测结果是均等的（随机猜测）。然而作者认为，这种初始化方式在类别极度不均衡的时候是有害的。作者提出，应该初始化模型参数，使得初始化之后，模型输出稀有类别的概率变小（如$0.01$）。作者发现这种初始化方法对于交叉熵损失和Focal Loss的性能提升都有帮助。
 
@@ -59,4 +106,4 @@ $$\text{FL}(p_t) = -(1-p_t)^\gamma\log(p_t)$$
 这样进行模型初始化造成的结果就是，在初始阶段，不会产生大量的False Positive，使得训练更加稳定。
 
 ## RetinaNet
-作者利用前面介绍的发现和结论，基于ResNet和Feature Pyramid Net（FPN）设计了一种新的one-stage检测框架，命名为RetinaNet。
+作者利用前面介绍的发现和结论，基于ResNet和Feature Pyramid Net（FPN）设计了一种新的one-stage检测框架，命名为RetinaNet。（待续）
