@@ -3,7 +3,8 @@ title: Incremental Network Quantization 论文阅读
 date: 2018-01-25 15:30:28
 tags:
     - paper
-    - quantize
+    - quantization
+    - deep learning
 ---
 卷积神经网络虽然已经在很多任务上取得了很棒的效果，但是模型大小和运算量限制了它们在移动设备和嵌入式设备上的使用。模型量化压缩等问题自然引起了大家的关注。[Incremental Network Quantization](https://arxiv.org/abs/1702.03044)这篇文章关注的是如何使用更少的比特数进行模型参数量化以达到压缩模型，减少模型大小同时使得模型精度无损。如下图所示，使用5bit位数，INQ在多个模型上都取得了不逊于原始FP32模型的精度。实验结果还是很有说服力的。作者将其开源在了GitHub上，见[Incremental-Network-Quantization](https://github.com/Zhouaojun/Incremental-Network-Quantization)。
 ![实验结果](/img/paper-inq-result.png)

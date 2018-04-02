@@ -3,6 +3,8 @@ title: 捉bug记 - JupyterNotebook中使用pycaffe加载多个模型一直等待
 date: 2018-02-27 13:30:25
 tags:
     - caffe
+    - python
+    - debug
 ---
 JupyteNotebook是个很好的工具，但是在使用pycaffe试图在notebook中同时加载多个caffemodel模型的时候，却出现了无法加载的问题。
 

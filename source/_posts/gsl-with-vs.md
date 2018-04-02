@@ -3,7 +3,6 @@ title: 使用 Visual Studio 编译 GSL 科学计算库
 date: 2016-12-16 19:00:00
 tags:
     - tool
-    - gsl
 ---
 
 GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。

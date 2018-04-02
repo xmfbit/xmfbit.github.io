@@ -3,6 +3,7 @@ title: 使用IPDB调试Python代码
 date: 2017-08-21 15:53:16
 tags:
     - python
+    - debug
 ---
 IPDB是什么？IPDB（Ipython Debugger），和GDB类似，是一款集成了Ipython的Python代码命令行调试工具，可以看做PDB的升级版。这篇文章总结IPDB的使用方法，主要是若干命令的使用。更多详细的教程或文档还请参考Google。
 <!-- more -->

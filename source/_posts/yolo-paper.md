@@ -5,6 +5,7 @@ tags:
     - paper
     - yolo
     - deep learning
+    - detection
 ---
 YOLO(**Y**ou **O**nly **L**ook **O**nce)是一个流行的目标检测方法，和Faster RCNN等state of the art方法比起来，主打检测速度快。截止到目前为止（2017年2月初），YOLO已经发布了两个版本，在下文中分别称为[YOLO V1](https://arxiv.org/abs/1506.02640)和[YOLO V2](https://arxiv.org/abs/1612.08242)。YOLO V2的代码目前作为[Darknet](http://pjreddie.com/darknet/yolo/)的一部分开源在[GitHub]()。在这篇博客中，记录了阅读YOLO两个版本论文中的重点内容，并着重总结V2版本的改进。
 

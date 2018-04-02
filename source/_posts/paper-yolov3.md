@@ -5,6 +5,7 @@ tags:
     - paper
     - deep learning
     - detection
+    - yolo
 ---
 YOLO的作者又放出了V3版本，在之前的版本上做出了一些改进，达到了更好的性能。这篇博客介绍这篇论文：[YOLOv3: An Incremental Improvement](https://pjreddie.com/media/files/papers/YOLOv3.pdf)。下面这张图是YOLO V3与RetinaNet的比较。
 ![YOLO v3和RetinaNet的比较](/img/paper-yolov3-comparison-retinanet.png)

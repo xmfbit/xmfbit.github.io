@@ -3,7 +3,6 @@ title: Caffe中卷积的大致实现思路
 date: 2018-02-26 15:26:09
 tags:
      - caffe
-     - deep learning
 ---
 参考资料：知乎：[在Caffe中如何计算卷积](https://www.zhihu.com/question/28385679)。
 ![Naive Loop](/img/conv-in-caffe-naive-loop.png)

@@ -97,7 +97,7 @@ $$P(y|x) = (h_\theta(x))^y (1-h_\theta(x))^(1-y)$$
 我们仍然使用上述极大似然的估计方法，求取参数$\theta$，为求简练，隐去了上标$(i)$。
 
 $$\begin{aligned}L(\theta) &= \prod_{i=1}^{N}P(y|x;\theta) \\
-&=\prod (h_\theta(x))^y (1-h_\theta(x))^(1-y) \end{aligned}$$
+&=\prod (h_\theta(x))^y (1-h_\theta(x))^{(1-y)} \end{aligned}$$
 
 取对数：
 $$\log L(\theta) = \sum_{i=1}^{N}y\log(h(x)) + (1-y)\log(1-h(x))$$

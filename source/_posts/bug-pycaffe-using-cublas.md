@@ -3,6 +3,8 @@ title: 捉bug记 - Cannot create Cublas handle. Cublas won't be available.
 date: 2018-02-08 14:16:53
 tags:
     - caffe
+    - python
+    - debug
 ---
 这两天在使用Caffe的时候出现了一个奇怪的bug。当使用C++接口时，完全没有问题；但是当使用python接口时，会出现错误提示如下：
 ```
