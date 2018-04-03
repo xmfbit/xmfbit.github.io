@@ -41,11 +41,11 @@ Top-down pathway是指将深层的有更强语义信息的feature经过upsamplin
 
 一些细节，直接引用：
 
-> To start the iteration, we simply attach a 1⇥1 convolutional layer on C5 to produce the coarsest resolution map. Finally, we append a 3⇥3 convolution on each merged map to generate the final feature map, which is to reduce the aliasing effect of upsampling.
+> To start the iteration, we simply attach a 1x1 convolutional layer on C5 to produce the coarsest resolution map. Finally, we append a 3x3 convolution on each merged map to generate the final feature map, which is to reduce the aliasing effect of upsampling.
 
 此外，由于金字塔上的所有feature共享classifier和regressor，要求它们的channel dimension必须一致。本文固定使用$256$。而且这些外的conv layer没有使用非线性激活。
 
-我们这里给出一个基于PyTorch的FPN的第三方实现[kuangliu/pytorch-fpn](https://github.com/kuangliu/pytorch-fpn/blob/master/fpn.py)。
+这里给出一个基于PyTorch的FPN的第三方实现[kuangliu/pytorch-fpn](https://github.com/kuangliu/pytorch-fpn/blob/master/fpn.py)，可以对照论文捋一遍。
 ``` py
 ## ResNet的block
 class Bottleneck(nn.Module):
@@ -83,7 +83,7 @@ class FPN(nn.Module):
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
 
-        # Bottom-up layers
+        # Bottom-up layers, backbone of the network
         self.layer1 = self._make_layer(block,  64, num_blocks[0], stride=1)
         self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
@@ -161,5 +161,11 @@ class FPN(nn.Module):
 ## 应用
 下面作者会把FPN应用到FasterRCNN的两个重要步骤：RPN和Fast RCNN。
 ### FPN加持的RPN
+在Faster RCNN中，RPN用来提供ROI的proposal。backbone网络输出的single feature map上接了$3\times 3$大小的卷积核来实现sliding window的功能，后面接两个$1\times 1$的卷积分别用来做objectness的分类和bounding box基于anchor box的回归。我们把最后的classifier和regressor部分叫做head。
 
+使用FPN时，我们在金字塔每层的输出feature map上都接上这样的head结构（$3\times 3$的卷积 + two sibling $1\times 1$的卷积）。同时，我们不再使用多尺度的anchor box，而是在每个level上分别使用不同大小的anchor box。具体说，对应于特征金字塔的$5$个level的特征，`P2 - P6`，anchor box的大小分别是$32^2, 64^2, 128^2, 256^2, 512^2$。不过每层的anchor box仍然要照顾到不同的长宽比例，我们使用了$3$个不同的比例：$1:2, 1:1, 2:1$（和原来一样）。这样，我们一共有$5\times 3 = 15$个anchor box。
+
+训练过程中，我们需要给anchor boxes赋上对应的正负标签。对于那些与ground truth有最大IoU或者与任意一个ground truth的IoU超过$0.7$的anchor boxes，是positive label；那些与所有ground truth的IoU都小于$0.3$的是negtive label。
+
+有一个疑问是head的参数是否要在不同的level上共享。我们试验了共享与不共享两个方法，accuracy是相近的。这也说明不同level之间语义信息是相似的，只是resolution不同。
 ### FPN加持的Fast RCNN
