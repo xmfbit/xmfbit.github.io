@@ -168,4 +168,9 @@ class FPN(nn.Module):
 训练过程中，我们需要给anchor boxes赋上对应的正负标签。对于那些与ground truth有最大IoU或者与任意一个ground truth的IoU超过$0.7$的anchor boxes，是positive label；那些与所有ground truth的IoU都小于$0.3$的是negtive label。
 
 有一个疑问是head的参数是否要在不同的level上共享。我们试验了共享与不共享两个方法，accuracy是相近的。这也说明不同level之间语义信息是相似的，只是resolution不同。
+
 ### FPN加持的Fast RCNN
+Fast RCNN的原始方法是只在single scale的feature map上做的，要想使用FPN，首先应该解决的问题是前端提供的ROI proposal应该对应到pyramid的哪一个label。由于我们的网络基本都是在ImageNet训练的网络上做transfer learning得到的，我们就以base model在ImageNet上训练时候的输入$224\times 224$作为参考，依据当前ROI和它的大小比例，确定该把这个ROI对应到哪个level。如下所示：
+$$k = \lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor$$
+
+后面接的predictor head我们这里直接连了两个$1024d$的fc layer，再接final classification和regression的部分。同样的，这些参数对于不同level来说是共享的。
