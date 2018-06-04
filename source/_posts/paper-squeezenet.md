@@ -29,7 +29,7 @@ tags:
 > Our intuition is that large activation maps (due to delayed downsampling) can lead to higher classification accuracy, with all else held equal.
 
 ### Fire Module
-Fire Module是SNet的基本组成单元，如下图所示。可以分为两个部分，一个是上面的*squeeze*部分，是一组$1\times 1$的卷积，用来将输入的channel squeeze到一个较小的值。后面是*expand*部分，由$1\times 1$和$3\times 3$卷积mix起来。使用$s_{1 x 1}$，$e_{1x1}$和$e_{3x3}$表示squeeze和expand中两种不同卷积的channel数量，令$s_{1x1} < e_{1x1} + e_{3x3}$，用来实现上述策略2.
+Fire Module是SNet的基本组成单元，如下图所示。可以分为两个部分，一个是上面的*squeeze*部分，是一组$1\times 1$的卷积，用来将输入的channel squeeze到一个较小的值。后面是*expand*部分，由$1\times 1$和$3\times 3$卷积mix起来。使用$s\_{1 x 1}$，$e\_{1x1}$和$e\_{3x3}$表示squeeze和expand中两种不同卷积的channel数量，令$s\_{1x1} < e\_{1x1} + e\_{3x3}$，用来实现上述策略2.
 ![Fire Module示意](/img/paper-squeezenet-fire-module.png)
 
 下面，对照PyTorch实现的SNet代码看下Fire的实现，注意上面说的CONV后面都接了ReLU。
@@ -131,13 +131,13 @@ class SqueezeNet(nn.Module):
 注意上述结果是使用HanSong的Deep Compression技术（聚类+codebook）得到的。这种方法得到的模型在通用计算平台（CPU/GPU）上的优势并不明显，需要在作者提出的EIE硬件上才能充分发挥其性能。对于线性的量化（直接用量化后的$8$位定点存储模型），[Ristretto](http://lepsucd.com/?page_id=630)实现了SNet的量化，但是有一个点的损失。
 
 ## Micro Arch探索
-所谓CNN的Micro Arch，是指如何确定各层的参数，如filter的个数，kernel size的大小等。在SNet中，主要是filter的个数，即上文提到的$s_{1x1}$，$e_{1x1}$和$e_{3x3}$。这样，$8$个Fire Module就有$24$个超参数，数量太多，我们需要加一些约束，暴露主要矛盾，把问题变简单一点。
+所谓CNN的Micro Arch，是指如何确定各层的参数，如filter的个数，kernel size的大小等。在SNet中，主要是filter的个数，即上文提到的$s\_{1x1}$，$e\_{1x1}$和$e\_{3x3}$。这样，$8$个Fire Module就有$24$个超参数，数量太多，我们需要加一些约束，暴露主要矛盾，把问题变简单一点。
 
 我们设定$base_e$是第一个Fire Module的expand layer的filter个数，每隔$freq$个Fire Module，会加上$incr_e$这么多。那么任意一个Fire Module的expand layer filter的个数为$e_i = base_e + (incr_e \times \lfloor \frac{i}{freq}\rfloor)$。
 
-在expand layer，我们有$e_i = e_{i,1x1} + e_{i,3x3}$，设定$pct_{3x3} = e_{i,3x3}/e_i$为$3\times 3$的conv占的比例。
+在expand layer，我们有$e\_i = e\_{i,1x1} + e\_{i,3x3}$，设定$pct\_{3x3} = e\_{i,3x3}/e\_i$为$3\times 3$的conv占的比例。
 
-设定$SR = s_{i,1x1} / e_i$，为squeeze和expand filter个数比例。
+设定$SR = s\_{i,1x1} / e\_i$，为squeeze和expand filter个数比例。
 
 ### SR的影响
 $SR$于区间$[0.125, 1]$之间取，accuracy基本随着$SR$增大而提升，同时模型的size也在变大。但$SR$从$0.75$提升到$1.0$，accuracy无提升。publish的SNet使用了$SR=0.125$。
