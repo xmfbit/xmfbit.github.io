@@ -4,6 +4,7 @@ date: 2018-03-14 16:18:53
 tags:
      - paper
      - deep learning
+     - model compression
 ---
 Han Song的Deep Compression是模型压缩方面很重要的论文。在Deep Compression中，作者提出了三个步骤来进行模型压缩：剪枝，量化和霍夫曼编码。其中，剪枝对应的方法就是基于本文要总结的这篇论文：[Learning both Weights and Connections for Efficient Neural Networks](https://arxiv.org/abs/1506.02626)。在这篇论文中，作者介绍了如何在不损失精度的前提下，对深度学习的网络模型进行剪枝，从而达到减小模型大小的目的。
 ![Pruning的主要过程](/img/paper-pruning-network-demo.png)

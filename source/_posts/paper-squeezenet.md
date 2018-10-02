@@ -2,6 +2,9 @@
 title: 论文 - SqueezeNet, AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size
 date: 2018-03-24 14:02:53
 tags:
+    - paper
+    - deep learning
+    - model compression
 ---
 [SqueezeNet](https://arxiv.org/abs/1602.07360)由HanSong等人提出，和AlexNet相比，用少于$50$倍的参数量，在ImageNet上实现了comparable的accuracy。比较本文和HanSoing其他的工作，可以看出，其他工作，如Deep Compression是对已有的网络进行压缩，减小模型size；而SqueezeNet是从网络设计入手，从设计之初就考虑如何使用较少的参数实现较好的性能。可以说是模型压缩的两个不同思路。
 

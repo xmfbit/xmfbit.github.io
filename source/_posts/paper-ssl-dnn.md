@@ -4,6 +4,7 @@ date: 2018-02-24 10:21:14
 tags:
     - deep learning
     - paper
+    - model compression
 ---
 DNN的稀疏化？用L1正则项不就好了？在很多场合，这种方法的确可行。但是当试图使用FPGA/AISC加速DNN的前向计算时，我们希望DNN的参数能有一些结构化的稀疏性质。这样才能减少不必要的cache missing等问题。在[这篇文章](https://arxiv.org/pdf/1608.03665.pdf)中，作者提出了一种结构化稀疏的方法，能够在不损失精度的前提下，对深度神经网络进行稀疏化，达到加速的目的。本文作者[温伟](http://www.pittnuts.com/)，目前是杜克大学Chen Yiran组的博士生，做了很多关于结构化稀疏和DNN加速相关的工作。本文发表在NIPS 2016上。本文的代码已经公开：[GitHub](https://github.com/wenwei202/caffe/tree/scnn)
 ![SSL的原理示意图](/img/paper-ssldnn.png)

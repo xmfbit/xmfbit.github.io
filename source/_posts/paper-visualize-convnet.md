@@ -4,6 +4,7 @@ date: 2018-02-08 10:48:21
 tags:
     - paper
     - deep learning
+    - visulization
 ---
 [Visualizing & Understanding ConvNet](https://arxiv.org/pdf/1311.2901.pdf)这篇文章是比较早期关于CNN调试的文章，作者利用可视化方法，设计了一个超过AlexNet性能的网络结构。
 

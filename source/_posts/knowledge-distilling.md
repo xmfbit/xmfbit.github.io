@@ -2,6 +2,9 @@
 title: 论文 - Distilling the Knowledge in a Neural Network
 date: 2018-06-07 21:56:12
 tags:
+    - paper
+    - deep learning
+    - model compression
 ---
 知识蒸馏（Knowledge Distilling）是模型压缩的一种方法，是指利用已经训练的一个较复杂的Teacher模型，指导一个较轻量的Student模型训练，从而在减小模型大小和计算资源的同时，尽量保持原Teacher模型的准确率的方法。这种方法受到大家的注意，主要是由于Hinton的论文[Distilling the Knowledge in a Neural Network](https://arxiv.org/abs/1503.02531)。这篇博客做一总结。后续还会有KD方法的改进相关论文的心得介绍。
 

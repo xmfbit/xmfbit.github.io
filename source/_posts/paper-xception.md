@@ -4,6 +4,7 @@ date: 2018-03-22 09:44:38
 tags:
     - paper
     - deep learning
+    - model compression
 ---
 在MobileNet, ShuffleMet等轻量级网络中，**depthwise separable conv**是一个很流行的设计。借助[Xception: Deep Learning with Depthwise separable Convolution](https://arxiv.org/abs/1610.02357)，对这种分解卷积的思路做一个总结。
 <!-- more -->
