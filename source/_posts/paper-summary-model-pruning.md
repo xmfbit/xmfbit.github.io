@@ -122,6 +122,8 @@ class channel_selection(nn.Module):
 
 论文的其他部分就是对几种现有方法的实验和diss。我还没有细看，如果后续这篇论文得到了接收，再做总结吧~夹带一些私货，基于几篇论文的实现经验和在真实数据集上的测试，这篇文章的看法我是同意的。
 
+更新：这篇文章的作者原来正是Net Sliming的作者Liu Zhuang和Huang Gao，那实验和结论应该是很有保障的。最近这篇文章确实也引起了大家的注意，值得好好看一看。
+
 ## 其他论文等资源
 - [Distiller](https://nervanasystems.github.io/distiller/index.html)：一个使用PyTorch实现的剪枝工具包
 
