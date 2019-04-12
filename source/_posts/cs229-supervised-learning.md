@@ -92,7 +92,7 @@ $$\begin{aligned}P(y=1|x) &= h_\theta(x) \\
 P(y=0|x) &= 1-h_\theta(x) \end{aligned}$$
 
 或者我们写的更紧凑些：
-$$P(y|x) = (h_\theta(x))^y (1-h_\theta(x))^(1-y)$$
+$$P(y|x) = (h_\theta(x))^y (1-h_\theta(x))^{(1-y)}$$
 
 我们仍然使用上述极大似然的估计方法，求取参数$\theta$，为求简练，隐去了上标$(i)$。
 
