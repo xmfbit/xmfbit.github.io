@@ -95,11 +95,39 @@ True
 ### `.data`怎么办？What about .data?
 原来版本中，对于某个`Variable`，我们可以通过`x.data`的方式获取其包装的`Tensor`。现在两者已经merge到了一起，如果你调用`y = x.data`仍然和以前相似，`y`现在会共享`x`的data，并与`x`的计算历史无关，且其`requires_grad`标志为`False`。
 
-然而，`.data`有的时候可能会成为代码中不安全的一个点。对`x.data`的任何带动都不会被`aotograd`跟踪。所以，当做反传的时候，计算的梯度可能会不对，一种更安全的替代方法是调用`x.detach()`，仍然会返回一个共享`x`data的Tensor，且`requires_grad=False`，但是当`x`需要bp的时候，
+然而，`.data`有的时候可能会成为代码中不安全的一个点。对`x.data`的任何带动都不会被`aotograd`跟踪。所以，当做反传的时候，计算的梯度可能会不对，一种更安全的替代方法是调用`x.detach()`，仍然会返回一个共享`x`data的Tensor，且`requires_grad=False`，但是当`x`需要bp的时候，会报告那些in-place的操作。
 
-However, .data can be unsafe in some cases. Any changes on x.data wouldn’t be tracked by autograd, and the computed gradients would be incorrect if x is needed in a backward pass. A safer alternative is to use x.detach(), which also returns a Tensor that shares data with requires_grad=False, but will have its in-place changes reported by autograd if x is needed in backward.
+> However, .data can be unsafe in some cases. Any changes on x.data wouldn’t be tracked by autograd, and the computed gradients would be incorrect if x is needed in a backward pass. A safer alternative is to use x.detach(), which also returns a Tensor that shares data with requires_grad=False, but will have its in-place changes reported by autograd if x is needed in backward.
+
+这里有些绕，可以看下下面的示例代码：
+
+``` py
+# 一个简单的计算图：y = sum(x**2)
+x = torch.ones((1 ,2))
+x.requires_grad_()
+y = torch.sum(x**2)
+y.backward()
+x.grad   # grad: [2, 2, 2]
+# 使用.data，在计算完y之后，又改动了x，会造成梯度计算错误
+x.grad.zero_()
+y = torch.sum(x**2)
+data = x.data
+data[0, 0] = 2
+y.backward()
+x.grad   # grad: [4, 2, 2] 错了哦~
+# 使用detach，同样的操作，会抛出异常
+x.grad.zero_()
+y = torch.sum(x**2)
+data = x.detach()
+data[0, 0] = 2
+y.backward()
+# 抛出如下异常
+# RuntimeError: one of the variables needed for gradient 
+# computation has been modified by an inplace operation
+```
 
 ## 支持0维(scalar)的Tensor
+
 原来的版本中，对Tensor vector（1D Tensor）做索引得到的结果是一个python number，但是对一个Variable vector来说，得到的就是一个`size(1,)`的vector!对于reduction function（如`torch.sum`，`torch.max`）也有这样的问题。
 
 所以我们引入了scalar（0D Tensor）。它可以使用`torch.tensor()` 函数来创建，现在你可以这样做：
