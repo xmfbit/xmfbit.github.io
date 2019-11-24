@@ -1,5 +1,5 @@
 ---
-title: 论文解读 - MetaPruning：Meta Learning for Automatic Neural Network Channel Pruning
+title: 论文 - MetaPruning：Meta Learning for Automatic Neural Network Channel Pruning
 date: 2019-10-26 00:33:37
 tags:
      - paper
