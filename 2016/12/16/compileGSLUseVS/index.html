@@ -1,0 +1,974 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="tool,gsl," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。GSL 的项目主页提供的说明来看，它支持如下的科学计算：
+（下面的这张表格的HTML使用的是No-Cruft Excel to HTML Table Converter生成的）
+
+   
+      Complex Numbers 
+      Roots of Polynomials
+   
+   
+      Special Fu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 Visual Studio 编译 GSL 科学计算库">
+<meta property="og:url" content="http://yoursite.com/2016/12/16/compileGSLUseVS/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。GSL 的项目主页提供的说明来看，它支持如下的科学计算：
+（下面的这张表格的HTML使用的是No-Cruft Excel to HTML Table Converter生成的）
+
+   
+      Complex Numbers 
+      Roots of Polynomials
+   
+   
+      Special Fu">
+<meta property="og:image" content="http://i.imgur.com/uXhVvwS.jpg">
+<meta property="og:updated_time" content="2017-01-22T13:47:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用 Visual Studio 编译 GSL 科学计算库">
+<meta name="twitter:description" content="GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。GSL 的项目主页提供的说明来看，它支持如下的科学计算：
+（下面的这张表格的HTML使用的是No-Cruft Excel to HTML Table Converter生成的）
+
+   
+      Complex Numbers 
+      Roots of Polynomials
+   
+   
+      Special Fu">
+<meta name="twitter:image" content="http://i.imgur.com/uXhVvwS.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/16/compileGSLUseVS/"/>
+
+
+
+
+
+  <title> 使用 Visual Studio 编译 GSL 科学计算库 | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/16/compileGSLUseVS/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                使用 Visual Studio 编译 GSL 科学计算库
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-16T19:00:00+08:00">
+                2016-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/16/compileGSLUseVS/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/16/compileGSLUseVS/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。<a href="http://www.gnu.org/software/gsl/" target="_blank" rel="external">GSL 的项目主页</a>提供的说明来看，它支持如下的科学计算：</p>
+<p>（下面的这张表格的HTML使用的是<a href="http://pressbin.com/tools/excel_to_html_table/index.html" target="_blank" rel="external">No-Cruft Excel to HTML Table Converter</a>生成的）<br>
+<table>
+   <tr>
+      <td>Complex Numbers </td>
+      <td>Roots of Polynomials</td>
+   </tr>
+   <tr>
+      <td>Special Functions </td>
+      <td>Vectors and Matrices</td>
+   </tr>
+   <tr>
+      <td>Permutations </td>
+      <td>Sorting</td>
+   </tr>
+   <tr>
+      <td>BLAS Support </td>
+      <td>Linear Algebra</td>
+   </tr>
+   <tr>
+      <td>Eigensystems </td>
+      <td>Fast Fourier Transforms</td>
+   </tr>
+   <tr>
+      <td>Quadrature </td>
+      <td>Random Numbers</td>
+   </tr>
+   <tr>
+      <td>Quasi-Random Sequences </td>
+      <td>Random Distributions</td>
+   </tr>
+   <tr>
+      <td>Statistics </td>
+      <td>Histograms</td>
+   </tr>
+   <tr>
+      <td>N-Tuples </td>
+      <td>Monte Carlo Integration</td>
+   </tr>
+   <tr>
+      <td>Simulated Annealing </td>
+      <td>Differential Equations</td>
+   </tr>
+   <tr>
+      <td>Interpolation </td>
+      <td>Numerical Differentiation</td>
+   </tr>
+   <tr>
+      <td>Chebyshev Approximation </td>
+      <td>Series Acceleration</td>
+   </tr>
+   <tr>
+      <td>Discrete Hankel Transforms </td>
+      <td>Root-Finding</td>
+   </tr>
+   <tr>
+      <td>Minimization </td>
+      <td>Least-Squares Fitting</td>
+   </tr>
+   <tr>
+      <td>Physical Constants </td>
+      <td>IEEE Floating-Point</td>
+   </tr>
+   <tr>
+      <td>Discrete Wavelet Transforms </td>
+      <td>Basis splines</td>
+   </tr>
+</table>
+</p>
+<p>GSL的Linux下的配置很简单，照着它的INSTALL文件一步一步来就可以了。CMAKE大法HAO!</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">./configure</div><div class="line">make</div><div class="line">make install</div><div class="line">make clean</div></pre></td></tr></table></figure>
+<p>同样的，GSL也可以在Windows环境下配置，下面记录了如何在Windows环境下使用 Visual Studio 和 CMakeGUI 编译测试GSL。</p>
+<h2 id="使用CMAKE编译成-SLN文件"><a href="#使用CMAKE编译成-SLN文件" class="headerlink" title="使用CMAKE编译成.SLN文件"></a>使用CMAKE编译成.SLN文件</h2><p>打开CMAKEGUI，将输入代码路径选为GSL源代码地址，输出路径设为自己想要的输出路径。点击 “Configure“，选择Visual Studio2013为编译器，点击Finish后会进行必要的配置。然后将表格里面的选项都打上勾，再次点击”Configure“，等待完成之后点击”Generate“。完成之后，就可以在输出路径下看到GSL.sln文件了。</p>
+<h2 id="使用Visual-Studio生成解决方案"><a href="#使用Visual-Studio生成解决方案" class="headerlink" title="使用Visual Studio生成解决方案"></a>使用Visual Studio生成解决方案</h2><p>使用 Visual Studio 打开刚才生成的.SLN文件，分别在Debug和Release模式下生成解决方案，等待完成即可。</p>
+<p>当完成后，你应该可以在路径下看到这样一张图，我们主要关注的文件夹是\bin，\gsl，\Debug和\Release。</p>
+<h2 id="加入环境变量"><a href="#加入环境变量" class="headerlink" title="加入环境变量"></a>加入环境变量</h2><p>修改环境变量的Path，将\GSL_Build_Path\bin\Debug加入，这主要是为了\Debug文件夹下面的gsl.dll文件。如果不进行这一步的话，一会虽然可以编译，但是却不能运行。</p>
+<p>这里顺便注释一句，当使用第三方库的时候，如果需要动态链接库的支持，其中一种方法就是将DLL文件的路径加入到Path中去。</p>
+<h2 id="建立Visual-Studio属性表"><a href="#建立Visual-Studio属性表" class="headerlink" title="建立Visual Studio属性表"></a>建立Visual Studio属性表</h2><p>Visual Studio可以通过建立工程属性表的方法来配置工程选项，一个OpenCV的例子可以参见Yuanbo She的这篇博文 <a href="http://my.phirobot.com/blog/2014-02-opencv_configuration_in_vs.html" target="_blank" rel="external">Opencv 完美配置攻略 2014 (Win8.1 + Opencv 2.4.8 + VS 2013)</a>。</p>
+<p>配置文件中主要是包含文件和静态链接库LIB的路径设置。下面把我的贴出来，只需要根据GSL的生成路径做相应修改即可。注意我的属性表中保留了OpenCV的内容，如果不需要的话，尽可以删掉。上面的博文对这张属性表如何配置讲得很清楚，有问题可以去参考。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">Project</span> <span class="attr">ToolsVersion</span>=<span class="string">"4.0"</span> <span class="attr">xmlns</span>=<span class="string">"http://schemas.microsoft.com/developer/msbuild/2003"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">ImportGroup</span> <span class="attr">Label</span>=<span class="string">"PropertySheets"</span> /&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">PropertyGroup</span> <span class="attr">Label</span>=<span class="string">"UserMacros"</span> /&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">PropertyGroup</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">IncludePath</span>&gt;</span>$(OPENCV249)\include;E:\GSLCode\gsl-build\;$(IncludePath)<span class="tag">&lt;/<span class="name">IncludePath</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">LibraryPath</span> <span class="attr">Condition</span>=<span class="string">"'$(Platform)'=='Win32'"</span>&gt;</span>$(OPENCV249)\x86\vc12\lib;E:\GSLCode\gsl-build\Debug;$(LibraryPath)<span class="tag">&lt;/<span class="name">LibraryPath</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">LibraryPath</span> <span class="attr">Condition</span>=<span class="string">"'$(Platform)'=='X64'"</span>&gt;</span>$(OPENCV249)\x64\vc12\lib;E:\GSLCode\gsl-build\Debug;$(LibraryPath)<span class="tag">&lt;/<span class="name">LibraryPath</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">PropertyGroup</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">ItemDefinitionGroup</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">Link</span> <span class="attr">Condition</span>=<span class="string">"'$(Configuration)'=='Debug'"</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">AdditionalDependencies</span>&gt;</span>opencv_calib3d249d.lib;opencv_contrib249d.lib;opencv_core249d.lib;opencv_features2d249d.lib;opencv_flann249d.lib;opencv_gpu249d.lib;opencv_highgui249d.lib;opencv_imgproc249d.lib;opencv_legacy249d.lib;opencv_ml249d.lib;opencv_nonfree249d.lib;opencv_objdetect249d.lib;opencv_ocl249d.lib;opencv_photo249d.lib;opencv_stitching249d.lib;opencv_superres249d.lib;opencv_ts249d.lib;opencv_video249d.lib;opencv_videostab249d.lib;gsl.lib;gslcblas.lib;%(AdditionalDependencies)<span class="tag">&lt;/<span class="name">AdditionalDependencies</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">Link</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">Link</span> <span class="attr">Condition</span>=<span class="string">"'$(Configuration)'=='Release'"</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">AdditionalDependencies</span>&gt;</span>opencv_calib3d249.lib;opencv_contrib249.lib;opencv_core249.lib;opencv_features2d249.lib;opencv_flann249.lib;opencv_gpu249.lib;opencv_highgui249.lib;opencv_imgproc249.lib;opencv_legacy249.lib;opencv_ml249.lib;opencv_nonfree249.lib;opencv_objdetect249.lib;opencv_ocl249.lib;opencv_photo249.lib;opencv_stitching249.lib;opencv_superres249.lib;opencv_ts249.lib;opencv_video249.lib;opencv_videostab249.lib;gsl.lib;gslcblas.lib;%(AdditionalDependencies)<span class="tag">&lt;/<span class="name">AdditionalDependencies</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">Link</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">ItemDefinitionGroup</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">ItemGroup</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">Project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>在以后建立Visual Studio工程的时候，在属性窗口直接添加现有属性表就可以了！</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>在项目网站的教程上直接找到一段代码，进行测试，输出贝塞尔函数的值。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;gsl/gsl_sf_bessel.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">	<span class="keyword">double</span> x = <span class="number">5.0</span>;</div><div class="line">	<span class="keyword">double</span> y = gsl_sf_bessel_J0(x);</div><div class="line">	<span class="built_in">printf</span>(<span class="string">"J0(%g) = %.18e\n"</span>, x, y);</div><div class="line">	<span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>控制台输出正确：<br>
+</p><p><img src="http://i.imgur.com/uXhVvwS.jpg" width="600" height="200"></p>
+<p></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tool/" rel="tag"># tool</a>
+          
+            <a href="/tags/gsl/" rel="tag"># gsl</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/16/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/22/CS131/" rel="prev" title="CS131_线代基础">
+                CS131_线代基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/12/16/compileGSLUseVS/"
+           data-title="使用 Visual Studio 编译 GSL 科学计算库" data-url="http://yoursite.com/2016/12/16/compileGSLUseVS/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/liumengli.jpg"
+               alt="一个脱离了高级趣味的人" />
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用CMAKE编译成-SLN文件"><span class="nav-number">1.</span> <span class="nav-text">使用CMAKE编译成.SLN文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Visual-Studio生成解决方案"><span class="nav-number">2.</span> <span class="nav-text">使用Visual Studio生成解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加入环境变量"><span class="nav-number">3.</span> <span class="nav-text">加入环境变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建立Visual-Studio属性表"><span class="nav-number">4.</span> <span class="nav-text">建立Visual Studio属性表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试"><span class="nav-number">5.</span> <span class="nav-text">测试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"xmfbit"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

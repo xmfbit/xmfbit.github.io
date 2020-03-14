@@ -1,0 +1,957 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="deep learning,paper,model compression," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Han Song的Deep Compression是模型压缩方面很重要的论文。在Deep Compression中，作者提出了三个步骤来进行模型压缩：剪枝，量化和霍夫曼编码。其中，剪枝对应的方法就是基于本文要总结的这篇论文：Learning both Weights and Connections for Efficient Neural Networks。在这篇论文中，作者介绍了如何在不损失精度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文 - Learning both Weights and Connections for Efficient Neural Networks">
+<meta property="og:url" content="https://xmfbit.github.io/2018/03/14/paper-network-prune-hansong/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="Han Song的Deep Compression是模型压缩方面很重要的论文。在Deep Compression中，作者提出了三个步骤来进行模型压缩：剪枝，量化和霍夫曼编码。其中，剪枝对应的方法就是基于本文要总结的这篇论文：Learning both Weights and Connections for Efficient Neural Networks。在这篇论文中，作者介绍了如何在不损失精度">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-pruning-network-demo.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-pruning-network-energy-for-different-memory-hieracy.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-pruning-network-algrithem.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-pruning-network-regularization.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-pruning-network-layer-sensitivity.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-pruning-network-iterative-pruning.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-pruning-network-results.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-pruning-network-lstm.png">
+<meta property="og:updated_time" content="2019-11-24T11:24:03.300Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="论文 - Learning both Weights and Connections for Efficient Neural Networks">
+<meta name="twitter:description" content="Han Song的Deep Compression是模型压缩方面很重要的论文。在Deep Compression中，作者提出了三个步骤来进行模型压缩：剪枝，量化和霍夫曼编码。其中，剪枝对应的方法就是基于本文要总结的这篇论文：Learning both Weights and Connections for Efficient Neural Networks。在这篇论文中，作者介绍了如何在不损失精度">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/paper-pruning-network-demo.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2018/03/14/paper-network-prune-hansong/"/>
+
+
+
+
+
+  <title> 论文 - Learning both Weights and Connections for Efficient Neural Networks | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/03/14/paper-network-prune-hansong/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                论文 - Learning both Weights and Connections for Efficient Neural Networks
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-14T16:18:53+08:00">
+                2018-03-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Han Song的Deep Compression是模型压缩方面很重要的论文。在Deep Compression中，作者提出了三个步骤来进行模型压缩：剪枝，量化和霍夫曼编码。其中，剪枝对应的方法就是基于本文要总结的这篇论文：<a href="https://arxiv.org/abs/1506.02626" target="_blank" rel="external">Learning both Weights and Connections for Efficient Neural Networks</a>。在这篇论文中，作者介绍了如何在不损失精度的前提下，对深度学习的网络模型进行剪枝，从而达到减小模型大小的目的。<br><img src="/img/paper-pruning-network-demo.png" alt="Pruning的主要过程"><br><a id="more"></a></p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>DNN虽然能够解决很多以前很难解决的问题，但是一个应用方面的问题就是这些模型通常都太大了。尤其是当运行在手机等移动设备上时，对电源和网络带宽都是负担。对于电源来说，由于模型巨大，所以只能在外部内存DRAM中加载，造成能耗上升。具体数值见下表。所以模型压缩很有必要。本文就是使用剪枝的方法，将模型中不重要的权重设置为$0$，将原来的dense model转变为sparse model，达到压缩的目的。<br><img src="/img/paper-pruning-network-energy-for-different-memory-hieracy.png" alt="操作数地址的不同造成的功耗对比"></p>
+<h3 id="解决什么问题？"><a href="#解决什么问题？" class="headerlink" title="解决什么问题？"></a>解决什么问题？</h3><p>如何在不损失精度的前提下，对DNN进行剪枝（或者说稀疏化），从而压缩模型。</p>
+<h3 id="为什么剪枝是work的？"><a href="#为什么剪枝是work的？" class="headerlink" title="为什么剪枝是work的？"></a>为什么剪枝是work的？</h3><p>为什么能够通过剪枝的方法来压缩模型呢？难道剪掉的那些连接真的不重要到可以去掉吗？论文中，作者指出，DNN模型广泛存在着参数过多的问题，具有很大的冗余（见参考文献NIPS 2013的一篇文章<a href="https://arxiv.org/abs/1306.0543" target="_blank" rel="external">Predicting parameters in deep learning</a>）。</p>
+<blockquote>
+<p>Neural networks are typically over-parameterized, and there is significant redundancy for deep learning models </p>
+</blockquote>
+<p>另外，作者也为自己的剪枝方法找到了生理学上的依据，生理学上发现，对于哺乳动物来说，婴儿期会产生许多的突触连接，在后续的成长过程中，不怎么用的那些突出会退化消失。</p>
+<h3 id="怎么做"><a href="#怎么做" class="headerlink" title="怎么做"></a>怎么做</h3><p>作者的方法分为三个步骤：</p>
+<ul>
+<li>Train Connectivity: 按照正常方法训练初始模型。作者认为该模型中权重的大小表征了其重要程度</li>
+<li>Prune Connection: 将初始模型中那些低于某个阈值的的权重参数置成$0$（即所谓剪枝）</li>
+<li>Re-Train: 重新训练，以期其他未被剪枝的权重能够补偿pruning带来的精度下降</li>
+</ul>
+<p>为了达到一个满意的压缩比例和精度要求，$2$和$3$要重复多次。</p>
+<h2 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h2><p>为了减少网络的冗余，减小模型的size，有以下相关工作：</p>
+<ul>
+<li>定点化。将weight使用8bit定点表示，32bit浮点表示activation。</li>
+<li>低秩近似。使用矩阵分解等方法。</li>
+<li>网络设计上，NIN等使用Global Average Pooling取代FC层，可以大大减少参数量，这种结构已经得到了广泛使用。而FC也并非无用。在Pooling后面再接一个fc层，便于后续做迁移学习transfer learning。</li>
+<li>从优化上下手，使用损失函数的Hessian矩阵，比直接用weight decay更好。</li>
+<li>HashedNet等工作，这里不再详述。</li>
+</ul>
+<h2 id="如何Prune"><a href="#如何Prune" class="headerlink" title="如何Prune"></a>如何Prune</h2><p>主要分为三步，上面 概述 中 怎么做 部分已经简单列出。下面的算法流程摘自作者的博士论文，可能更加详细清楚。<br><img src="/img/paper-pruning-network-algrithem.png" alt="剪枝算法"></p>
+<h3 id="正则项的选择"><a href="#正则项的选择" class="headerlink" title="正则项的选择"></a>正则项的选择</h3><p>L1和L2都可以用来做正则，惩罚模型的复杂度。使用不同的正则方法会对pruning和retraining产生影响。实验发现，采用L2做正则项较好。见下图，可以看到详细的比较结果，分别是with/without retrain下L1和L2正则对精度的影响。还可以看到一个共性的地方，就是当pruning的比例大于某个阈值后，模型的精度会快速下降。</p>
+<p><img src="/img/paper-pruning-network-regularization.png" alt="L1/L2 Regularization"></p>
+<h3 id="Dropout"><a href="#Dropout" class="headerlink" title="Dropout"></a>Dropout</h3><p>Dropout是一项防止过拟合的技术。要注意的是，在retraining的时候，我们需要对Dropout ratio做出调整。因为网络中的很多连接都被剪枝剪下来了，所以dropout的比例要变小。下面给出定量的估计。</p>
+<p>对于FC层来说，如果第$i$层的神经元个数是$N_i$，那么该层的连接数$C_i$用乘法原理可以很容易得到：$C_i = N_{i-1}N_i$。也就是说，连接数$C\sim N^2$。而dropout是作用于神经元的（dropout是将$N_i$个神经元输出按照概率dropout掉）。所以，比例$D^2 \sim C$，最后得到：</p>
+<script type="math/tex; mode=display">D_r = D_o \sqrt{\frac{C_{ir}}{C_{io}}}</script><p>其中，下标$r$表示retraining，$o$表示初始模型(original)。</p>
+<h2 id="Local-Pruning"><a href="#Local-Pruning" class="headerlink" title="Local Pruning"></a>Local Pruning</h2><p>在retraining部分，在初始模型基础上继续fine tune较好。为了能够更有效地训练，在训练FC层的时候，可以将CONV的参数固定住。反之亦然。</p>
+<p>另外，不同深度和类型的layer对剪枝的敏感度是不一样的。作者指出，CONV比FC更敏感，第$1$个CONV比后面的要敏感。下图是AlexNet中各个layer剪枝比例和模型精度下降之间的关系。可以印证上面的结论。</p>
+<p><img src="/img/paper-pruning-network-layer-sensitivity.png" alt="CONV和FC的prune和精度下降的关系"></p>
+<h2 id="多次迭代剪枝"><a href="#多次迭代剪枝" class="headerlink" title="多次迭代剪枝"></a>多次迭代剪枝</h2><p>应该迭代地进行多次剪枝 + 重新训练这套组合拳。作者还尝试过根据参数的绝对值依概率进行剪枝，效果不好。<br><img src="/img/paper-pruning-network-iterative-pruning.png" alt="迭代剪枝"></p>
+<h2 id="对神经元进行剪枝"><a href="#对神经元进行剪枝" class="headerlink" title="对神经元进行剪枝"></a>对神经元进行剪枝</h2><p>将神经元之间的connection剪枝后（或者说将权重稀疏化了），那些$0$输入$0$输出的神经元也应该被剪枝了。然后，我们又可以继续以这个神经元出发，剪掉与它相关的connection。这个步骤可以在训练的时候自动发生。因为如果某个神经元已经是dead状态，那么它的梯度也会是$0$。那么只有正则项推着它向$0$的方向。</p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>使用Caffe实现，需要加入一个<code>mask</code>来表示剪枝。剪枝的阈值，是该layer的权重标准差乘上某个超参数。这里：<a href="https://github.com/BVLC/caffe/pull/4294/files" target="_blank" rel="external">Add pruning possibilities at inner_product_layer #4294 </a>，有人基于Caffe官方的repo给FC层加上了剪枝。这里：<a href="https://github.com/may0324/DeepCompression-caffe" target="_blank" rel="external">Github: DeepCompression</a>,，有人实现了Deep Compression，可以参考他们的实现思路。</p>
+<p>对于实验结果，论文中比对了LeNet和AlexNet。此外，作者的博士论文中给出了更加详细的实验结果，在更多的流行的模型上取得了不错的压缩比例。直接引用如下，做一个mark：</p>
+<blockquote>
+<p>On the ImageNet dataset, the pruning method reduced the number of parameters of AlexNet by a factor of 9× (61 to 6.7 million), without incurring accuracy loss. Similar experiments with VGG-16 found that the total number of parameters can be reduced by 13× (138 to 10.3 million), again with no loss of accuracy. We also experimented with the more efficient fully-convolutional neural networks: GoogleNet (Inception-V1), SqueezeNet, and ResNet-50, which have zero or very thin fully connected layers. From these experiments we find that they share very similar pruning ratios before the accuracy drops: 70% of the parameters in those fully-convolutional neural networks can be pruned. GoogleNet is pruned from 7 million to 2 million parameters, SqueezeNet from 1.2 million to 0.38 million, and ResNet-50 from 25.5 million to 7.47 million, all with no loss of Top-1 and Top-5 accuracy on Imagenet.</p>
+</blockquote>
+<p><img src="/img/paper-pruning-network-results.png" alt="Results"></p>
+<p>下面 参考资料 部分也给出了作者在GitHub上放出的Deep Compression的结果，可以前去参考。</p>
+<h3 id="学习率的设置"><a href="#学习率的设置" class="headerlink" title="学习率的设置"></a>学习率的设置</h3><p>跑模型跑实验，一个重要的超参数就是学习率$LR$。这里作者也给了一个经验规律。一般在训练初始模型的时候，学习率都是逐渐下降的。刚开始是一个较大的值$LR_1$，最后是一个较小的值$LR_2$。它们之间可能有数量级的差别。作者指出，retraining的学习率应该介于两者之间。可以取做比$LR_1$小$1 \sim 2$个数量级。</p>
+<h3 id="RNN和LSTM"><a href="#RNN和LSTM" class="headerlink" title="RNN和LSTM"></a>RNN和LSTM</h3><p>在博士论文中，作者还是用这一技术对RNN/LSTM在Neural Talk任务上做了剪枝，取得了不错的结果。<br><img src="/img/paper-pruning-network-lstm.png" alt="LSTM"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li>HanSong的个人主页：<a href="http://stanford.edu/~songhan/" target="_blank" rel="external">Homepage</a></li>
+<li>HanSong的博士论文：<a href="https://purl.stanford.edu/qf934gh3708" target="_blank" rel="external">Efficient Methods and Hardware for Deep Learning</a></li>
+<li>后续的Deep Compression论文：<a href="https://arxiv.org/abs/1510.00149" target="_blank" rel="external">DEEP COMPRESSION- COMPRESSING DEEP NEURAL NETWORKS WITH PRUNING, TRAINED QUANTIZATION AND HUFFMAN CODING</a></li>
+<li>Deep Compression AlexNet: <a href="https://github.com/songhan/Deep-Compression-AlexNet" target="_blank" rel="external">Github: Deep-Compression-AlexNet</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/paper/" rel="tag"># paper</a>
+          
+            <a href="/tags/model-compression/" rel="tag"># model compression</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/28/caffe-net/" rel="next" title="Caffe中的Net实现">
+                <i class="fa fa-chevron-left"></i> Caffe中的Net实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/caffe-hack-python-interface/" rel="prev" title="Hack PyCaffe">
+                Hack PyCaffe <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/liumengli.jpg"
+               alt="一个脱离了高级趣味的人" />
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解决什么问题？"><span class="nav-number">1.1.</span> <span class="nav-text">解决什么问题？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么剪枝是work的？"><span class="nav-number">1.2.</span> <span class="nav-text">为什么剪枝是work的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#怎么做"><span class="nav-number">1.3.</span> <span class="nav-text">怎么做</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关工作"><span class="nav-number">2.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何Prune"><span class="nav-number">3.</span> <span class="nav-text">如何Prune</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#正则项的选择"><span class="nav-number">3.1.</span> <span class="nav-text">正则项的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dropout"><span class="nav-number">3.2.</span> <span class="nav-text">Dropout</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Local-Pruning"><span class="nav-number">4.</span> <span class="nav-text">Local Pruning</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多次迭代剪枝"><span class="nav-number">5.</span> <span class="nav-text">多次迭代剪枝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对神经元进行剪枝"><span class="nav-number">6.</span> <span class="nav-text">对神经元进行剪枝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验"><span class="nav-number">7.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#学习率的设置"><span class="nav-number">7.1.</span> <span class="nav-text">学习率的设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RNN和LSTM"><span class="nav-number">7.2.</span> <span class="nav-text">RNN和LSTM</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">8.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

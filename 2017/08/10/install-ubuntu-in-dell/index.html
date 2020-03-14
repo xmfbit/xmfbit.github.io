@@ -1,0 +1,928 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ubuntu," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="虽说开源大法好，但是在我的DELL 游匣7559笔记本上安装Ubuntu+Windows双系统可是耗费了我不少精力。这篇博客是我参考这篇文章成功安装Ubuntu16.04和CUDA的记录。感谢上文作者的记录，我才能够最终解决这个问题。基本流程和上文作者相同，只不过没有安装后续的bumblee等工具，所以本文并不是原创，而更多是翻译和备份。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DELL 游匣7559安装Ubuntu和CUDA记录">
+<meta property="og:url" content="https://xmfbit.github.io/2017/08/10/install-ubuntu-in-dell/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="虽说开源大法好，但是在我的DELL 游匣7559笔记本上安装Ubuntu+Windows双系统可是耗费了我不少精力。这篇博客是我参考这篇文章成功安装Ubuntu16.04和CUDA的记录。感谢上文作者的记录，我才能够最终解决这个问题。基本流程和上文作者相同，只不过没有安装后续的bumblee等工具，所以本文并不是原创，而更多是翻译和备份。">
+<meta property="og:image" content="https://xmfbit.github.io/img/install_ubuntu_in_dell_kaiyuandafahao.jpg">
+<meta property="og:image" content="https://xmfbit.github.io/img/install_ubuntu_in_dell_weixiaodaizhepibei.jpg">
+<meta property="og:image" content="https://xmfbit.github.io/img/install_ubuntu_in_dell_weixiaojiuhao.jpg">
+<meta property="og:updated_time" content="2019-11-24T11:24:03.288Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DELL 游匣7559安装Ubuntu和CUDA记录">
+<meta name="twitter:description" content="虽说开源大法好，但是在我的DELL 游匣7559笔记本上安装Ubuntu+Windows双系统可是耗费了我不少精力。这篇博客是我参考这篇文章成功安装Ubuntu16.04和CUDA的记录。感谢上文作者的记录，我才能够最终解决这个问题。基本流程和上文作者相同，只不过没有安装后续的bumblee等工具，所以本文并不是原创，而更多是翻译和备份。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/install_ubuntu_in_dell_kaiyuandafahao.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2017/08/10/install-ubuntu-in-dell/"/>
+
+
+
+
+
+  <title> DELL 游匣7559安装Ubuntu和CUDA记录 | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/08/10/install-ubuntu-in-dell/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                DELL 游匣7559安装Ubuntu和CUDA记录
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-10T11:29:38+08:00">
+                2017-08-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>虽说开源大法好，但是在我的DELL 游匣7559笔记本上安装Ubuntu+Windows双系统可是耗费了我不少精力。这篇博客是我参考<a href="https://hemenkapadia.github.io/blog/2016/11/11/Ubuntu-with-Nvidia-CUDA-Bumblebee.html" target="_blank" rel="external">这篇文章</a>成功安装Ubuntu16.04和CUDA的记录。感谢上文作者的记录，我才能够最终解决这个问题。基本流程和上文作者相同，只不过没有安装后续的bumblee等工具，所以本文并不是原创，而更多是翻译和备份。<br><img src="/img/install_ubuntu_in_dell_kaiyuandafahao.jpg" alt="开源大法好"><br><a id="more"></a></p>
+<h2 id="蛋疼的过往"><a href="#蛋疼的过往" class="headerlink" title="蛋疼的过往"></a>蛋疼的过往</h2><p>之前我安装过Ubuntu14.04，但是却不支持笔记本的无线网卡，所以一直很不方便。搜索之后才发现，笔记本使用的无线网卡要到Ubuntu15.10以上才有支持，所以想要安装16.04.结果却发现安装界面都进不去。。。</p>
+<h2 id="安装Ubuntu"><a href="#安装Ubuntu" class="headerlink" title="安装Ubuntu"></a>安装Ubuntu</h2><p>我使用的版本号为Ubuntu16.04.3，使用Windows中的UltraISO制作U盘启动盘。在Windows系统中，通过电池计划关闭快速启动功能，之后重启。在开机出现DELL徽标的时候，按下F12进入BIOS，关闭Security Boot选项。按F10保存并重启，选择U盘启动。</p>
+<p>选择“Install Ubuntu”选项，按<code>e</code>，找到包含有<code>quiet splash</code>的那行脚本，将<code>quiet splash</code>替换为以下内容：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nomodeset i915.modeset=1 quiet splash</div></pre></td></tr></table></figure>
+<p>之后按F10重启，会进入Ubuntu的安装界面。如何安装Ubuntu这里不再详述。安装完毕之后，重启。出现Ubuntu GRUB引导界面之后，高亮Ubuntu选项（一般来说就是第一个备选项），按<code>e</code>，按照上述方法替换<code>quiet splash</code>。确定可以进入Ubuntu系统并登陆。</p>
+<h2 id="GRUB设置"><a href="#GRUB设置" class="headerlink" title="GRUB设置"></a>GRUB设置</h2><p>下面，修改GRUB设置，避免每次都手动替换。编辑相应配置文件：<code>sudo vi /etc/default/grub</code>，找到包含<code>GRUB_CMDLINE_LINUX_DEFAULT</code>的那一行，将其修改如下（就是将我们上面每次手动输入的内容直接写到了配置里面）：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GRUB_CMDLINE_LINUX_DEFAULT=<span class="string">"nomodeset i915.modeset=1 quiet splash"</span></div></pre></td></tr></table></figure>
+<h2 id="更新系统软件"><a href="#更新系统软件" class="headerlink" title="更新系统软件"></a>更新系统软件</h2><p>配置更新源（清华的很好用，非教育网也能轻轻松松上700K），使用如下命令更新，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo apt-get update</div><div class="line">sudo apt-get upgrade</div><div class="line">sudo apt-get dist-upgrade</div><div class="line">sudo apt-get autoremove</div></pre></td></tr></table></figure>
+<p>参考博客中指出，如果这个过程中让你选GRUB文件，要选择保持原有文件。但是我并没有遇到这个问题。可能是由于我的Ubuntu版本已经是16.04中目前最新的了？</p>
+<p>由于后续有较多的终端文件编辑操作，建议这时候顺便安装Vim。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install vim</div></pre></td></tr></table></figure></p>
+<p>更新完之后，重启，确认可以正常登陆系统。</p>
+<h2 id="移除原有的Nvidia和Nouveau驱动"><a href="#移除原有的Nvidia和Nouveau驱动" class="headerlink" title="移除原有的Nvidia和Nouveau驱动"></a>移除原有的Nvidia和Nouveau驱动</h2><p>按下ALT+CTL+F1，进入虚拟终端，首先关闭lightdm服务。这项操作之后会比较经常用到。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo service lightdm stop</div></pre></td></tr></table></figure></p>
+<p>之后，执行卸载操作：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo apt-get remove --purge nvidia*</div><div class="line">sudo apt-get remove --purge bumblebee*</div><div class="line">sudo apt-get --purge remove xserver-xorg-video-nouveau*</div></pre></td></tr></table></figure></p>
+<p>编辑配置文件，<code>/etc/modprobe.d/blacklist.conf</code>，将Nouveau加入到黑名单中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">blacklist nouveau</div><div class="line">blacklist lbm-nouveau</div><div class="line">alias nouveau off</div><div class="line">alias lbm-nouveau off</div><div class="line">options nouveau modeset=0</div></pre></td></tr></table></figure></p>
+<p>编辑<code>/etc/init/gpu-manager.conf</code>文件，将其前面几行注释掉，改成下面的样子，停止gpu-manager服务：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># Comment these start on settings ; GPU Manager ruins our work</span></div><div class="line"><span class="comment">#start on (starting lightdm</span></div><div class="line"><span class="comment">#          or starting kdm</span></div><div class="line"><span class="comment">#          or starting xdm</span></div><div class="line"><span class="comment">#          or starting lxdm)</span></div><div class="line">task</div><div class="line"><span class="built_in">exec</span> gpu-manager --log /var/<span class="built_in">log</span>/gpu-manager.log</div></pre></td></tr></table></figure></p>
+<p>之后，更新initramfs并重启。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo update-initramfs -u -k all</div></pre></td></tr></table></figure></p>
+<p>重启后，确定可以正常登陆系统。并使用下面的命令确定Nouveau被卸载掉了：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 正常情况下，下面的命令应该不产生任何输出</span></div><div class="line">lsmod | grep nouveau</div></pre></td></tr></table></figure></p>
+<p>并确定关闭了gpu-manager服务：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo service gpu-manager stop</div></pre></td></tr></table></figure></p>
+<p>至此，Ubuntu系统算是安装完毕了。如果没有使用CUDA的需求，可以从这里开始，安安静静地做一个使用Ubuntu的美男子/小仙女了。<br><img src="/img/install_ubuntu_in_dell_weixiaodaizhepibei.jpg" alt="微笑中带着疲惫"></p>
+<h2 id="安装CUDA"><a href="#安装CUDA" class="headerlink" title="安装CUDA"></a>安装CUDA</h2><p>鉴于国内坑爹的连接资本主义世界的网络环境，建议还是先去Nvidia的官网把CUDA离线安装包下载下来再安装。我使用的是CUDA-8.0-linux.deb安装包。</p>
+<p>按ALT+CTL+F1进入虚拟终端，停止lightdm服务，并安装一些可能要用到的包。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo service lightdm stop</div><div class="line">sudo apt-get install linux-headers-$(uname -r)</div><div class="line">sudo apt-get install mesa-utils</div></pre></td></tr></table></figure></p>
+<p>安装CUDA包：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo dpkg -i YOUR_CUDA_DEB_PATH</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install cuda-8-0</div><div class="line">sudo apt-get autoremove</div></pre></td></tr></table></figure></p>
+<p>安装完毕之后使用<code>sudo reboot</code>重启，确定能够正常登陆系统。</p>
+<p>在这个过程中，作者提到登录界面会出现两次，再次重启之后没有这个问题了。我也遇到了相同的情况。所以，不要慌！</p>
+<h2 id="测试CUDA"><a href="#测试CUDA" class="headerlink" title="测试CUDA"></a>测试CUDA</h2><p>我们来测试一下CUDA。首先，依照你使用shell的不同，将环境变量加入到<code>~/.bashrc</code>或者<code>~/.zshrc</code>（如果使用zsh）中去。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> PATH=<span class="string">"<span class="variable">$PATH</span>:/usr/local/cuda-8.0/bin"</span></div><div class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=<span class="string">"<span class="variable">$LD_LIBRARY_PATH</span>:/usr/local/cuda-8.0/lib"</span></div></pre></td></tr></table></figure></p>
+<p>接下来，我们将使用CUDA自带的example进行测试：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 导入我们刚加入的环境变量</span></div><div class="line"><span class="built_in">source</span> ~/.bashrc</div><div class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/cuda-8.0/bin</div><div class="line"><span class="comment"># 将CUDA example拷贝到$HOME下</span></div><div class="line">./cuda-install-samples-8.0.sh ~</div><div class="line"><span class="comment"># 进入拷贝到的那个目录 build</span></div><div class="line"><span class="built_in">cd</span> ~/NVIDIA_CUDA-8.0_Samples</div><div class="line">make -j12</div><div class="line"><span class="comment"># 自己挑选几个目录进去运行编译生成的可执行文件测试吧~</span></div></pre></td></tr></table></figure></p>
+<h2 id="Last-But-Not-Least"><a href="#Last-But-Not-Least" class="headerlink" title="Last But Not Least"></a>Last But Not Least</h2><p>安装完CUDA之后，不要随便更新系统！！！否则可能会损坏你的Kernel和Xserver。<br><img src="/img/install_ubuntu_in_dell_weixiaojiuhao.jpg" alt="微笑就好"></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/03/effective-cpp-08/" rel="next" title="Effective CPP 阅读 - Chapter 8 定制new和delete">
+                <i class="fa fa-chevron-left"></i> Effective CPP 阅读 - Chapter 8 定制new和delete
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/14/focal-loss-paper/" rel="prev" title="Focal Loss论文阅读 - Focal Loss for Dense Object Detection">
+                Focal Loss论文阅读 - Focal Loss for Dense Object Detection <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/liumengli.jpg"
+               alt="一个脱离了高级趣味的人" />
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#蛋疼的过往"><span class="nav-number">1.</span> <span class="nav-text">蛋疼的过往</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Ubuntu"><span class="nav-number">2.</span> <span class="nav-text">安装Ubuntu</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GRUB设置"><span class="nav-number">3.</span> <span class="nav-text">GRUB设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新系统软件"><span class="nav-number">4.</span> <span class="nav-text">更新系统软件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#移除原有的Nvidia和Nouveau驱动"><span class="nav-number">5.</span> <span class="nav-text">移除原有的Nvidia和Nouveau驱动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装CUDA"><span class="nav-number">6.</span> <span class="nav-text">安装CUDA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试CUDA"><span class="nav-number">7.</span> <span class="nav-text">测试CUDA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Last-But-Not-Least"><span class="nav-number">8.</span> <span class="nav-text">Last But Not Least</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

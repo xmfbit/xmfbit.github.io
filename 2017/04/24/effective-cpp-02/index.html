@@ -1,0 +1,937 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="cpp," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在第二章中，作者主要关注了在C++的OOP“联邦”中行事的注意事项。主要包括有虚函数的情况下的继承以及copying function（拷贝构造函数和拷贝赋值函数）的处理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective CPP 阅读 - Chapter 2 构造拷贝和赋值函数">
+<meta property="og:url" content="https://xmfbit.github.io/2017/04/24/effective-cpp-02/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="在第二章中，作者主要关注了在C++的OOP“联邦”中行事的注意事项。主要包括有虚函数的情况下的继承以及copying function（拷贝构造函数和拷贝赋值函数）的处理。">
+<meta property="og:updated_time" content="2019-11-24T11:24:03.274Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Effective CPP 阅读 - Chapter 2 构造拷贝和赋值函数">
+<meta name="twitter:description" content="在第二章中，作者主要关注了在C++的OOP“联邦”中行事的注意事项。主要包括有虚函数的情况下的继承以及copying function（拷贝构造函数和拷贝赋值函数）的处理。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2017/04/24/effective-cpp-02/"/>
+
+
+
+
+
+  <title> Effective CPP 阅读 - Chapter 2 构造拷贝和赋值函数 | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/04/24/effective-cpp-02/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Effective CPP 阅读 - Chapter 2 构造拷贝和赋值函数
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-24T20:50:10+08:00">
+                2017-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在第二章中，作者主要关注了在C++的OOP“联邦”中行事的注意事项。主要包括有虚函数的情况下的继承以及copying function（拷贝构造函数和拷贝赋值函数）的处理。<br><a id="more"></a></p>
+<h2 id="05-了解C-默默编写并调用了哪些函数"><a href="#05-了解C-默默编写并调用了哪些函数" class="headerlink" title="05 了解C++默默编写并调用了哪些函数"></a>05 了解C++默默编写并调用了哪些函数</h2><p>C++编译器会自动为类添加默认构造函数和拷贝构造函数和析构函数，以及拷贝赋值函数。</p>
+<p>在默认构造函数中，会调用基类的构造函数以及各个成员变量的构造函数。</p>
+<p>在拷贝构造函数和拷贝赋值函数中，将单纯地将源对象中的non-static的成员变量拷贝到目标对象（浅拷贝）。</p>
+<h2 id="06-若不想使用编译器自动生成的函数，那就明确拒绝"><a href="#06-若不想使用编译器自动生成的函数，那就明确拒绝" class="headerlink" title="06 若不想使用编译器自动生成的函数，那就明确拒绝"></a>06 若不想使用编译器自动生成的函数，那就明确拒绝</h2><p>有的时候，我们的类故意设计为不能拷贝构造或赋值。这时候，可以将拷贝构造函数和拷贝赋值函数声明为<code>private</code>，并且不提供函数的实现。</p>
+<h2 id="07-为多态基类声明虚析构函数"><a href="#07-为多态基类声明虚析构函数" class="headerlink" title="07 为多态基类声明虚析构函数"></a>07 为多态基类声明虚析构函数</h2><p>多态是OOP的基本概念之一。在C++中，可能遇到这样的情景：使用base class的指针或引用指向derived派生类对象，以此实现运行时的不同逻辑。这种情况下，要为基类声明虚析构函数。这是因为，当派生类对象经由一个base class指针被删除时，如果该base class带有非虚的析构函数，其结果是未定义的。常常会造成派生类自己的成员变量不能被销毁，造成内存泄露。</p>
+<p>而那些意图并非是用来当做base class的类来说，随意将其虚构函数声明为<code>virtual</code>也是不恰当的。因为这会额外引入虚函数表，造成对象体积的无谓增大，给性能造成影响，而且丧失了对C语言的移植性。</p>
+<p>由于那些被用来作为base class等待派生类继承的类通常情况下都有虚函数存在（派生类正是对虚函数重写，实现了多态），所以这一条款可以归纳如下：</p>
+<blockquote>
+<p>那些有虚函数的类，几乎确定都应该有一个虚析构函数。</p>
+</blockquote>
+<p>对于STL而言，记住其中的容器都不是为了继承而设计的，不要继承STL中的容器，包括<code>vector</code>，<code>string</code>等。</p>
+<p>有的时候，我们可能会想声明一个抽象基类作为接口。当手上没有纯虚函数时候，可以将析构函数声明为纯虚的。然而这时候问题来了，我们需要为这个纯虚析构函数提供了一个空定义。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> ABC &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">virtual</span> ~ABC() = <span class="number">0</span>;    </div><div class="line">&#125;;</div><div class="line">ABC::~ABC() &#123;&#125;</div></pre></td></tr></table></figure>
+<p>这看上去很违背常理，因为一般情况下纯虚函数不需要实现。这里是因为当派生类被销毁时，其析构函数中会调用<code>~ABC()</code>，所以必须为这个函数提供一份定义。</p>
+<h2 id="08-别让异常逃离析构函数"><a href="#08-别让异常逃离析构函数" class="headerlink" title="08 别让异常逃离析构函数"></a>08 别让异常逃离析构函数</h2><p>如果在析构函数中抛出异常，会导致未定义的行为。</p>
+<p>析构函数不应该抛出异常。如果析构函数调用的函数可能会抛出异常，要在析构函数中捕获异常，然后结束程序（这不是未定义行为）或者吞掉它们。</p>
+<h2 id="09-绝不在构造函数和析构函数中调用虚函数"><a href="#09-绝不在构造函数和析构函数中调用虚函数" class="headerlink" title="09 绝不在构造函数和析构函数中调用虚函数"></a>09 绝不在构造函数和析构函数中调用虚函数</h2><p>你不应该在构造函数和析构函数中调用虚函数，这样的调用通常不会导致你想要的结果。</p>
+<p>为什么呢？</p>
+<p>如果我们在派生类的构造函数中使用了从基类中继承而来的虚函数。在派生类的构造函数之前，基类的构造函数被调用，这时候，所调用的虚函数实际是基类中的那个版本！析构函数同理。</p>
+<p>直接在构造函数中调用虚函数看上去很容易避免。然而在构造函数中你可能会调用其他的初始化函数，你应该确保这些初始化函数中没有调用虚函数。否则，你可能会陷入到苦涩头疼的调试中去。编译器通常不会发现此类问题，但是在程序运行中，如果基类的虚函数是纯虚函数，程序很可能中止（和后面的相比，也许这还算好的）。如果基类中的虚函数有自己的实现，那么你可能就会头疼于程序的表现为何出乎意料（期望调用派生类的重写版本，实际仍是基类的原始版本）。</p>
+<h2 id="10-令operator-返回一个-this的引用"><a href="#10-令operator-返回一个-this的引用" class="headerlink" title="10 令operator=返回一个*this的引用"></a>10 令<code>operator=</code>返回一个<code>*this</code>的引用</h2><p>为了实现连锁赋值，赋值操作符必须返回一个引用，指向操作符左侧的赋值实参。这条规范被大多数人遵守。除非有确实好的理由，否则最好按规范办事。</p>
+<p>所谓连锁赋值，是指下面这样的情况：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">a = b = c;</div></pre></td></tr></table></figure>
+<p>这一条款不仅适用于赋值运算符，也适用于<code>+=</code>等。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> A &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    A&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> A&amp; rhs) &#123;</div><div class="line">        <span class="comment">// ...</span></div><div class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h2 id="11-在operator-中处理自我赋值"><a href="#11-在operator-中处理自我赋值" class="headerlink" title="11 在operator=中处理自我赋值"></a>11 在<code>operator=</code>中处理自我赋值</h2><p>所谓自我赋值，是指：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Widget w;</div><div class="line"><span class="comment">// ...</span></div><div class="line">w = w;</div></pre></td></tr></table></figure>
+<p>自我赋值常常发生在同一个对象的不同别名之间。在实现赋值运算符时，应注意处理这一现象。</p>
+<p>一种方法是进行“证同测试”，如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">A&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> A&amp; rhs) &#123;</div><div class="line">    <span class="keyword">if</span>(&amp;rhs == <span class="keyword">this</span>) <span class="keyword">return</span> *<span class="keyword">this</span>; <span class="comment">//证同测试</span></div><div class="line">    <span class="comment">// ...</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不过作者指出，这种方法不具备异常安全性。另一种方法是在函数内部，合理安排语句顺序，防止提前释放该对象本身的资源。</p>
+<p>还有一种方法，使用copy-swap方法，首先拷贝构造一个<code>rhs</code>的拷贝，然后交换该拷贝和<code>*this</code>，</p>
+<p>毫无疑问，使用证同测试方法和作者后文的方法都会造成性能的些许下降，这需要根据具体情况具体分析，合理采用。</p>
+<h2 id="12-复制对象时勿忘每一个成分"><a href="#12-复制对象时勿忘每一个成分" class="headerlink" title="12 复制对象时勿忘每一个成分"></a>12 复制对象时勿忘每一个成分</h2><p>这一条款是指存在继承时，实现copying函数（指拷贝构造函数和拷贝赋值函数）不要忘记base class部分成员。看下面的例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Derived: <span class="keyword">public</span> Base&#123;</div><div class="line"><span class="keyword">private</span>:</div><div class="line">    <span class="keyword">int</span> a;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    Derived(<span class="keyword">const</span> Derived&amp; rhs):a(rhs.a) &#123;&#125;</div><div class="line">    Derived&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Derived&amp; rhs) &#123;</div><div class="line">        a = rhs.a;</div><div class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>上面的代码只是拷贝了派生类新加入的成员<code>a</code>，而对基类中已有的成员未作处理。要记住，</p>
+<blockquote>
+<p>任何时候自己实现copying函数时，要担起重责大任，小心地复制其基类的成员。由于基类成员往往声明为<code>private</code>，所以，一般调用基类的成员函数进行拷贝。将上面的代码修改为：</p>
+</blockquote>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Derived(<span class="keyword">const</span> Derived&amp; rhs):Base(rhs), a(rhs.a) &#123;&#125;</div><div class="line">Derived&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Derived&amp; rhs) &#123;</div><div class="line">    Base::<span class="keyword">operator</span>=(rhs);</div><div class="line">    a = rhs.a;</div><div class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>此外，两种copying函数的实现往往是相似的。然而，不要试图在一个函数中调用另一个函数。把相似代码提取出来，写成一个独立的<code>init()</code>函数是一个更好的选择。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cpp/" rel="tag"># cpp</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/21/python-iter-generator/" rel="next" title="Python中的迭代器和生成器">
+                <i class="fa fa-chevron-left"></i> Python中的迭代器和生成器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/25/effective-cpp-03/" rel="prev" title="Effective CPP阅读 - Chapter 3 资源管理">
+                Effective CPP阅读 - Chapter 3 资源管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/liumengli.jpg"
+               alt="一个脱离了高级趣味的人" />
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#05-了解C-默默编写并调用了哪些函数"><span class="nav-number">1.</span> <span class="nav-text">05 了解C++默默编写并调用了哪些函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#06-若不想使用编译器自动生成的函数，那就明确拒绝"><span class="nav-number">2.</span> <span class="nav-text">06 若不想使用编译器自动生成的函数，那就明确拒绝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#07-为多态基类声明虚析构函数"><span class="nav-number">3.</span> <span class="nav-text">07 为多态基类声明虚析构函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#08-别让异常逃离析构函数"><span class="nav-number">4.</span> <span class="nav-text">08 别让异常逃离析构函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#09-绝不在构造函数和析构函数中调用虚函数"><span class="nav-number">5.</span> <span class="nav-text">09 绝不在构造函数和析构函数中调用虚函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-令operator-返回一个-this的引用"><span class="nav-number">6.</span> <span class="nav-text">10 令operator=返回一个*this的引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-在operator-中处理自我赋值"><span class="nav-number">7.</span> <span class="nav-text">11 在operator=中处理自我赋值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-复制对象时勿忘每一个成分"><span class="nav-number">8.</span> <span class="nav-text">12 复制对象时勿忘每一个成分</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
