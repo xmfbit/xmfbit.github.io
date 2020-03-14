@@ -74,6 +74,8 @@
 
 
 
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
 
 
 
@@ -283,7 +285,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/02/05/cs131-kmeans/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/02/08/paper-visualize-convnet/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -308,8 +310,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/05/cs131-kmeans/" itemprop="url">
-                  CS131-KMeans聚类
+                <a class="post-title-link" href="/2018/02/08/paper-visualize-convnet/" itemprop="url">
+                  论文 - Visualizing and Understanding ConvNet
                 </a>
               
             
@@ -325,8 +327,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-05T23:07:00+08:00">
-                2017-02-05
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-08T10:48:21+08:00">
+                2018-02-08
               </time>
             
 
@@ -362,11 +364,11 @@
 
       
         
-          <p><a href="https://zh.wikipedia.org/wiki/K-平均算法">K-Means聚类</a>是把n个点（可以是样本的一次观察或一个实例）划分到$k$个聚类中，使得每个点都属于离他最近的均值（此即聚类中心）对应的聚类，以之作为聚类的标准，满足最小化聚类中心和属于该中心的数据点之间的平方距离和（Sum of Square Distance，SSD）。</p>
-<script type="math/tex; mode=display">\text{SSD} = \sum_{i=1}^{k}\sum_{x\in c_i}(x-c_i)^2</script><p><img src="/img/kmeans_demo.png" alt="K-Means Demo"></p>
+          <p><a href="https://arxiv.org/pdf/1311.2901.pdf">Visualizing &amp; Understanding ConvNet</a>这篇文章是比较早期关于CNN调试的文章，作者利用可视化方法，设计了一个超过AlexNet性能的网络结构。</p>
+<p><img src="/img/paper_visconvnet_demo.png" alt="可视化结果"><br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/05/cs131-kmeans/#more" rel="contents">
+            <a class="btn" href="/2018/02/08/paper-visualize-convnet/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -407,7 +409,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/02/05/video-linear-alg-essential-property/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/01/25/inq-paper/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -432,8 +434,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/05/video-linear-alg-essential-property/" itemprop="url">
-                  B站视频“线性代数的本质”观后感
+                <a class="post-title-link" href="/2018/01/25/inq-paper/" itemprop="url">
+                  Incremental Network Quantization 论文阅读
                 </a>
               
             
@@ -449,8 +451,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-05T19:16:32+08:00">
-                2017-02-05
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-25T15:30:28+08:00">
+                2018-01-25
               </time>
             
 
@@ -486,10 +488,10 @@
 
       
         
-          <p>线性代数对于现代科技的重要性不言而喻，在机器学习领域也是重要的工具。最近，在B站上发现了这样的一个视频：<a href="http://www.bilibili.com/video/av6731067/index_1.html">线性代数的本质</a>。这个视频共有十集左右，每集大约10分钟，从线性空间入手，介绍线性变换，并由此介绍矩阵的相关性质，动画做的很棒，翻译得也很好，用了几天时间零散地把几集视频看完，记录一些心得。<br><img src="/img/video_linear_alg_essential.png" alt=""></p>
+          <p>卷积神经网络虽然已经在很多任务上取得了很棒的效果，但是模型大小和运算量限制了它们在移动设备和嵌入式设备上的使用。模型量化压缩等问题自然引起了大家的关注。<a href="https://arxiv.org/abs/1702.03044">Incremental Network Quantization</a>这篇文章关注的是如何使用更少的比特数进行模型参数量化以达到压缩模型，减少模型大小同时使得模型精度无损。如下图所示，使用5bit位数，INQ在多个模型上都取得了不逊于原始FP32模型的精度。实验结果还是很有说服力的。作者将其开源在了GitHub上，见<a href="https://github.com/Zhouaojun/Incremental-Network-Quantization">Incremental-Network-Quantization</a>。<br><img src="/img/paper-inq-result.png" alt="实验结果"><br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/05/video-linear-alg-essential-property/#more" rel="contents">
+            <a class="btn" href="/2018/01/25/inq-paper/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -530,7 +532,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/02/04/yolo-paper/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/01/12/caffe-syncedmem/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -555,8 +557,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/04/yolo-paper/" itemprop="url">
-                  YOLO 论文阅读
+                <a class="post-title-link" href="/2018/01/12/caffe-syncedmem/" itemprop="url">
+                  Caffe 中的 SyncedMem介绍
                 </a>
               
             
@@ -572,8 +574,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-04T18:49:22+08:00">
-                2017-02-04
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-12T14:05:59+08:00">
+                2018-01-12
               </time>
             
 
@@ -609,11 +611,11 @@
 
       
         
-          <p>YOLO(<strong>Y</strong>ou <strong>O</strong>nly <strong>L</strong>ook <strong>O</strong>nce)是一个流行的目标检测方法，和Faster RCNN等state of the art方法比起来，主打检测速度快。截止到目前为止（2017年2月初），YOLO已经发布了两个版本，在下文中分别称为<a href="https://arxiv.org/abs/1506.02640">YOLO V1</a>和<a href="https://arxiv.org/abs/1612.08242">YOLO V2</a>。YOLO V2的代码目前作为<a href="http://pjreddie.com/darknet/yolo/">Darknet</a>的一部分开源在<a href="">GitHub</a>。在这篇博客中，记录了阅读YOLO两个版本论文中的重点内容，并着重总结V2版本的改进。</p>
-<p><img src="/img/yolo2_result.png" alt="YOLO V2的检测效果示意"><br>
+          <p><code>Blob</code>是Caffe中的基本数据结构，类似于TensorFlow和PyTorch中的Tensor。图像读入后作为<code>Blob</code>，开始在各个<code>Layer</code>之间传递，最终得到输出。下面这张图展示了<code>Blob</code>和<code>Layer</code>之间的关系：<br> <img src="/img/caffe_syncedmem_blob_flow.jpg" width = "300" height = "200" alt="blob的流动" align=center /></p>
+<p>Caffe中的<code>Blob</code>在实现的时候，使用了<code>SyncedMem</code>管理内存，并在内存（Host）和显存（device）之间同步。这篇博客对Caffe中<code>SyncedMem</code>的实现做一总结。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/04/yolo-paper/#more" rel="contents">
+            <a class="btn" href="/2018/01/12/caffe-syncedmem/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -654,7 +656,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/02/02/cs131-camera/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/01/08/caffe-batch-norm/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -679,8 +681,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/02/cs131-camera/" itemprop="url">
-                  CS131-立体视觉基础
+                <a class="post-title-link" href="/2018/01/08/caffe-batch-norm/" itemprop="url">
+                  Caffe中的BatchNorm实现
                 </a>
               
             
@@ -696,8 +698,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-02T20:38:55+08:00">
-                2017-02-02
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-08T20:12:44+08:00">
+                2018-01-08
               </time>
             
 
@@ -733,10 +735,10 @@
 
       
         
-          <p>数字图像是现实世界的物体通过光学成像设备在感光材料上的投影。在3D到2D的转换过程中，深度信息丢失。如何从单幅或者多幅图像中恢复出有用的3D信息，需要使用立体视觉的知识进行分析。如下图所示。这篇博客对课程讲义中立体视觉部分做一整理，分别介绍了针孔相机模型和对极集合的基础知识。<br><img src="/img/camera_geometry_application.png" alt="立体视觉应用"><br>
+          <p>这篇博客总结了Caffe中BN的实现。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/02/cs131-camera/#more" rel="contents">
+            <a class="btn" href="/2018/01/08/caffe-batch-norm/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -777,7 +779,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/01/30/cs131-sift/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/11/10/shell-programming/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -802,8 +804,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/30/cs131-sift/" itemprop="url">
-                  CS131-描述图像的特征(SIFT)
+                <a class="post-title-link" href="/2017/11/10/shell-programming/" itemprop="url">
+                  shell编程
                 </a>
               
             
@@ -819,8 +821,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-30T22:16:18+08:00">
-                2017-01-30
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-10T13:06:30+08:00">
+                2017-11-10
               </time>
             
 
@@ -856,17 +858,10 @@
 
       
         
-          <p><a href="https://en.wikipedia.org/wiki/Scale-invariant_feature_transform">SIFT(尺度不变特征变换，Scale Invariant Feature Transform)</a>,最早由Lowe提出，目的是为了解决目标检测（Object Detection）问题中提取图像特征的问题。从名字可以看出，SIFT的优势就在于对尺度变换的不变性，同时SIFT还满足平移变换和旋转变换下的不变性，并对光照变化和3D视角变换有一定的不变性。它的主要步骤如下：</p>
-<ul>
-<li>scale space上的极值检测。使用DoG在不同的scaleast和image position下找到interest point。</li>
-<li>interest point的localization。对上面的interest point进行稳定度检测，并确定其所在的scale和position。</li>
-<li>确定方向。通过计算图像的梯度图，确定key point的方向，下一步的feature operation就是在这个方向，scale和position上进行的。</li>
-<li>确定key point的描述子。使用图像的局部梯度作为key point的描述子，最终构成SIFT特征向量。</li>
-</ul>
-<p><img src="/img/sift_picture.jpg" alt="SIFT图示"></p>
+          <p>介绍基本的shell编程方法，参考的教程是<a href="http://www.freeos.com/guides/lsst/">Linux Shell Scripting Tutorial, A Beginner’s handbook</a>。<br><img src="/img/shell-programming-bash-logo.png" alt="Bash Logo"><br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/30/cs131-sift/#more" rel="contents">
+            <a class="btn" href="/2017/11/10/shell-programming/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -907,7 +902,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/01/25/cs131-finding-features/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/10/27/fuck-gfw/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -932,8 +927,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/25/cs131-finding-features/" itemprop="url">
-                  CS131-描述图像的特征(Harris 角点)
+                <a class="post-title-link" href="/2017/10/27/fuck-gfw/" itemprop="url">
+                  过秦论
                 </a>
               
             
@@ -949,8 +944,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-25T10:51:47+08:00">
-                2017-01-25
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-27T09:56:00+08:00">
+                2017-10-27
               </time>
             
 
@@ -986,12 +981,10 @@
 
       
         
-          <p>feature是对图像的描述。比如，图像整体灰度值的均值和方差就可以作为feature。如果我们想在一副图像中检测足球时，可以使用滑动窗方法，逐一检查窗口内的灰度值分布是否和一张给定的典型黑白格子足球相似。可想而知，这种方法的性能一定让人捉急。而在image matching问题中，常常需要将不同视角的同一目标物进行matching，进而计算相机转过的角度。这在SLAM问题中很有意义。如下图所示，同一处景观，在不同摄影师的镜头下，不仅视角不同，而且明暗变化也有很多差别，右侧的图暖色调更浓。这也告诉我们，上面提到的只使用全局图像灰度值来做feature的做法有多么不靠谱。</p>
-<p>那么，让我们脱离全局特征，转而将注意力集中在局部特征上。这是因为使用局部特征能够更好地处理图像中的遮挡、变形等情况，而且我们的研究对象常常是图像中的部分区域而不是图像整体。更特殊地，在这一讲中，我们主要探究key point作为local feature的描述，并介绍Harris角点检测方法。在下一节中介绍SIFT特征。</p>
-<p><img src="/img/image_matching_hard.png" alt="image matching example"></p>
+          <p>秦以耕战立国，起于西北，从边陲弱小诸侯，借以天时地利，用商鞅、李斯，举法家大旗。而后逐鹿中原，坑赵括，灌大梁，掳六国贵族，结束战乱，建立大一统帝国。然而，强秦却二世而亡。“始皇之心，自以为关中之固，金城千里，子孙帝王万世之业也。”封建王朝的皇帝总觉得自己的国祚能够绵延不绝，历史却一次次地打他们的脸。<br><img src="/img/just-a-joke.png" alt="just a joke"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/25/cs131-finding-features/#more" rel="contents">
+            <a class="btn" href="/2017/10/27/fuck-gfw/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1032,7 +1025,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/01/24/cs131-edge-detection/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/10/22/useful-tools-list/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1057,8 +1050,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/24/cs131-edge-detection/" itemprop="url">
-                  CS131-边缘检测
+                <a class="post-title-link" href="/2017/10/22/useful-tools-list/" itemprop="url">
+                  Ubuntu/Mac 工具软件列表
                 </a>
               
             
@@ -1074,8 +1067,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-24T10:42:47+08:00">
-                2017-01-24
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-22T20:12:09+08:00">
+                2017-10-22
               </time>
             
 
@@ -1111,11 +1104,10 @@
 
       
         
-          <p>边缘(Edge)在哺乳动物的视觉中有重要意义。在由若干卷积层构成的深度神经网络中，较低层的卷积层就被训练成为对特定形状的边缘做出响应。边缘检测也是计算机视觉和图像处理领域中一个重要的问题。</p>
-<p><img src="/img/edge_camera_man.png" alt="边缘检测图示"><br>
+          <p>工作环境大部分在Ubuntu和MacOS上进行，这里是一个我觉得在这两个平台上很有用的工具的整理列表，大部分都可以在两个系统上找到。这里并不会给出具体安装方式，因为最好的文档总是软件的官方Document或者GitHub的README。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/24/cs131-edge-detection/#more" rel="contents">
+            <a class="btn" href="/2017/10/22/useful-tools-list/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1156,7 +1148,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/01/23/cs131-filter-svd/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/08/29/learn-pyqt/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1181,8 +1173,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/23/cs131-filter-svd/" itemprop="url">
-                  CS131-线性滤波器和矩阵的SVD分解
+                <a class="post-title-link" href="/2017/08/29/learn-pyqt/" itemprop="url">
+                  学一点PyQT
                 </a>
               
             
@@ -1198,8 +1190,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-23T12:19:05+08:00">
-                2017-01-23
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-29T14:07:55+08:00">
+                2017-08-29
               </time>
             
 
@@ -1235,11 +1227,10 @@
 
       
         
-          <p>数字图像可以看做$\mathbb{R}^2 \rightarrow \mathbb{R}^c$的映射，其中$c$是图像的channel数。使用信号与系统的角度来看，如果单独考察某个channel，可以将图像看做是二维离散系统。</p>
-<p><img src="/img/svd_picture.jpg" alt="SVD图示"></p>
+          <p>Qt是一个流行的GUI框架，支持C++/Python。这篇文章是我在这两天通过PyQT制作一个串口通信并画图的小程序的时候，阅读<a href="http://zetcode.com/gui/pyqt5/introduction/">PyQT5的一篇教程</a>时候的记录。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/23/cs131-filter-svd/#more" rel="contents">
+            <a class="btn" href="/2017/08/29/learn-pyqt/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1280,7 +1271,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/01/22/cs131-linear-alg/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/08/26/doc2dash-usage/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1305,8 +1296,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/22/cs131-linear-alg/" itemprop="url">
-                  CS131-线代基础
+                <a class="post-title-link" href="/2017/08/26/doc2dash-usage/" itemprop="url">
+                  doc2dash——制作自己的dash文档
                 </a>
               
             
@@ -1322,8 +1313,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-22T15:38:01+08:00">
-                2017-01-22
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-26T19:32:00+08:00">
+                2017-08-26
               </time>
             
 
@@ -1359,11 +1350,12 @@
 
       
         
-          <p>CS131课程(Computer Vision: Foundations and Applications)，是斯坦福大学Li Feifei实验室开设的一门计算机视觉入门基础课程，<a href="http://vision.stanford.edu/teaching/cs131_fall1617/index.html">该课程</a>目的在于为刚接触计算机视觉领域的学生提供基本原理和应用介绍。目前2016年冬季课程刚刚结束。CS131博客系列主要是关于本课的slide知识点总结与作业重点问题归纳，作为个人学习本门课程的心得体会和复习材料。</p>
-<p>由于是个人项目，所以会比较随意，只对个人感兴趣的内容做一总结。这篇文章是对课前<a href="http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture2_linalg_review_cs131_2016.pdf">线代基础</a>的复习与整理。<br><img src="/img/cs131_linear_algebra.jpg" alt="线性代数词云"></p>
+          <p>Dash是Mac上一款超棒的应用，提供了诸如C/C++/Python甚至是OpenCV/Vim等软件包或工具软件的参考文档。只要使用App的“Download Docsets”功能，就能轻松下载相应文档。使用的时候只需在Dash的搜索框内输入相应关键词，Dash会在所有文档中进行搜索，给出相关内容的列表。点击我们要寻找的条款，就能够直接在本地阅读文档。在Ubuntu/Windows平台上，Dash也有对应的替代品，例如<a href="https://zealdocs.org">zeal</a>就是一款Windows/Linux平台通用的Dash替代软件。</p>
+<p>这样强大的软件，如果只能使用官方提供的文档岂不是有些大材小用？<a href="https://doc2dash.readthedocs.io/en/stable/">doc2dash</a>就是一款能够自动生成Dash兼容docset文件的工具。例如，可以使用它为PyTorch生成本地化的docset文件，并导入Dash/zeal中，在本地进行搜索阅读。这不是美滋滋？</p>
+<p>本文章是基于doc2dash的官方介绍，对其使用进行的总结。<br><img src="/img/doc2dash_pytorch_example.jpg" alt="Demo"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/22/cs131-linear-alg/#more" rel="contents">
+            <a class="btn" href="/2017/08/26/doc2dash-usage/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1404,7 +1396,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2016/12/16/gsl-with-vs/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/08/21/debugging-with-ipdb/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1429,8 +1421,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/16/gsl-with-vs/" itemprop="url">
-                  使用 Visual Studio 编译 GSL 科学计算库
+                <a class="post-title-link" href="/2017/08/21/debugging-with-ipdb/" itemprop="url">
+                  使用IPDB调试Python代码
                 </a>
               
             
@@ -1446,8 +1438,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-16T19:00:00+08:00">
-                2016-12-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-21T15:53:16+08:00">
+                2017-08-21
               </time>
             
 
@@ -1483,11 +1475,10 @@
 
       
         
-          <p>GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。</p>
-<p><img src="/img/gsl_picture.jpg" alt="GSL is GNU Sentific Library"><br>
+          <p>IPDB是什么？IPDB（Ipython Debugger），和GDB类似，是一款集成了Ipython的Python代码命令行调试工具，可以看做PDB的升级版。这篇文章总结IPDB的使用方法，主要是若干命令的使用。更多详细的教程或文档还请参考Google。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/12/16/gsl-with-vs/#more" rel="contents">
+            <a class="btn" href="/2017/08/21/debugging-with-ipdb/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1523,7 +1514,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1566,7 +1557,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">82</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1577,7 +1568,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">30</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1585,6 +1576,13 @@
 
         </nav>
 
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
         
 
         <div class="links-of-author motion-element">
@@ -1637,7 +1635,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

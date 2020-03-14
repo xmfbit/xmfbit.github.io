@@ -74,6 +74,8 @@
 
 
 
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
 
 
 
@@ -283,7 +285,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/05/04/ubuntu-cannot-mount-exfat-disk/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/10/02/vim-you-complete-me/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -308,8 +310,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/04/ubuntu-cannot-mount-exfat-disk/" itemprop="url">
-                  Ubuntu Cannot Mount exfat格式硬盘的解决办法
+                <a class="post-title-link" href="/2018/10/02/vim-you-complete-me/" itemprop="url">
+                  VIM安装YouCompleteMe和Jedi进行自动补全
                 </a>
               
             
@@ -325,8 +327,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-04T18:36:29+08:00">
-                2017-05-04
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-02T22:30:54+08:00">
+                2018-10-02
               </time>
             
 
@@ -362,10 +364,11 @@
 
       
         
-          <p>我的移动硬盘为东芝1TB容量，为了能够在Windows和MacOS下使用，我将其格式化为exfat格式。然而我发现这样一来，在Ubuntu14.04下不能挂载。虽然可见盘符，但是却提示<code>unable to mount</code>。这篇文章是对解决办法的记录。<br><img src="/img/ubuntu_exfat.png" alt="Ubuntu Exfat"></p>
+          <p>这篇主要记录自己尝试编译Anaconda + VIM并安装Jedi和YouCompleteMe自动补全插件的过程。踩了一些坑，不过最后还是装上了。给VIM装上了Dracula主题，有点小清新的感觉~</p>
+<p><img src="/img/vim-config-demo.png" alt="我的VIM"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/05/04/ubuntu-cannot-mount-exfat-disk/#more" rel="contents">
+            <a class="btn" href="/2018/10/02/vim-you-complete-me/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,7 +409,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/05/03/hinton-nnml-01/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/10/02/mxnet-fit-usage/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -431,8 +434,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/03/hinton-nnml-01/" itemprop="url">
-                  Neural Network for Machine Learning - Lecture 01
+                <a class="post-title-link" href="/2018/10/02/mxnet-fit-usage/" itemprop="url">
+                  MXNet fit介绍
                 </a>
               
             
@@ -448,8 +451,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-03T20:56:36+08:00">
-                2017-05-03
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-02T22:11:15+08:00">
+                2018-10-02
               </time>
             
 
@@ -485,10 +488,12 @@
 
       
         
-          <p>Hinton 在 Coursera 课程“Neural Network for Machine Learning”新开了一个班次。对课程内容做一总结。课程内容也许已经跟不上最近DL的发展，不过还是有很多的好东西。<br><img src="/img/hinton_brainsimulator.jpg" alt="神经元"><br>
+          <p>在MXNet中，<code>Module</code>提供了训练模型的方便接口。使用<code>symbol</code>将计算图建好之后，用<code>Module</code>包装一下，就可以通过<code>fit()</code>方法对其进行训练。当然，官方提供的接口一般只适合用来训练分类任务，如果是其他任务（如detection, segmentation等），单纯使用<code>fit()</code>接口就不太合适。这里把<code>fit()</code>代码梳理一下，也是为了后续方便在其基础上实现扩展，更好地用在自己的任务。</p>
+<p>其实如果看开源代码数量的话，MXNet已经显得式微，远不如TensorFlow，PyTorch也早已经后来居上。不过据了解，很多公司内部都有基于MXNet自研的框架或平台工具。下面这张图来自LinkedIn上的一个<a href="https://www.slideshare.net/beam2d/differences-of-deep-learning-frameworks">Slide分享</a>，姑且把它贴在下面，算是当前流行框架的一个比较（应该可以把Torch换成PyTorch）。</p>
+<p><img src="/img/differences-of-deep-learning-frameworks-22-638.jpg" alt="Differences of Deep Learning Frameworks"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/05/03/hinton-nnml-01/#more" rel="contents">
+            <a class="btn" href="/2018/10/02/mxnet-fit-usage/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -529,7 +534,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/05/03/cs131-opticalflow/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/10/02/paper-knowledge-transfer-neural-selectivity-transfer/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -554,8 +559,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/03/cs131-opticalflow/" itemprop="url">
-                  CS131-光流估计
+                <a class="post-title-link" href="/2018/10/02/paper-knowledge-transfer-neural-selectivity-transfer/" itemprop="url">
+                  论文 - Like What You Like - Knowledge Distill via Neuron Selectivity Transfer
                 </a>
               
             
@@ -571,8 +576,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-03T16:39:18+08:00">
-                2017-05-03
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-02T21:32:05+08:00">
+                2018-10-02
               </time>
             
 
@@ -608,11 +613,13 @@
 
       
         
-          <p>光流法是通过检测图像像素点的强度随时间的变化进而推断出物体移动速度及方向的方法。由于成像物体与相机之间存在相对运动，导致其成像后的像素强度值不同。通过连续观测运动物体图像序列帧间的像素强度变化，就可以估计物体的运动信息。</p>
-<p><del>是你让我的世界从那刻变成粉红色</del>  划掉。。。<br><img src="/img/cs131_opticalflow_demo.jpg" alt="OpticalFlow可视化"><br>
+          <p>好长时间没有写博客了，国庆假期把最近看的东西整理一下。<a href="https://arxiv.org/abs/1707.01219">Like What You Like: Knowledge Distill via Neuron Selectivity Transfer</a>这篇文章是图森的工作，在Knowledge Distilling基础上做出了改进Neural Selectivity Transfer，使用KD + NST方法能够取得SOTA的结果。PS：DL领域的论文名字真的是百花齐放。。。Like what you like。。。感受一下。。。</p>
+<p><img src="/img/paper-nst-kt-like-what-you-like.gif" alt="jump if you jump"></p>
+<p>另外，这篇论文的作者Wang Naiyan大神和Huang Zehao在今年的ECCV 2018上还有一篇论文发表，同样是模型压缩，但是使用了剪枝方法，有兴趣可以关注一下：<a href="https://arxiv.org/abs/1707.01213">Data-driven sparse structure selection for deep neural networks</a>。</p>
+<p>另另外，其实这两篇文章挂在Arxiv的时间很接近，<a href="https://www.zhihu.com/question/62068158">知乎的讨论帖：如何评价图森科技连发的三篇关于深度模型压缩的文章？</a>有相关回答，可以看一下。DL/CV方法论文实在太多了，感觉Naiyan大神和图森的工作还是很值得信赖的，值得去follow。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/05/03/cs131-opticalflow/#more" rel="contents">
+            <a class="btn" href="/2018/10/02/paper-knowledge-transfer-neural-selectivity-transfer/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -653,7 +660,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/05/01/effective-cpp-05/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/06/07/knowledge-distilling/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -678,8 +685,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/01/effective-cpp-05/" itemprop="url">
-                  Effective CPP 阅读 - Chapter 5 实现
+                <a class="post-title-link" href="/2018/06/07/knowledge-distilling/" itemprop="url">
+                  论文 - Distilling the Knowledge in a Neural Network
                 </a>
               
             
@@ -695,8 +702,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-01T14:56:54+08:00">
-                2017-05-01
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-07T21:56:12+08:00">
+                2018-06-07
               </time>
             
 
@@ -732,10 +739,10 @@
 
       
         
-          <p>第四章中探讨了如何更好地提出类的定义和函数声明，精心设计的接口能让后续工作轻松不少。然而如何能够正确高效地实现，也是一件重要的事情。行百里者半九十。</p>
+          <p>知识蒸馏（Knowledge Distilling）是模型压缩的一种方法，是指利用已经训练的一个较复杂的Teacher模型，指导一个较轻量的Student模型训练，从而在减小模型大小和计算资源的同时，尽量保持原Teacher模型的准确率的方法。这种方法受到大家的注意，主要是由于Hinton的论文<a href="https://arxiv.org/abs/1503.02531">Distilling the Knowledge in a Neural Network</a>。这篇博客做一总结。后续还会有KD方法的改进相关论文的心得介绍。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/05/01/effective-cpp-05/#more" rel="contents">
+            <a class="btn" href="/2018/06/07/knowledge-distilling/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -776,7 +783,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/04/29/effective-cpp-04/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/04/27/pytorch-040-migration-guide/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -801,8 +808,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/29/effective-cpp-04/" itemprop="url">
-                  Effective CPP 阅读 - Chapter 4 设计与声明
+                <a class="post-title-link" href="/2018/04/27/pytorch-040-migration-guide/" itemprop="url">
+                  （译）PyTorch 0.4.0 Migration Guide
                 </a>
               
             
@@ -818,8 +825,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-29T17:29:33+08:00">
-                2017-04-29
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-27T10:49:31+08:00">
+                2018-04-27
               </time>
             
 
@@ -855,10 +862,15 @@
 
       
         
-          <p>良好的代码架构能够使得后续编码工作变的简单。尤其在OOP的世界中，如何能够设计良好的C++接口？我们的目标是高效，易用，易拓展。<br><img src="/img/effectivecpp_04_cwithclass.jpg" alt="带类的C?"><br>
+          <p>PyTorch在前两天官方发布了0.4.0版本。这个版本与之前相比，API发生了较大的变化，所以官方也出了一个<a href="http://pytorch.org/2018/04/22/0_4_0-migration-guide.html">转换指导</a>，这篇博客是这篇指导的中文翻译版。归结起来，对我们代码影响最大的地方主要有：</p>
+<ul>
+<li><code>Tensor</code>和<code>Variable</code>合并，<code>autograd</code>的机制有所不同，变得更简单，使用<code>requires_grad</code>和上下文相关环境管理。</li>
+<li>Numpy风格的<code>Tensor</code>构建。</li>
+<li>提出了<code>device</code>，更简单地在cpu和gpu中移动数据。</li>
+</ul>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/04/29/effective-cpp-04/#more" rel="contents">
+            <a class="btn" href="/2018/04/27/pytorch-040-migration-guide/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -899,7 +911,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/04/25/effective-cpp-03/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/04/09/set-env-in-jupyternotebook/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -924,8 +936,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/25/effective-cpp-03/" itemprop="url">
-                  Effective CPP阅读 - Chapter 3 资源管理
+                <a class="post-title-link" href="/2018/04/09/set-env-in-jupyternotebook/" itemprop="url">
+                  JupyterNotebook设置Python环境
                 </a>
               
             
@@ -941,8 +953,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-25T13:35:43+08:00">
-                2017-04-25
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T13:44:04+08:00">
+                2018-04-09
               </time>
             
 
@@ -978,10 +990,10 @@
 
       
         
-          <p>C++相信程序员，将内存等底层资源毫无保留地献给程序员使用。然而，做到正确处理资源，写出健壮的代码并不容易，内存泄漏的幽灵始终徘徊在C++程序员身边。遵守本章给出的建议能够使你尽可能地陷入资源泄漏的泥沼，避免奇怪而又毫无头绪的调试。<br><img src="/img/effectivecpp_02_pointers.png" alt="Pointer是什么？"><br>
+          <p>使用Python时，常遇到的一个问题就是Python和库的版本不同。Anaconda的env算是解决这个问题的一个好用的方法。但是，在使用Jupyter Notebook的时候，我却发现加载的仍然是默认的Python Kernel。这篇博客记录了如何在Jupyter Notebook中也能够设置相应的虚拟环境。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/04/25/effective-cpp-03/#more" rel="contents">
+            <a class="btn" href="/2018/04/09/set-env-in-jupyternotebook/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1022,7 +1034,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/04/24/effective-cpp-02/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/04/03/newton-method/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1047,8 +1059,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/24/effective-cpp-02/" itemprop="url">
-                  Effective CPP 阅读 - Chapter 2 构造拷贝和赋值函数
+                <a class="post-title-link" href="/2018/04/03/newton-method/" itemprop="url">
+                  数值优化之牛顿方法
                 </a>
               
             
@@ -1064,8 +1076,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-24T20:50:10+08:00">
-                2017-04-24
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-03T21:43:16+08:00">
+                2018-04-03
               </time>
             
 
@@ -1101,10 +1113,10 @@
 
       
         
-          <p>在第二章中，作者主要关注了在C++的OOP“联邦”中行事的注意事项。主要包括有虚函数的情况下的继承以及copying function（拷贝构造函数和拷贝赋值函数）的处理。<br>
+          <p>简要介绍一下优化方法中的牛顿方法（Newton’s Method）。下面的动图demo来源于<a href="https://zh.wikipedia.org/wiki/%E7%89%9B%E9%A1%BF%E6%B3%95">Wiki页面</a>。<br><img src="/img/newton-method-demo.gif" width = "400" height = "300" alt="牛顿法动图" align=center /><br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/04/24/effective-cpp-02/#more" rel="contents">
+            <a class="btn" href="/2018/04/03/newton-method/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1145,7 +1157,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/04/21/python-iter-generator/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/04/02/paper-fpn/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1170,8 +1182,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/21/python-iter-generator/" itemprop="url">
-                  Python中的迭代器和生成器
+                <a class="post-title-link" href="/2018/04/02/paper-fpn/" itemprop="url">
+                  论文 - Feature Pyramid Networks for Object Detection (FPN)
                 </a>
               
             
@@ -1187,8 +1199,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-21T15:53:23+08:00">
-                2017-04-21
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-02T10:12:03+08:00">
+                2018-04-02
               </time>
             
 
@@ -1224,10 +1236,10 @@
 
       
         
-          <p>在STL中，迭代器可以剥离算法和具体数据类型之间的耦合，使得库的维护者只需要为特定的迭代器（如前向迭代器，反向迭代器和随机迭代器）等实现算法即可，而不用关心具体的数据结构。在Python中，迭代器更是无处不在。这篇博客简要介绍Python中的迭代器和生成器，它们背后的原理以及如何实现一个自定义的迭代器/生成器，主要参考了教程<a href="http://anandology.com/python-practice-book/iterators.html">Iterators &amp; Generators</a>。</p>
+          <p>图像金字塔或特征金字塔是传统CV方法中常用的技巧，例如求取<a href="https://xmfbit.github.io/2017/01/30/cs131-sift/">SIFT特征</a>就用到了DoG图像金字塔。但是在Deep Learning统治下的CV detection下，这种方法变得无人问津。一个重要的问题就是计算量巨大。而本文提出了一种仅用少量额外消耗建立特征金字塔的方法，提高了detector的性能。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/04/21/python-iter-generator/#more" rel="contents">
+            <a class="btn" href="/2018/04/02/paper-fpn/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1268,7 +1280,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/04/20/effective-cpp-01/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/04/01/paper-yolov3/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1293,8 +1305,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/20/effective-cpp-01/" itemprop="url">
-                  Effective CPP 阅读 - Chapter 1 让自己习惯C++
+                <a class="post-title-link" href="/2018/04/01/paper-yolov3/" itemprop="url">
+                  论文 - YOLO v3
                 </a>
               
             
@@ -1310,8 +1322,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-20T13:49:42+08:00">
-                2017-04-20
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-01T16:48:45+08:00">
+                2018-04-01
               </time>
             
 
@@ -1347,10 +1359,11 @@
 
       
         
-          <p>本系列是《Effective C++》一书的阅读摘记，分章整理各个条款。<br><img src="/img/effectivecpp_01_cpp_rely_on_renpin.jpg" alt="写C++需要人品"><br>
+          <p>YOLO的作者又放出了V3版本，在之前的版本上做出了一些改进，达到了更好的性能。这篇博客介绍这篇论文：<a href="https://pjreddie.com/media/files/papers/YOLOv3.pdf">YOLOv3: An Incremental Improvement</a>。下面这张图是YOLO V3与RetinaNet的比较。<br><img src="/img/paper-yolov3-comparison-retinanet.png" alt="YOLO v3和RetinaNet的比较"></p>
+<p>可以使用搜索功能，在本博客内搜索YOLO前作的论文阅读和代码。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/04/20/effective-cpp-01/#more" rel="contents">
+            <a class="btn" href="/2018/04/01/paper-yolov3/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1391,7 +1404,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/03/08/mathfunctions-in-caffe/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/03/24/paper-squeezenet/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1416,8 +1429,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/08/mathfunctions-in-caffe/" itemprop="url">
-                  Caffe中的底层数学计算函数
+                <a class="post-title-link" href="/2018/03/24/paper-squeezenet/" itemprop="url">
+                  论文 - SqueezeNet, AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size
                 </a>
               
             
@@ -1433,8 +1446,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-08T17:24:48+08:00">
-                2017-03-08
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-24T14:02:53+08:00">
+                2018-03-24
               </time>
             
 
@@ -1470,10 +1483,10 @@
 
       
         
-          <p>Caffe中使用了BLAS库作为底层矩阵运算的实现，这篇文章对<a href="https://github.com/BVLC/caffe/blob/master/include/caffe/util/math_functions.hpp">mathfunction.hpp 文件</a>中的相关函数做一总结。我们在自己实现layer运算的时候，也要注意是否Caffe中已经支持了类似运算，不要从scratch开始编码，自己累点不算啥，CPU/GPU的运算能力发挥不出来，更别说自己写的代码也许还是错的，那就尴尬了。。。<br><img src="/img/caffe_mathfunctions_gpuisnuclearweapon.jpg" alt="一卡一栋楼，双卡灭地球，三卡银河系，四卡创世纪"></p>
+          <p><a href="https://arxiv.org/abs/1602.07360">SqueezeNet</a>由HanSong等人提出，和AlexNet相比，用少于$50$倍的参数量，在ImageNet上实现了comparable的accuracy。比较本文和HanSoing其他的工作，可以看出，其他工作，如Deep Compression是对已有的网络进行压缩，减小模型size；而SqueezeNet是从网络设计入手，从设计之初就考虑如何使用较少的参数实现较好的性能。可以说是模型压缩的两个不同思路。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/03/08/mathfunctions-in-caffe/#more" rel="contents">
+            <a class="btn" href="/2018/03/24/paper-squeezenet/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1509,7 +1522,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1552,7 +1565,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">82</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1563,7 +1576,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">30</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1571,6 +1584,13 @@
 
         </nav>
 
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
         
 
         <div class="links-of-author motion-element">
@@ -1623,7 +1643,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

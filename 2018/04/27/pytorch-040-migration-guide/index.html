@@ -1,0 +1,1119 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="pytorch," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="PyTorch在前两天官方发布了0.4.0版本。这个版本与之前相比，API发生了较大的变化，所以官方也出了一个转换指导，这篇博客是这篇指导的中文翻译版。归结起来，对我们代码影响最大的地方主要有：
+
+Tensor和Variable合并，autograd的机制有所不同，变得更简单，使用requires_grad和上下文相关环境管理。
+Numpy风格的Tensor构建。
+提出了device，更简单地在c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="（译）PyTorch 0.4.0 Migration Guide">
+<meta property="og:url" content="https://xmfbit.github.io/2018/04/27/pytorch-040-migration-guide/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="PyTorch在前两天官方发布了0.4.0版本。这个版本与之前相比，API发生了较大的变化，所以官方也出了一个转换指导，这篇博客是这篇指导的中文翻译版。归结起来，对我们代码影响最大的地方主要有：
+
+Tensor和Variable合并，autograd的机制有所不同，变得更简单，使用requires_grad和上下文相关环境管理。
+Numpy风格的Tensor构建。
+提出了device，更简单地在c">
+<meta property="og:updated_time" content="2019-11-24T11:24:03.309Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="（译）PyTorch 0.4.0 Migration Guide">
+<meta name="twitter:description" content="PyTorch在前两天官方发布了0.4.0版本。这个版本与之前相比，API发生了较大的变化，所以官方也出了一个转换指导，这篇博客是这篇指导的中文翻译版。归结起来，对我们代码影响最大的地方主要有：
+
+Tensor和Variable合并，autograd的机制有所不同，变得更简单，使用requires_grad和上下文相关环境管理。
+Numpy风格的Tensor构建。
+提出了device，更简单地在c">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2018/04/27/pytorch-040-migration-guide/"/>
+
+
+
+
+
+  <title> （译）PyTorch 0.4.0 Migration Guide | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/04/27/pytorch-040-migration-guide/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                （译）PyTorch 0.4.0 Migration Guide
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-27T10:49:31+08:00">
+                2018-04-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>PyTorch在前两天官方发布了0.4.0版本。这个版本与之前相比，API发生了较大的变化，所以官方也出了一个<a href="http://pytorch.org/2018/04/22/0_4_0-migration-guide.html" target="_blank" rel="external">转换指导</a>，这篇博客是这篇指导的中文翻译版。归结起来，对我们代码影响最大的地方主要有：</p>
+<ul>
+<li><code>Tensor</code>和<code>Variable</code>合并，<code>autograd</code>的机制有所不同，变得更简单，使用<code>requires_grad</code>和上下文相关环境管理。</li>
+<li>Numpy风格的<code>Tensor</code>构建。</li>
+<li>提出了<code>device</code>，更简单地在cpu和gpu中移动数据。</li>
+</ul>
+<a id="more"></a>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在0.4.0版本中，PyTorch引入了许多令人兴奋的新特性和bug fixes。为了方便以前版本的使用者转换到新的版本，我们编写了此指导，主要包括以下几个重要的方面：</p>
+<ul>
+<li><code>Tensors</code> 和 <code>Variables</code> 已经merge到一起了</li>
+<li>支持0维的Tensor（即标量scalar）</li>
+<li>弃用了 <code>volatile</code> 标志</li>
+<li><code>dtypes</code>, <code>devices</code>, 和 Numpy 风格的 Tensor构造函数</li>
+<li>（更好地编写）设备无关代码</li>
+</ul>
+<p>下面分条介绍。</p>
+<h2 id="Tensor-和-Variable-合并"><a href="#Tensor-和-Variable-合并" class="headerlink" title="Tensor 和 Variable 合并"></a><code>Tensor</code> 和 <code>Variable</code> 合并</h2><p>在PyTorch以前的版本中，<code>Tensor</code>类似于<code>numpy</code>中的<code>ndarray</code>，只是对多维数组的抽象。为了能够使用自动求导机制，必须使用<code>Variable</code>对其进行包装。而现在，这两个东西已经完全合并成一个了，以前<code>Variable</code>的使用情境都可以使用<code>Tensor</code>。所以以前训练的时候总要额外写的warpping语句用不到了。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> data, target <span class="keyword">in</span> data_loader:</div><div class="line">    <span class="comment">## 用不到了</span></div><div class="line">    data, target = Variable(data), Variable(target)</div><div class="line">    loss = criterion(model(data), target)</div></pre></td></tr></table></figure>
+<h3 id="Tensor的类型type"><a href="#Tensor的类型type" class="headerlink" title="Tensor的类型type()"></a><code>Tensor</code>的类型<code>type()</code></h3><p>以前我们可以使用<code>type()</code>获取<code>Tensor</code>的data type（FloatTensor，LongTensor等）。现在需要使用<code>x.type()</code>获取类型或<code>isinstance()</code>判别类型。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>x = torch.DoubleTensor([<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>])</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>print(type(x))  <span class="comment"># 曾经会给出 torch.DoubleTensor</span></div><div class="line"><span class="string">"&lt;class 'torch.Tensor'&gt;"</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>print(x.type())  <span class="comment"># OK: 'torch.DoubleTensor'</span></div><div class="line"><span class="string">'torch.DoubleTensor'</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>print(isinstance(x, torch.DoubleTensor))  <span class="comment"># OK: True</span></div><div class="line"><span class="keyword">True</span></div></pre></td></tr></table></figure>
+<h3 id="autograd现在如何追踪计算图的历史"><a href="#autograd现在如何追踪计算图的历史" class="headerlink" title="autograd现在如何追踪计算图的历史"></a><code>autograd</code>现在如何追踪计算图的历史</h3><p><code>Tensor</code>和<code>Variable</code>的合并，简化了计算图的构建，具体规则见本条和以下几条说明。</p>
+<p><code>requires_grad</code>, 这个<code>autograd</code>中的核心标志量,现在成了<code>Tensor</code>的属性。之前的<code>Variable</code>使用规则可以同样应用于<code>Tensor</code>，<code>autograd</code>自动跟踪那些至少有一个input的<code>requires_grad==True</code>的计算节点构成的图。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>x = torch.ones(<span class="number">1</span>)  <span class="comment">## 默认requires_grad = False</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>x.requires_grad</div><div class="line"><span class="keyword">False</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>y = torch.ones(<span class="number">1</span>)  <span class="comment">## 同样，y的requires_grad标志也是False</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>z = x + y</div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">## 所有的输入节点都不要求梯度，所以z的requires_grad也是False</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>z.requires_grad</div><div class="line"><span class="keyword">False</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">## 所以如果试图对z做梯度反传，会抛出Error</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>z.backward()</div><div class="line">RuntimeError: element <span class="number">0</span> of tensors does <span class="keyword">not</span> require grad <span class="keyword">and</span> does <span class="keyword">not</span> have a grad_fn</div><div class="line">&gt;&gt;&gt;</div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">## 通过手动指定的方式创建 requires_grad=True 的Tensor</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>w = torch.ones(<span class="number">1</span>, requires_grad=<span class="keyword">True</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>w.requires_grad</div><div class="line"><span class="keyword">True</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">## 把它和之前requires_grad=False的节点相加，得到输出</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>total = w + z</div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">## 由于w需要梯度，所以total也需要</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>total.requires_grad</div><div class="line"><span class="keyword">True</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">## 可以做bp</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>total.backward()</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>w.grad</div><div class="line">tensor([ <span class="number">1.</span>])</div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">## 不用有时间浪费在求取 x y z的梯度上，因为它们没有 require grad，它们的grad == None</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>z.grad == x.grad == y.grad == <span class="keyword">None</span></div><div class="line"><span class="keyword">True</span></div></pre></td></tr></table></figure>
+<h3 id="操作-requires-grad-标志"><a href="#操作-requires-grad-标志" class="headerlink" title="操作 requires_grad 标志"></a>操作 <code>requires_grad</code> 标志</h3><p>除了直接设置这个属性，你可以使用<code>my_tensor.requires_grad_()</code>就地修改这个标志（还记得吗，以<code>_</code>结尾的方法名表示in-place的操作）。或者就在构造的时候传入此参数。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>existing_tensor.requires_grad_()</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>existing_tensor.requires_grad</div><div class="line"><span class="keyword">True</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>my_tensor = torch.zeros(<span class="number">3</span>, <span class="number">4</span>, requires_grad=<span class="keyword">True</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>my_tensor.requires_grad</div><div class="line"><span class="keyword">True</span></div></pre></td></tr></table></figure>
+<h3 id="data怎么办？What-about-data"><a href="#data怎么办？What-about-data" class="headerlink" title=".data怎么办？What about .data?"></a><code>.data</code>怎么办？What about .data?</h3><p>原来版本中，对于某个<code>Variable</code>，我们可以通过<code>x.data</code>的方式获取其包装的<code>Tensor</code>。现在两者已经merge到了一起，如果你调用<code>y = x.data</code>仍然和以前相似，<code>y</code>现在会共享<code>x</code>的data，并与<code>x</code>的计算历史无关，且其<code>requires_grad</code>标志为<code>False</code>。</p>
+<p>然而，<code>.data</code>有的时候可能会成为代码中不安全的一个点。对<code>x.data</code>的任何带动都不会被<code>aotograd</code>跟踪。所以，当做反传的时候，计算的梯度可能会不对，一种更安全的替代方法是调用<code>x.detach()</code>，仍然会返回一个共享<code>x</code>data的Tensor，且<code>requires_grad=False</code>，但是当<code>x</code>需要bp的时候，会报告那些in-place的操作。</p>
+<blockquote>
+<p>However, .data can be unsafe in some cases. Any changes on x.data wouldn’t be tracked by autograd, and the computed gradients would be incorrect if x is needed in a backward pass. A safer alternative is to use x.detach(), which also returns a Tensor that shares data with requires_grad=False, but will have its in-place changes reported by autograd if x is needed in backward.</p>
+</blockquote>
+<p>这里有些绕，可以看下下面的示例代码：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 一个简单的计算图：y = sum(x**2)</span></div><div class="line">x = torch.ones((<span class="number">1</span> ,<span class="number">2</span>))</div><div class="line">x.requires_grad_()</div><div class="line">y = torch.sum(x**<span class="number">2</span>)</div><div class="line">y.backward()</div><div class="line">x.grad   <span class="comment"># grad: [2, 2, 2]</span></div><div class="line"><span class="comment"># 使用.data，在计算完y之后，又改动了x，会造成梯度计算错误</span></div><div class="line">x.grad.zero_()</div><div class="line">y = torch.sum(x**<span class="number">2</span>)</div><div class="line">data = x.data</div><div class="line">data[<span class="number">0</span>, <span class="number">0</span>] = <span class="number">2</span></div><div class="line">y.backward()</div><div class="line">x.grad   <span class="comment"># grad: [4, 2, 2] 错了哦~</span></div><div class="line"><span class="comment"># 使用detach，同样的操作，会抛出异常</span></div><div class="line">x.grad.zero_()</div><div class="line">y = torch.sum(x**<span class="number">2</span>)</div><div class="line">data = x.detach()</div><div class="line">data[<span class="number">0</span>, <span class="number">0</span>] = <span class="number">2</span></div><div class="line">y.backward()</div><div class="line"><span class="comment"># 抛出如下异常</span></div><div class="line"><span class="comment"># RuntimeError: one of the variables needed for gradient </span></div><div class="line"><span class="comment"># computation has been modified by an inplace operation</span></div></pre></td></tr></table></figure>
+<h2 id="支持0维-scalar-的Tensor"><a href="#支持0维-scalar-的Tensor" class="headerlink" title="支持0维(scalar)的Tensor"></a>支持0维(scalar)的Tensor</h2><p>原来的版本中，对Tensor vector（1D Tensor）做索引得到的结果是一个python number，但是对一个Variable vector来说，得到的就是一个<code>size(1,)</code>的vector!对于reduction function（如<code>torch.sum</code>，<code>torch.max</code>）也有这样的问题。</p>
+<p>所以我们引入了scalar（0D Tensor）。它可以使用<code>torch.tensor()</code> 函数来创建，现在你可以这样做：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.tensor(<span class="number">3.1416</span>)         <span class="comment"># 直接创建scalar</span></div><div class="line">tensor(<span class="number">3.1416</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.tensor(<span class="number">3.1416</span>).size()  <span class="comment"># scalar 是 0D</span></div><div class="line">torch.Size([])</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.tensor([<span class="number">3</span>]).size()     <span class="comment"># 和1D对比</span></div><div class="line">torch.Size([<span class="number">1</span>])</div><div class="line">&gt;&gt;&gt;</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>vector = torch.arange(<span class="number">2</span>, <span class="number">6</span>)  <span class="comment"># 1D的vector</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>vector</div><div class="line">tensor([ <span class="number">2.</span>,  <span class="number">3.</span>,  <span class="number">4.</span>,  <span class="number">5.</span>])</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>vector.size()</div><div class="line">torch.Size([<span class="number">4</span>])</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>vector[<span class="number">3</span>]                    <span class="comment"># 对1D的vector做indexing，得到的是scalar</span></div><div class="line">tensor(<span class="number">5.</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>vector[<span class="number">3</span>].item()             <span class="comment"># 使用.item()获取python number</span></div><div class="line"><span class="number">5.0</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>mysum = torch.tensor([<span class="number">2</span>, <span class="number">3</span>]).sum()</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>mysum</div><div class="line">tensor(<span class="number">5</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>mysum.size()</div><div class="line">torch.Size([])</div></pre></td></tr></table></figure>
+<h3 id="累积losses"><a href="#累积losses" class="headerlink" title="累积losses"></a>累积losses</h3><p>我们在训练的时候，经常有这样的用法：<code>total_loss += loss.data[0]</code>。<code>loss</code>通常都是由损失函数计算出来的一个标量，也就是包装了<code>(1,)</code>大小<code>Tensor</code>的<code>Variable</code>。在新的版本中，<code>loss</code>则变成了0D的scalar。对一个scalar做indexing是没有意义的，应该使用<code>loss.item()</code>获取python number。</p>
+<p>注意，如果你在做累加的时候没有转换为python number，你的程序可能会出现不必要的内存占用。因为<code>autograd</code>会记录调用过程，以便做反向传播。所以，你现在应该写成 <code>total_loss += loss.item()</code>。</p>
+<h2 id="弃用volatile标志"><a href="#弃用volatile标志" class="headerlink" title="弃用volatile标志"></a>弃用<code>volatile</code>标志</h2><p><code>volatile</code> 标志被弃用了，现在没有任何效果。以前的版本中，一个设置<code>volatile=True</code>的<code>Variable</code> 表明其不会被<code>autograd</code>追踪。现在，被替换成了一个更灵活的上下文管理器，如<code>torch.no_grad()</code>，<code>torch.set_grad_enable(grad_mode)</code>等。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>x = torch.zeros(<span class="number">1</span>, requires_grad=<span class="keyword">True</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">with</span> torch.no_grad():    <span class="comment"># 使用 torch,no_grad()构建不需要track的上下文环境</span></div><div class="line"><span class="meta">... </span>    y = x * <span class="number">2</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>y.requires_grad</div><div class="line"><span class="keyword">False</span></div><div class="line">&gt;&gt;&gt;</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>is_train = <span class="keyword">False</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">with</span> torch.set_grad_enabled(is_train):   <span class="comment"># 在inference的时候，设置不要track</span></div><div class="line"><span class="meta">... </span>    y = x * <span class="number">2</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>y.requires_grad</div><div class="line"><span class="keyword">False</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.set_grad_enabled(<span class="keyword">True</span>)  <span class="comment"># 当然也可以不用with构建上下文环境，而单独这样用</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>y = x * <span class="number">2</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>y.requires_grad</div><div class="line"><span class="keyword">True</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.set_grad_enabled(<span class="keyword">False</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>y = x * <span class="number">2</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>y.requires_grad</div><div class="line"><span class="keyword">False</span></div></pre></td></tr></table></figure>
+<h2 id="dtypes-devices-和NumPy风格的构建函数"><a href="#dtypes-devices-和NumPy风格的构建函数" class="headerlink" title="dtypes, devices 和NumPy风格的构建函数"></a><code>dtypes</code>, <code>devices</code> 和NumPy风格的构建函数</h2><p>以前的版本中，我们需要以”tensor type”的形式给出对data type（如<code>float</code>或<code>double</code>），device type（如cpu或gpu）以及layout（dense或sparse）的限定。例如，<code>torch.cuda.sparse.DoubleTensor</code>用来构造一个data type是<code>double</code>，在GPU上以及sparse的tensor。</p>
+<p>现在我们引入了<code>torch.dtype</code>，<code>torch.device</code>和<code>torch.layout</code>来更好地使用Numpy风格的构建函数。</p>
+<h3 id="torch-dtype"><a href="#torch-dtype" class="headerlink" title="torch.dtype"></a><code>torch.dtype</code></h3><p>下面是可用的 <code>torch.dtypes</code> (data types) 和它们对应的tensor types。可以使用<code>x.dtype</code>获取。</p>
+<table>
+   <tr>
+      <td>data type</td>
+      <td>torch.dtype</td>
+      <td>Tensor types</td>
+   </tr>
+   <tr>
+      <td>32-bit floating point</td>
+      <td>torch.float32 or torch.float</td>
+      <td>torch.*.FloatTensor</td>
+   </tr>
+   <tr>
+      <td>64-bit floating point</td>
+      <td>torch.float64 or torch.double</td>
+      <td>torch.*.DoubleTensor</td>
+   </tr>
+   <tr>
+      <td>16-bit floating point</td>
+      <td>torch.float16 or torch.half</td>
+      <td>torch.*.HalfTensor</td>
+   </tr>
+   <tr>
+      <td>8-bit integer (unsigned)</td>
+      <td>torch.uint8</td>
+      <td>torch.*.ByteTensor</td>
+   </tr>
+   <tr>
+      <td>8-bit integer (signed)</td>
+      <td>torch.int8</td>
+      <td>torch.*.CharTensor</td>
+   </tr>
+   <tr>
+      <td>16-bit integer (signed)</td>
+      <td>torch.int16 or torch.short</td>
+      <td>torch.*.ShortTensor</td>
+   </tr>
+   <tr>
+      <td>32-bit integer (signed)</td>
+      <td>torch.int32 or torch.int</td>
+      <td>torch.*.IntTensor</td>
+   </tr>
+   <tr>
+      <td>64-bit integer (signed)</td>
+      <td>torch.int64 or torch.long</td>
+      <td>torch.*.LongTensor</td>
+   </tr>
+</table>
+
+<h3 id="torch-device"><a href="#torch-device" class="headerlink" title="torch.device"></a><code>torch.device</code></h3><p><code>torch.device</code>包含了device type（如cpu或cuda）和可能的设备id。使用<code>torch.device(&#39;{device_type}&#39;)</code>或<code>torch.device(&#39;{device_type}:{device_ordinal}&#39;)</code>的方式来初始化。 </p>
+<p>如果没有指定<code>device ordinal</code>，那么默认是当前的device。例如，<code>torch.device(&#39;cuda&#39;)</code>相当于<code>torch.device(&#39;cuda:X&#39;)</code>，其中，<code>X</code>是<code>torch.cuda.current_device()</code>的返回结果。</p>
+<p>使用<code>x.device</code>来获取。</p>
+<h3 id="torch-layout"><a href="#torch-layout" class="headerlink" title="torch.layout"></a><code>torch.layout</code></h3><p><code>torch.layout</code>代表了<code>Tensor</code>的data layout。 目前支持的是<code>torch.strided</code> (dense，也是默认的) 和 <code>torch.sparse_coo</code> (COOG格式的稀疏tensor)。</p>
+<p>使用<code>x.layout</code>来获取。</p>
+<h3 id="创建Tensor（Numpy风格）"><a href="#创建Tensor（Numpy风格）" class="headerlink" title="创建Tensor（Numpy风格）"></a>创建<code>Tensor</code>（Numpy风格）</h3><p>你可以使用<code>dtype</code>，<code>device</code>，<code>layout</code>和<code>requires_grad</code>更好地控制<code>Tensor</code>的创建。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>device = torch.device(<span class="string">"cuda:1"</span>) </div><div class="line"><span class="meta">&gt;&gt;&gt; </span>x = torch.randn(<span class="number">3</span>, <span class="number">3</span>, dtype=torch.float64, device=device)</div><div class="line">tensor([[<span class="number">-0.6344</span>,  <span class="number">0.8562</span>, <span class="number">-1.2758</span>],</div><div class="line">        [ <span class="number">0.8414</span>,  <span class="number">1.7962</span>,  <span class="number">1.0589</span>],</div><div class="line">        [<span class="number">-0.1369</span>, <span class="number">-1.0462</span>, <span class="number">-0.4373</span>]], dtype=torch.float64, device=<span class="string">'cuda:1'</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>x.requires_grad  <span class="comment"># default is False</span></div><div class="line"><span class="keyword">False</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>x = torch.zeros(<span class="number">3</span>, requires_grad=<span class="keyword">True</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>x.requires_grad</div><div class="line"><span class="keyword">True</span></div></pre></td></tr></table></figure>
+<h3 id="torch-tensor-data"><a href="#torch-tensor-data" class="headerlink" title="torch.tensor(data, ...)"></a><code>torch.tensor(data, ...)</code></h3><p><code>torch.tensor</code>是新加入的<code>Tesnor</code>构建函数。它接受一个”array-like”的参数，并将其value copy到一个新的<code>Tensor</code>中。可以将它看做<code>numpy.array</code>的等价物。不同于<code>torch.*Tensor</code>方法，你可以创建0D的Tensor（也就是scalar）。此外，如果<code>dtype</code>参数没有给出，它会自动推断。推荐使用这个函数从已有的data，如Python List创建<code>Tensor</code>。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>cuda = torch.device(<span class="string">"cuda"</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.tensor([[<span class="number">1</span>], [<span class="number">2</span>], [<span class="number">3</span>]], dtype=torch.half, device=cuda)</div><div class="line">tensor([[ <span class="number">1</span>],</div><div class="line">        [ <span class="number">2</span>],</div><div class="line">        [ <span class="number">3</span>]], device=<span class="string">'cuda:0'</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.tensor(<span class="number">1</span>)               <span class="comment"># scalar</span></div><div class="line">tensor(<span class="number">1</span>)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.tensor([<span class="number">1</span>, <span class="number">2.3</span>]).dtype  <span class="comment"># type inferece</span></div><div class="line">torch.float32</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.tensor([<span class="number">1</span>, <span class="number">2</span>]).dtype    <span class="comment"># type inferece</span></div><div class="line">torch.int64</div></pre></td></tr></table></figure>
+<p>我们还加了更多的<code>Tensor</code>创建方法。其中有一些<code>torch.*_like</code>，<code>tensor.new_*</code>这样的形式。</p>
+<ul>
+<li><p><code>torch.*_like</code>的参数是一个input tensor， 它返回一个相同属性的tensor，除非有特殊指定。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>x = torch.randn(<span class="number">3</span>, dtype=torch.float64)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.zeros_like(x)</div><div class="line">tensor([ <span class="number">0.</span>,  <span class="number">0.</span>,  <span class="number">0.</span>], dtype=torch.float64)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>torch.zeros_like(x, dtype=torch.int)</div><div class="line">tensor([ <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">0</span>], dtype=torch.int32)</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>tensor.new_*</code>类似，不过它通常需要接受一个指定shape的参数。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>x = torch.randn(<span class="number">3</span>, dtype=torch.float64)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>x.new_ones(<span class="number">2</span>)</div><div class="line">tensor([ <span class="number">1.</span>,  <span class="number">1.</span>], dtype=torch.float64)</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>x.new_ones(<span class="number">4</span>, dtype=torch.int)</div><div class="line">tensor([ <span class="number">1</span>,  <span class="number">1</span>,  <span class="number">1</span>,  <span class="number">1</span>], dtype=torch.int32)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>为了指定shape参数，你可以使用<code>tuple</code>，如<code>torch.zeros((2, 3))</code>（Numpy风格）或者可变数量参数<code>torch.zeros(2, 3)</code>（以前的版本只支持这种）。</p>
+<table>
+   <tr>
+      <td>Name</td>
+      <td>Returned Tensor</td>
+      <td>torch.*_likevariant</td>
+      <td>tensor.new_*variant</td>
+   </tr>
+   <tr>
+      <td>torch.empty</td>
+      <td>unintialized memory</td>
+      <td>✔</td>
+      <td>✔</td>
+   </tr>
+   <tr>
+      <td>torch.zeros</td>
+      <td>all zeros</td>
+      <td>✔</td>
+      <td>✔</td>
+   </tr>
+   <tr>
+      <td>torch.ones</td>
+      <td>all ones</td>
+      <td>✔</td>
+      <td>✔</td>
+   </tr>
+   <tr>
+      <td>torch.full</td>
+      <td>filled with a given value</td>
+      <td>✔</td>
+      <td>✔</td>
+   </tr>
+   <tr>
+      <td>torch.rand</td>
+      <td>i.i.d. continuous Uniform[0, 1)</td>
+      <td>✔</td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>torch.randn</td>
+      <td>i.i.d. Normal(0, 1)</td>
+      <td>✔</td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>torch.randint</td>
+      <td>i.i.d. discrete Uniform in given range</td>
+      <td>✔</td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>torch.randperm</td>
+      <td>random permutation of {0, 1, ..., n - 1}</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>torch.tensor</td>
+      <td>copied from existing data (list, NumPy ndarray, etc.)</td>
+      <td></td>
+      <td>✔</td>
+   </tr>
+   <tr>
+      <td>torch.from_numpy*</td>
+      <td>from NumPy ndarray (sharing storage without copying)</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>torch.arange, torch.range and torch.linspace</td>
+      <td>uniformly spaced values in a given range</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>torch.logspace</td>
+      <td>logarithmically spaced values in a given range</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>torch.eye</td>
+      <td>identity matrix</td>
+      <td></td>
+      <td></td>
+   </tr>
+</table>
+
+<p>注：<code>torch.from_numpy</code>只接受NumPy <code>ndarray</code>作为输入参数。</p>
+<h2 id="书写设备无关代码（device-agnostic-code）"><a href="#书写设备无关代码（device-agnostic-code）" class="headerlink" title="书写设备无关代码（device-agnostic code）"></a>书写设备无关代码（device-agnostic code）</h2><p>以前版本很难写设备无关代码。我们使用两种方法使其变得简单：</p>
+<ul>
+<li><code>Tensor</code>的<code>device</code>属性可以给出其<code>torch.device</code>（<code>get_device</code>只能获取CUDA tensor）</li>
+<li>使用<code>x.to()</code>方法，可以很容易将<code>Tensor</code>或者<code>Module</code>在devices间移动（而不用调用<code>x.cpu()</code>或者<code>x.cuda()</code>。</li>
+</ul>
+<p>推荐使用下面的模式：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 在脚本开始的地方，指定device</span></div><div class="line">device = torch.device(<span class="string">"cuda:0"</span> <span class="keyword">if</span> torch.cuda.is_available() <span class="keyword">else</span> <span class="string">"cpu"</span>)</div><div class="line"></div><div class="line"><span class="comment">## 一些代码</span></div><div class="line"></div><div class="line"><span class="comment"># 当你想创建新的Tensor或者Module时候，使用下面的方法</span></div><div class="line"><span class="comment"># 如果已经在相应的device上了，将不会发生copy</span></div><div class="line">input = data.to(device)</div><div class="line">model = MyModule(...).to(device)</div></pre></td></tr></table></figure>
+<h2 id="在nn-Module中对于submodule，parameter和buffer名字新的约束"><a href="#在nn-Module中对于submodule，parameter和buffer名字新的约束" class="headerlink" title="在nn.Module中对于submodule，parameter和buffer名字新的约束"></a>在<code>nn.Module</code>中对于submodule，parameter和buffer名字新的约束</h2><p>当使用<code>module.add_module(name, value)</code>, <code>module.add_parameter(name, value)</code> 或者 <code>module.add_buffer(name, value)</code>时候不要使用空字符串或者包含<code>.</code>的字符串，可能会导致<code>state_dict</code>中的数据丢失。如果你在load这样的<code>state_dict</code>，注意打补丁，并且应该更新代码，规避这个问题。</p>
+<h2 id="一个具体的例子"><a href="#一个具体的例子" class="headerlink" title="一个具体的例子"></a>一个具体的例子</h2><p>下面是一个code snippet，展示了从0.3.1跨越到0.4.0的不同。</p>
+<h3 id="0-3-1-version"><a href="#0-3-1-version" class="headerlink" title="0.3.1 version"></a>0.3.1 version</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">model = MyRNN()</div><div class="line"><span class="keyword">if</span> use_cuda:</div><div class="line">    model = model.cuda()</div><div class="line"></div><div class="line"><span class="comment"># train</span></div><div class="line">total_loss = <span class="number">0</span></div><div class="line"><span class="keyword">for</span> input, target <span class="keyword">in</span> train_loader:</div><div class="line">    input, target = Variable(input), Variable(target)</div><div class="line">    hidden = Variable(torch.zeros(*h_shape))  <span class="comment"># init hidden</span></div><div class="line">    <span class="keyword">if</span> use_cuda:</div><div class="line">        input, target, hidden = input.cuda(), target.cuda(), hidden.cuda()</div><div class="line">    ...  <span class="comment"># get loss and optimize</span></div><div class="line">    total_loss += loss.data[<span class="number">0</span>]</div><div class="line"></div><div class="line"><span class="comment"># evaluate</span></div><div class="line"><span class="keyword">for</span> input, target <span class="keyword">in</span> test_loader:</div><div class="line">    input = Variable(input, volatile=<span class="keyword">True</span>)</div><div class="line">    <span class="keyword">if</span> use_cuda:</div><div class="line">        ...</div><div class="line">    ...</div></pre></td></tr></table></figure>
+<h3 id="0-4-0-version"><a href="#0-4-0-version" class="headerlink" title="0.4.0 version"></a>0.4.0 version</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># torch.device object used throughout this script</span></div><div class="line">device = torch.device(<span class="string">"cuda"</span> <span class="keyword">if</span> use_cuda <span class="keyword">else</span> <span class="string">"cpu"</span>)</div><div class="line"></div><div class="line">model = MyRNN().to(device)</div><div class="line"></div><div class="line"><span class="comment"># train</span></div><div class="line">total_loss = <span class="number">0</span></div><div class="line"><span class="keyword">for</span> input, target <span class="keyword">in</span> train_loader:</div><div class="line">    input, target = input.to(device), target.to(device)</div><div class="line">    hidden = input.new_zeros(*h_shape)  <span class="comment"># has the same device &amp; dtype as `input`</span></div><div class="line">    ...  <span class="comment"># get loss and optimize</span></div><div class="line">    total_loss += loss.item()           <span class="comment"># get Python number from 1-element Tensor</span></div><div class="line"></div><div class="line"><span class="comment"># evaluate</span></div><div class="line"><span class="keyword">with</span> torch.no_grad():                   <span class="comment"># operations inside don't track history</span></div><div class="line">    <span class="keyword">for</span> input, target <span class="keyword">in</span> test_loader:</div><div class="line">        ...</div></pre></td></tr></table></figure>
+<h2 id="附"><a href="#附" class="headerlink" title="附"></a>附</h2><ul>
+<li><a href="https://github.com/pytorch/pytorch/releases/tag/v0.4.0" target="_blank" rel="external">Release Note</a></li>
+<li><a href="http://pytorch.org/docs/stable/index.html" target="_blank" rel="external">Documentation</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pytorch/" rel="tag"># pytorch</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/09/set-env-in-jupyternotebook/" rel="next" title="JupyterNotebook设置Python环境">
+                <i class="fa fa-chevron-left"></i> JupyterNotebook设置Python环境
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/07/knowledge-distilling/" rel="prev" title="论文 - Distilling the Knowledge in a Neural Network">
+                论文 - Distilling the Knowledge in a Neural Network <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/liumengli.jpg"
+               alt="一个脱离了高级趣味的人" />
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tensor-和-Variable-合并"><span class="nav-number">2.</span> <span class="nav-text">Tensor 和 Variable 合并</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Tensor的类型type"><span class="nav-number">2.1.</span> <span class="nav-text">Tensor的类型type()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#autograd现在如何追踪计算图的历史"><span class="nav-number">2.2.</span> <span class="nav-text">autograd现在如何追踪计算图的历史</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作-requires-grad-标志"><span class="nav-number">2.3.</span> <span class="nav-text">操作 requires_grad 标志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data怎么办？What-about-data"><span class="nav-number">2.4.</span> <span class="nav-text">.data怎么办？What about .data?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#支持0维-scalar-的Tensor"><span class="nav-number">3.</span> <span class="nav-text">支持0维(scalar)的Tensor</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#累积losses"><span class="nav-number">3.1.</span> <span class="nav-text">累积losses</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#弃用volatile标志"><span class="nav-number">4.</span> <span class="nav-text">弃用volatile标志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dtypes-devices-和NumPy风格的构建函数"><span class="nav-number">5.</span> <span class="nav-text">dtypes, devices 和NumPy风格的构建函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#torch-dtype"><span class="nav-number">5.1.</span> <span class="nav-text">torch.dtype</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#torch-device"><span class="nav-number">5.2.</span> <span class="nav-text">torch.device</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#torch-layout"><span class="nav-number">5.3.</span> <span class="nav-text">torch.layout</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建Tensor（Numpy风格）"><span class="nav-number">5.4.</span> <span class="nav-text">创建Tensor（Numpy风格）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#torch-tensor-data"><span class="nav-number">5.5.</span> <span class="nav-text">torch.tensor(data, ...)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#书写设备无关代码（device-agnostic-code）"><span class="nav-number">6.</span> <span class="nav-text">书写设备无关代码（device-agnostic code）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在nn-Module中对于submodule，parameter和buffer名字新的约束"><span class="nav-number">7.</span> <span class="nav-text">在nn.Module中对于submodule，parameter和buffer名字新的约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一个具体的例子"><span class="nav-number">8.</span> <span class="nav-text">一个具体的例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0-3-1-version"><span class="nav-number">8.1.</span> <span class="nav-text">0.3.1 version</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0-4-0-version"><span class="nav-number">8.2.</span> <span class="nav-text">0.4.0 version</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附"><span class="nav-number">9.</span> <span class="nav-text">附</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

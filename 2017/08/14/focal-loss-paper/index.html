@@ -74,6 +74,8 @@
 
 
 
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
 
 
 
@@ -84,20 +86,22 @@
 
 
 
-<meta name="description" content="Focal Loss这篇文章是He Kaiming和Ross发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的讨论。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。
-下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型">
+<meta name="description" content="Focal Loss这篇文章是He Kaiming和RBG发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的讨论。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。
+下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Focal Loss论文阅读 - Focal Loss for Dense Object Detection">
 <meta property="og:url" content="https://xmfbit.github.io/2017/08/14/focal-loss-paper/index.html">
 <meta property="og:site_name" content="来呀，快活呀~">
-<meta property="og:description" content="Focal Loss这篇文章是He Kaiming和Ross发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的讨论。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。
-下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型">
+<meta property="og:description" content="Focal Loss这篇文章是He Kaiming和RBG发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的讨论。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。
+下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型。">
 <meta property="og:image" content="https://xmfbit.github.io/img/focal_loss_different_model_comparison.jpg">
-<meta property="og:updated_time" content="2017-08-21T08:54:56.000Z">
+<meta property="og:image" content="https://xmfbit.github.io/img/yolov3-comparision-with-retina.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/focal_loss_vs_ce_loss.jpg">
+<meta property="og:updated_time" content="2019-11-24T11:24:03.280Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Focal Loss论文阅读 - Focal Loss for Dense Object Detection">
-<meta name="twitter:description" content="Focal Loss这篇文章是He Kaiming和Ross发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的讨论。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。
-下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型">
+<meta name="twitter:description" content="Focal Loss这篇文章是He Kaiming和RBG发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的讨论。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。
+下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型。">
 <meta name="twitter:image" content="https://xmfbit.github.io/img/focal_loss_different_model_comparison.jpg">
 
 
@@ -362,10 +366,33 @@
       
 
       
-        <p>Focal Loss这篇文章是He Kaiming和Ross发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的<a href="https://www.zhihu.com/question/63581984" target="_blank" rel="external">讨论</a>。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。</p>
-<p>下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型。不过图上没有加入YOLO的对比。YOLO的速度仍然是其一大优势。</p>
-<p><img src="/img/focal_loss_different_model_comparison.jpg" alt="不同模型关于精度和速度的比较"><br><a id="more"></a></p>
-<h2 id="为什么要有Focal-Loss？"><a href="#为什么要有Focal-Loss？" class="headerlink" title="为什么要有Focal Loss？"></a>为什么要有Focal Loss？</h2><p>目前主流的检测算法可以分为两类：one-state和two-stage。前者以YOLO和SSD为代表，后者以RCNN系列为代表。后者的特点是分类器是在一个稀疏的候选目标中进行分类（背景和对应类别），而这是通过前面的proposal过程实现的。例如Seletive Search或者RPN。与之相反，前者是输出一个稠密的proposal，</p>
+        <p>Focal Loss这篇文章是He Kaiming和RBG发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的<a href="https://www.zhihu.com/question/63581984" target="_blank" rel="external">讨论</a>。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。</p>
+<p>下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型。不过图上没有加入YOLO的对比。YOLO的速度仍然是其一大优势，但是精度和其他方法相比，仍然不高。</p>
+<p><img src="/img/focal_loss_different_model_comparison.jpg" alt="不同模型关于精度和速度的比较"></p>
+<p>Update@2018.03.26 YOLO更新了v3版本，见<a href="https://pjreddie.com/darknet/yolo/" target="_blank" rel="external">项目主页</a>，并“点名”与有Focal Loss加持的Retina Net相比较，见下图。<br><img src="/img/yolov3-comparision-with-retina.png" alt="YOLO v3"><br><a id="more"></a></p>
+<h2 id="为什么要有Focal-Loss？"><a href="#为什么要有Focal-Loss？" class="headerlink" title="为什么要有Focal Loss？"></a>为什么要有Focal Loss？</h2><p>目前主流的检测算法可以分为两类：one-state和two-stage。前者以YOLO和SSD为代表，后者以RCNN系列为代表。后者的特点是分类器是在一个稀疏的候选目标中进行分类（背景和对应类别），而这是通过前面的proposal过程实现的。例如Seletive Search或者RPN。相对于后者，这种方法是在一个稀疏集合内做分类。与之相反，前者是输出一个稠密的proposal，然后丢进分类器中，直接进行类别分类。后者使用的方法结构一般较为简单，速度较快，但是目前存在的问题是精度不高，普遍不如前者的方法。</p>
+<p>论文作者指出，之所以做稠密分类的后者精度不够高，核心问题（central issus）是稠密proposal中前景和背景的极度不平衡。以我更熟悉的YOLO举例子，比如在PASCAL VOC数据集中，每张图片上标注的目标可能也就几个。但是YOLO V2最后一层的输出是$13 \times 13 \times 5$，也就是$845$个候选目标！大量（简单易区分）的负样本在loss中占据了很大比重，使得有用的loss不能回传回来。</p>
+<p>基于此，作者将经典的交叉熵损失做了变形（见下），给那些易于被分类的简单例子小的权重，给不易区分的难例更大的权重。同时，作者提出了一个新的one-stage的检测器RetinaNet，达到了速度和精度很好地trade-off。</p>
+<script type="math/tex; mode=display">\text{FL}(p_t) = -(1-p_t)^\gamma \log(p_t)</script><h2 id="物体检测的两种主流方法"><a href="#物体检测的两种主流方法" class="headerlink" title="物体检测的两种主流方法"></a>物体检测的两种主流方法</h2><p>在深度学习之前，经典的物体检测方法为滑动窗，并使用人工设计的特征。HoG和DPM等方法是其中比较有名的。</p>
+<p>R-CNN系的方法是目前最为流行的物体检测方法之一，同时也是目前精度最高的方法。在R-CNN系方法中，正负类别不平衡这个问题通过前面的proposal解决了。通过EdgeBoxes，Selective Search，DeepMask，RPN等方法，过滤掉了大多数的背景，实际传给后续网络的proposal的数量是比较少的（1-2K）。</p>
+<p>在YOLO，SSD等方法中，需要直接对feature map的大量proposal（100K）进行检测，而且这些proposal很多都在feature map上重叠。大量的负样本带来两个问题：</p>
+<ul>
+<li>过于简单，有效信息过少，使得训练效率低；</li>
+<li>简单的负样本在训练过程中压倒性优势，使得模型发生退化。</li>
+</ul>
+<p>在Faster-RCNN方法中，Huber Loss被用来降低outlier的影响（较大error的样本，也就是难例，传回来的梯度做了clipping，也只能是$1$）。而FocalLoss是对inner中简单的那些样本对loss的贡献进行限制。即使这些简单样本数量很多，也不让它们在训练中占到优势。</p>
+<h2 id="Focal-Loss"><a href="#Focal-Loss" class="headerlink" title="Focal Loss"></a>Focal Loss</h2><p>Focal Loss从交叉熵损失而来。二分类的交叉熵损失如下：</p>
+<script type="math/tex; mode=display">\text{CE}(p, y) = \begin{cases}-\log(p) \quad &\text{if}\quad y = 1\\ -\log(1-p) &\text{otherwise}\end{cases}</script><p>对应的，多分类的交叉熵损失是这样的：</p>
+<script type="math/tex; mode=display">\text{CE}(p, y) = -\log(p_y)</script><p>如下图所示，蓝色线为交叉熵损失函数随着$p_t$变化的曲线($p_t$意为ground truth，是标注类别所对应的概率)。可以看到，当概率大于$.5$，即认为是易分类的简单样本时，值仍然较大。这样，很多简单样本累加起来，就很可能盖住那些稀少的不易正确分类的类别。<br><img src="/img/focal_loss_vs_ce_loss.jpg" alt="FL vs CELoss"></p>
+<p>为了改善类别样本分布不均衡的问题，已经有人提出了使用加上权重的交叉熵损失，如下（即用参数$\alpha_t$来平衡，这组参数可以是超参数，也可以由类别的比例倒数决定）。作者将其作为比较的baseline。</p>
+<script type="math/tex; mode=display">\text{CE}(p) = -\alpha_t\log(p_t)</script><p>作者提出的则是一个自适应调节的权重，即Focal Loss，定义如下。由上图可以看到$\gamma$取不同值的时候的函数值变化。作者发现，$\gamma=2$时能够获得最佳的效果提升。</p>
+<script type="math/tex; mode=display">\text{FL}(p_t) = -(1-p_t)^\gamma\log(p_t)</script><p>在实际实验中，作者使用的是加权之后的Focal Loss，作者发现这样能够带来些微的性能提升。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>这里给出PyTorch中第三方给出的<a href="https://github.com/DingKe/pytorch_workplace/blob/master/focalloss/loss.py" target="_blank" rel="external">Focal Loss的实现</a>。在下面的代码中，首先实现了<code>one-hot</code>编码，给定类别总数<code>classes</code>和当前类别<code>index</code>，生成one-hot向量。那么，Focal Loss可以用下面的式子计算（可以对照交叉损失熵使用onehot编码的计算）。其中，$\odot$表示element-wise乘法。</p>
+<script type="math/tex; mode=display">L = -\sum_{i}^{C}\text{onehot}\odot (1-P_i)^\gamma \log P_i</script><figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> torch</div><div class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</div><div class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</div><div class="line"><span class="keyword">from</span> torch.autograd <span class="keyword">import</span> Variable</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">one_hot</span><span class="params">(index, classes)</span>:</span></div><div class="line">    size = index.size() + (classes,)</div><div class="line">    view = index.size() + (<span class="number">1</span>,)</div><div class="line"></div><div class="line">    mask = torch.Tensor(*size).fill_(<span class="number">0</span>)</div><div class="line">    index = index.view(*view)</div><div class="line">    ones = <span class="number">1.</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> isinstance(index, Variable):</div><div class="line">        ones = Variable(torch.Tensor(index.size()).fill_(<span class="number">1</span>))</div><div class="line">        mask = Variable(mask, volatile=index.volatile)</div><div class="line"></div><div class="line">    <span class="keyword">return</span> mask.scatter_(<span class="number">1</span>, index, ones)</div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">FocalLoss</span><span class="params">(nn.Module)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, gamma=<span class="number">0</span>, eps=<span class="number">1e-7</span>)</span>:</span></div><div class="line">        super(FocalLoss, self).__init__()</div><div class="line">        self.gamma = gamma</div><div class="line">        self.eps = eps</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, input, target)</span>:</span></div><div class="line">        y = one_hot(target, input.size(<span class="number">-1</span>))</div><div class="line">        logit = F.softmax(input)</div><div class="line">        logit = logit.clamp(self.eps, <span class="number">1.</span> - self.eps)</div><div class="line"></div><div class="line">        loss = <span class="number">-1</span> * y * torch.log(logit) <span class="comment"># cross entropy</span></div><div class="line">        loss = loss * (<span class="number">1</span> - logit) ** self.gamma <span class="comment"># focal loss</span></div><div class="line"></div><div class="line">        <span class="keyword">return</span> loss.sum()</div></pre></td></tr></table></figure>
+<h2 id="模型初始化"><a href="#模型初始化" class="headerlink" title="模型初始化"></a>模型初始化</h2><p>对于一般的分类网络，初始化之后，往往其输出的预测结果是均等的（随机猜测）。然而作者认为，这种初始化方式在类别极度不均衡的时候是有害的。作者提出，应该初始化模型参数，使得初始化之后，模型输出稀有类别的概率变小（如$0.01$）。作者发现这种初始化方法对于交叉熵损失和Focal Loss的性能提升都有帮助。</p>
+<p>在后续的模型介绍部分，作者较为详细地说明了模型初始化方法。首先，从imagenet预训练得到的base net不做调整，新加入的卷积层权重均初始化为$\sigma=0.01$的高斯分布，偏置项为$0$。对于分类网络的最后一个卷积层，将偏置项置为$b=-\log((1-\pi)/\pi)$。这里的$\pi$参数是一个超参数，其意义是在训练的初始阶段，每个anchor被分类为前景的概率。在实验中，作者实际使用的大小是$0.01$。</p>
+<p>这样进行模型初始化造成的结果就是，在初始阶段，不会产生大量的False Positive，使得训练更加稳定。</p>
+<h2 id="RetinaNet"><a href="#RetinaNet" class="headerlink" title="RetinaNet"></a>RetinaNet</h2><p>作者利用前面介绍的发现和结论，基于ResNet和Feature Pyramid Net（FPN）设计了一种新的one-stage检测框架，命名为RetinaNet。（待续）</p>
 
       
     </div>
@@ -507,7 +534,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">82</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -518,7 +545,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">30</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -526,6 +553,13 @@
 
         </nav>
 
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
         
 
         <div class="links-of-author motion-element">
@@ -573,7 +607,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要有Focal-Loss？"><span class="nav-number">1.</span> <span class="nav-text">为什么要有Focal Loss？</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要有Focal-Loss？"><span class="nav-number">1.</span> <span class="nav-text">为什么要有Focal Loss？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#物体检测的两种主流方法"><span class="nav-number">2.</span> <span class="nav-text">物体检测的两种主流方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Focal-Loss"><span class="nav-number">3.</span> <span class="nav-text">Focal Loss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">4.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模型初始化"><span class="nav-number">5.</span> <span class="nav-text">模型初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RetinaNet"><span class="nav-number">6.</span> <span class="nav-text">RetinaNet</span></a></li></ol></div>
             
 
           </div>
@@ -594,7 +628,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

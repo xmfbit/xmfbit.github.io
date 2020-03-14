@@ -74,6 +74,8 @@
 
 
 
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
 
 
 
@@ -283,7 +285,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/08/21/debugging-with-ipdb/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2020/03/13/mit-missing-semester-02-shell/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -308,8 +310,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/08/21/debugging-with-ipdb/" itemprop="url">
-                  使用IPDB调试Python代码
+                <a class="post-title-link" href="/2020/03/13/mit-missing-semester-02-shell/" itemprop="url">
+                  MIT Missing Semester - Shell
                 </a>
               
             
@@ -325,8 +327,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-21T15:53:16+08:00">
-                2017-08-21
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-13T22:05:30+08:00">
+                2020-03-13
               </time>
             
 
@@ -362,10 +364,12 @@
 
       
         
-          <p>IPDB是什么？IPDB（Ipython Debugger），和GDB类似，是一款集成了Ipython的Python代码命令行调试工具，可以看做PDB的升级版。这篇文章总结IPDB的使用方法，主要是若干命令的使用。更多详细的教程或文档还请参考Google。<br>
+          <p>工欲善其事，必先利其器。<a href="https://missing.csail.mit.edu/">MIT Missing Semester</a>就是这样一门课。在这门课中，不会讲到多少理论知识，也不会告诉你如何写代码，而是会向你介绍诸如shell，git等常用工具的使用。这些工具其实自己在学习工作中或多或少都有接触，不过还是有一些点是漏掉的。所以，一起来和MIT的这些牛人们重新熟悉下这些工具吧！</p>
+<p>这篇博客，包括后续的几篇，是我个人在过课程lecture的时候随手记下的自己之前不太清楚的点，可能并不适合阅读到这篇文章的你。如果有时间，还是建议去课程网站上自己过一遍。</p>
+<p>这里我跳过了第一节课，直接从bash shell开始。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/08/21/debugging-with-ipdb/#more" rel="contents">
+            <a class="btn" href="/2020/03/13/mit-missing-semester-02-shell/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,7 +410,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/08/14/focal-loss-paper/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2019/11/24/caffe-compiling-debian9/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -431,8 +435,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/08/14/focal-loss-paper/" itemprop="url">
-                  Focal Loss论文阅读 - Focal Loss for Dense Object Detection
+                <a class="post-title-link" href="/2019/11/24/caffe-compiling-debian9/" itemprop="url">
+                  Debian9 编译Caffe的一个坑
                 </a>
               
             
@@ -448,8 +452,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-14T22:43:55+08:00">
-                2017-08-14
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-24T19:12:48+08:00">
+                2019-11-24
               </time>
             
 
@@ -485,12 +489,13 @@
 
       
         
-          <p>Focal Loss这篇文章是He Kaiming和Ross发表在ICCV2017上的文章。关于这篇文章在知乎上有相关的<a href="https://www.zhihu.com/question/63581984">讨论</a>。最近一直在做强化学习相关的东西，目标检测方面很长时间不看新的东西了，把自己阅读论文的要点记录如下，也是一次对这方面进展的回顾。</p>
-<p>下图来自于论文，是各种主流模型的比较。其中横轴是前向推断的时间，纵轴是检测器的精度。作者提出的RetinaNet在单独某个维度上都可以吊打其他模型。不过图上没有加入YOLO的对比。YOLO的速度仍然是其一大优势。</p>
-<p><img src="/img/focal_loss_different_model_comparison.jpg" alt="不同模型关于精度和速度的比较"><br>
+          <p>记录一个编译Caffe的坑。环境，Debian 9 + GCC 6.3.0，出现的问题：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">In file included from /usr/local/cuda/include/cuda_runtime.h:120:0,</div><div class="line">                 from &lt;command-line&gt;:0:</div><div class="line">/usr/local/cuda/include/crt/common_functions.h:74:24: error: token &quot;&quot;__CUDACC_VER__ is no longer supported.  Use __CUDACC_VER_MAJOR__, __CUDACC_VER_MINOR__, and __CUDACC_VER</div><div class="line">_BUILD__ instead.&quot;&quot; is not valid in preprocessor expressions</div><div class="line"> #define __CUDACC_VER__ &quot;__CUDACC_VER__ is no longer supported.  Use __CUDACC_VER_MAJOR__, __CUDACC_VER_MINOR__, and __CUDACC_VER_BUILD__ instead.&quot;</div></pre></td></tr></table></figure>
+<p>如果你和我一样，自从从Github clone Caffe后很长时间没有与master合并过，就有可能出现这个问题。</p>
+<p>解决方法：这个问题应该是和boost有关，最初我看到的解决方法是将boost升级到1.65.1。不过感觉好麻烦，后来找到了这个<a href="https://github.com/NVIDIA/caffe/issues/408">github issue</a>，修改<code>include/caffe/common.hpp</code>即可。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/08/14/focal-loss-paper/#more" rel="contents">
+            <a class="btn" href="/2019/11/24/caffe-compiling-debian9/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -531,7 +536,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/08/10/install-ubuntu-in-dell/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2019/10/26/paper-meta-pruning/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -556,8 +561,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/08/10/install-ubuntu-in-dell/" itemprop="url">
-                  DELL 游匣7559安装Ubuntu和CUDA记录
+                <a class="post-title-link" href="/2019/10/26/paper-meta-pruning/" itemprop="url">
+                  论文 - MetaPruning：Meta Learning for Automatic Neural Network Channel Pruning
                 </a>
               
             
@@ -573,8 +578,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-10T11:29:38+08:00">
-                2017-08-10
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-26T00:33:37+08:00">
+                2019-10-26
               </time>
             
 
@@ -610,10 +615,11 @@
 
       
         
-          <p>虽说开源大法好，但是在我的DELL 游匣7559笔记本上安装Ubuntu+Windows双系统可是耗费了我不少精力。这篇博客是我参考<a href="https://hemenkapadia.github.io/blog/2016/11/11/Ubuntu-with-Nvidia-CUDA-Bumblebee.html">这篇文章</a>成功安装Ubuntu16.04和CUDA的记录。感谢上文作者的记录，我才能够最终解决这个问题。基本流程和上文作者相同，只不过没有安装后续的bumblee等工具，所以本文并不是原创，而更多是翻译和备份。<br><img src="/img/install_ubuntu_in_dell_kaiyuandafahao.jpg" alt="开源大法好"><br>
+          <p>这篇文章来自于旷视。旷视内部有一个基础模型组，孙剑老师也是很看好NAS相关的技术，相信这篇文章无论从学术上还是工程落地上都有可以让人借鉴的地方。回到文章本身，模型剪枝算法能够减少模型计算量，实现模型压缩和加速的目的，但是模型剪枝过程中确定剪枝比例等参数的过程实在让人头痛。这篇文章提出了PruningNet的概念，自动为剪枝后的模型生成权重，从而绕过了费时的retrain步骤。并且能够和进化算法等搜索方法结合，通过搜索编码network的coding vector，自动地根据所给约束搜索剪枝后的网络结构。和AutoML技术相比，这种方法并不是从头搜索，而是从已有的大模型出发，从而缩小了搜索空间，节省了搜索算力和时间。个人觉得这种剪枝和NAS结合的方法，应该会在以后吸引越来越多人的注意。这篇文章的代码已经开源在了Github：<a href="https://github.com/liuzechun/MetaPruning">MetaPruning</a>。</p>
+<p>这篇文章首发于<a href="https://wemp.app/accounts/fd027dce-bcd1-4eaf-9e64-88bffd7ca8a2">Paper Weekly公众号</a>，欢迎关注。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/08/10/install-ubuntu-in-dell/#more" rel="contents">
+            <a class="btn" href="/2019/10/26/paper-meta-pruning/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -654,7 +660,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/07/03/effective-cpp-08/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2019/07/06/bag-of-tricks-for-image-cls/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -679,8 +685,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/07/03/effective-cpp-08/" itemprop="url">
-                  Effective CPP 阅读 - Chapter 8 定制new和delete
+                <a class="post-title-link" href="/2019/07/06/bag-of-tricks-for-image-cls/" itemprop="url">
+                  论文 - Bag of Tricks for Image Classification with Convolutional Neural Networks
                 </a>
               
             
@@ -696,8 +702,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-03T19:47:43+08:00">
-                2017-07-03
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-07-06T13:52:45+08:00">
+                2019-07-06
               </time>
             
 
@@ -733,12 +739,11 @@
 
       
         
-          <p>手动管理内存，这既是C++的优点，也是C++中很容易出问题的地方。本章主要给出分配内存和归还时候的注意事项，主角是<code>operator new</code>和<code>operator delete</code>，配角是new_handler，它在当<code>operator new</code>无法满足客户内存需求时候被调用。</p>
-<p>另外，<code>operator new</code>和<code>operator delete</code>只用于分配单一对象内存。对于数组，应使用<code>operator new[]</code>，并通过<code>operator delete[]</code>归还。除非特别指定，本章中的各项既适用于单一<code>operator new</code>，也适用于<code>operator new[]</code>。</p>
-<p>最后，STL中容器使用的堆内存是由容器拥有的分配器对象（allocator objects）来管理的。本章不讨论。<br><img src="/img/effectivecpp_08_memory_leak_everywherre.jpg" alt="memory_leak_everywhere"><br>
+          <p>这是<a href="https://arxiv.org/abs/1812.01187">Bag of Tricks for Image Classification with Convolutional Neural Networks</a>的笔记。这篇文章躺在阅读列表里面很久了，里面的技术之前也用了一些。最近趁着做SOTA模型的训练，把论文整体读了一下，记录在这里。这篇文章总结的仍然是在通用学术数据集上的tricks。对于实际工作中遇到的训练任务，仍然是要结合问题本身来改进模型和训练算法。毕竟，没有银弹。</p>
+<p><img src="/img/bag_of_tricks_no_silver_bullet.jpeg" alt="软工里面没有银弹，数据科学同样这样"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/07/03/effective-cpp-08/#more" rel="contents">
+            <a class="btn" href="/2019/07/06/bag-of-tricks-for-image-cls/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -779,7 +784,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/06/25/hinton-nnml-06/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2019/06/29/tvm-helloworld/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -804,8 +809,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/06/25/hinton-nnml-06/" itemprop="url">
-                  Neural Network for Machine Learning - Lecture 06 神经网络的“调教”方法
+                <a class="post-title-link" href="/2019/06/29/tvm-helloworld/" itemprop="url">
+                  Hello TVM
                 </a>
               
             
@@ -821,8 +826,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-25T13:48:31+08:00">
-                2017-06-25
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-06-29T13:55:43+08:00">
+                2019-06-29
               </time>
             
 
@@ -858,12 +863,16 @@
 
       
         
-          <p>第六周的课程主要讲解了用于神经网络训练的梯度下降方法，首先对比了SGD，full batch GD和mini batch SGD方法，然后给出了几个用于神经网络训练的trick，主要包括输入数据预处理（零均值，单位方差以及PCA解耦），学习率的自适应调节以及网络权重的初始化方法（可以参考各大框架中实现的Xavier初始化方法等）。这篇文章主要记录了后续讲解的几种GD变种方法，如何合理利用梯度信息达到更好的训练效果。由于Hinton这门课确实时间已经很久了，所以文章末尾会结合一篇不错的总结性质的<a href="http://sebastianruder.com/optimizing-gradient-descent/index.html">博客</a>和对应的<a href="https://arxiv.org/abs/1609.04747">论文</a>以及PyTorch中的相关代码，对目前流行的梯度下降方法做个总结。</p>
-<p>下图即来自上面的这篇博客。</p>
-<p><img src="/img/contours_evaluation_optimizers.gif" alt="几种优化方法的可视化"><br>
+          <p>TVM 是什么？A compiler stack，graph level / operator level optimization，目的是（不同框架的）深度学习模型在不同硬件平台上提高 performance (我要更快！)</p>
+<blockquote>
+<p>TVM, a compiler that takes a high-level specification of a deep learning program from existing frameworks and generates low-level optimized code for a diverse set of hardware back-ends.</p>
+</blockquote>
+<p>compiler比较好理解。C编译器将C代码转换为汇编，再进一步处理成CPU可以理解的机器码。TVM的compiler是指将不同前端深度学习框架训练的模型，转换为统一的中间语言表示。stack我的理解是，TVM还提供了后续处理方法，对IR进行优化（graph / operator level），并转换为目标硬件上的代码逻辑（可能会进行benchmark，反复进行上述优化），从而实现了端到端的深度学习模型部署。</p>
+<p>我刚刚接触TVM，这篇主要介绍了如何编译TVM，以及如何使用TVM加载mxnet模型，进行前向计算。Hello TVM!</p>
+<p><img src="/img/tvm_introduction.jpg" alt="TVM概念图"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/06/25/hinton-nnml-06/#more" rel="contents">
+            <a class="btn" href="/2019/06/29/tvm-helloworld/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -904,7 +913,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/06/23/effective-cpp-07/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2019/05/01/cpp-primer-review/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -929,8 +938,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/06/23/effective-cpp-07/" itemprop="url">
-                  Effective CPP 阅读 - Chapter 7 模板与泛型编程
+                <a class="post-title-link" href="/2019/05/01/cpp-primer-review/" itemprop="url">
+                  重读 C++ Primer
                 </a>
               
             
@@ -946,8 +955,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-23T20:19:07+08:00">
-                2017-06-23
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-05-01T13:32:58+08:00">
+                2019-05-01
               </time>
             
 
@@ -983,11 +992,13 @@
 
       
         
-          <p>模板是C++联邦中的重要成员。要想用好STL，必须了解模板。同时，模板元编程也是C++中的黑科技。</p>
-<p><img src="/img/effective_cpp_07_joke.jpg" alt="来自大师的嘲讽~"><br>
+          <p>重读C++ Primer第五版，整理一些糊涂的语法知识点。</p>
+<div  align="center">    
+ <img src="/img/cpp_is_terrible.jpg" width = "200" height = "300" alt="入门到放弃" align=center />
+</div>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/06/23/effective-cpp-07/#more" rel="contents">
+            <a class="btn" href="/2019/05/01/cpp-primer-review/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1028,7 +1039,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/06/17/effective-cpp-06/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2019/03/09/darknet-caffe-converter/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1053,8 +1064,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/06/17/effective-cpp-06/" itemprop="url">
-                  Effective CPP 阅读 - Chapter 6 继承与面向对象设计
+                <a class="post-title-link" href="/2019/03/09/darknet-caffe-converter/" itemprop="url">
+                  YOLO Caffe模型转换BN的坑
                 </a>
               
             
@@ -1070,8 +1081,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-17T10:40:19+08:00">
-                2017-06-17
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-09T12:51:18+08:00">
+                2019-03-09
               </time>
             
 
@@ -1107,11 +1118,10 @@
 
       
         
-          <p>C++中允许多重继承，并且可以指定继承是否是public or private等。成员函数也可以是虚函数或者非虚函数。如何在OOP这一C++联邦中的重要一员的规则下，写出易于拓展，易于维护且高效的代码？</p>
-<p>真•面向对象编程！<br><img src="/img/effectivecpp_06_joke.jpg" alt="面向对象编程"><br>
+          <p>YOLO虽好，但是Darknet框架实在是小众，有必要在Inference阶段将其转换为其他框架，以便后续统一部署和管理。Caffe作为小巧灵活的老资格框架，使用灵活，方便魔改，所以尝试将Darknet训练的YOLO模型转换为Caffe。这里简单记录下YOLO V3 原始Darknet模型转换为Caffe模型过程中的一个坑。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/06/17/effective-cpp-06/#more" rel="contents">
+            <a class="btn" href="/2019/03/09/darknet-caffe-converter/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1152,7 +1162,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/06/06/silver-rl-dp/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/10/27/mac-update-mojave/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1177,8 +1187,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/06/06/silver-rl-dp/" itemprop="url">
-                  Silver RL课程 - DP Planning
+                <a class="post-title-link" href="/2018/10/27/mac-update-mojave/" itemprop="url">
+                  MacOS Mojave更新之后一定要做这几件事！
                 </a>
               
             
@@ -1194,8 +1204,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-06T16:57:49+08:00">
-                2017-06-06
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-27T14:57:12+08:00">
+                2018-10-27
               </time>
             
 
@@ -1231,10 +1241,10 @@
 
       
         
-          <p>上讲中介绍了MDP这一基本概念。之后的lecture以此出发，介绍不同情况下的最优策略求解方法。本节假设我们对MDP过程的所有参数都是已知的，这时候问题较为简单，可以直接得到确定的解。这种问题叫做planning问题，求解方法是动态规划。<br>
+          <p>很奇怪，对于手机上的APP，我一般能不升级就不升级；但是对于PC上的软件或操作系统更新，则是能升级就升级。。在将手中的MacOS更新到最新版本Mojave后，发现了一些需要手动调节的问题，记录在这里，原谅我标题党的画风。。。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/06/06/silver-rl-dp/#more" rel="contents">
+            <a class="btn" href="/2018/10/27/mac-update-mojave/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1275,7 +1285,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/05/31/silver-rl-mdp/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/10/22/paper-rethinking-the-value-of-network-pruning/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1300,8 +1310,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/31/silver-rl-mdp/" itemprop="url">
-                  Silver RL课程 - MDP
+                <a class="post-title-link" href="/2018/10/22/paper-rethinking-the-value-of-network-pruning/" itemprop="url">
+                  论文 - Rethinking The Value of Network Pruning
                 </a>
               
             
@@ -1317,8 +1327,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-31T13:03:31+08:00">
-                2017-05-31
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-22T22:25:42+08:00">
+                2018-10-22
               </time>
             
 
@@ -1354,10 +1364,12 @@
 
       
         
-          <p>Silver在英国UCL讲授强化学习的slide总结。背景介绍部分略去不表，第一篇首先介绍强化学习中重要的数学基础-马尔科夫决策过程（MDP）。<br><img src="/img/silver_rl_mdp.png" alt="MDP"><br>
+          <p><a href="https://openreview.net/forum?id=rJlnB3C5Ym">这篇文章</a>是ICLR 2019的投稿文章，最近也引发了大家的注意。在我的博客中，已经对此做过简单的介绍，请参考<a href="https://xmfbit.github.io/2018/10/03/paper-summary-model-pruning/">论文总结 - 模型剪枝 Model Pruning</a>。</p>
+<p>这篇文章的主要观点在于想纠正人们之前的认识误区。当然这个认识误区和DL的发展是密不可分的。DL中最先提出的AlexNet是一个很大的模型。后面的研究者虽然也在不断发明新的网络结构（如inception，Global Pooling，ResNet等）来获得参数更少更强大的模型，但模型的size总还是很大。既然研究社区是从这样的“大”模型出发的，那当面对工程上需要小模型以便在手机等移动设备上使用时，很自然的一条路就是去除大模型中已有的参数从而得到小模型。也是很自然的，我们需要保留大模型中“有用的”那些参数，让小模型以此为基础进行fine tune，补偿因为去除参数而导致的模型性能下降。</p>
+<p>然而，自然的想法就是合理的么？这篇文章对此提出了质疑。这篇论文的主要思路已经在上面贴出的博文链接中说过了。这篇文章主要是结合作者开源的代码对论文进行梳理：<a href="https://github.com/Eric-mingjie/rethinking-network-pruning">Eric-mingjie/rethinking-network-pruning</a>。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/05/31/silver-rl-mdp/#more" rel="contents">
+            <a class="btn" href="/2018/10/22/paper-rethinking-the-value-of-network-pruning/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1398,7 +1410,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/05/25/hinton-nnml-02/">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/10/03/paper-summary-model-pruning/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="一个脱离了高级趣味的人">
@@ -1423,8 +1435,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/25/hinton-nnml-02/" itemprop="url">
-                  Neural Network for Machine Learning - Lecture 02
+                <a class="post-title-link" href="/2018/10/03/paper-summary-model-pruning/" itemprop="url">
+                  论文总结 - 模型剪枝 Model Pruning
                 </a>
               
             
@@ -1440,8 +1452,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-25T13:26:33+08:00">
-                2017-05-25
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-03T16:31:07+08:00">
+                2018-10-03
               </time>
             
 
@@ -1477,11 +1489,11 @@
 
       
         
-          <p>这是第二周的课程内容，主要介绍了几种神经网络的分类，详细地介绍了感知机这一最简单的模型。</p>
-<p><img src="/img/hinton_02_perceptron_gragh.png" alt="Perceptron"></p>
+          <p>模型剪枝是常用的模型压缩方法之一。这篇是最近看的模型剪枝相关论文的总结。</p>
+<p><img src="/img/paper-summary-model-pruning-joke.jpg" alt="剪枝的学问"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/05/25/hinton-nnml-02/#more" rel="contents">
+            <a class="btn" href="/2018/10/03/paper-summary-model-pruning/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1517,7 +1529,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1560,7 +1572,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">82</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1571,7 +1583,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">30</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1579,6 +1591,13 @@
 
         </nav>
 
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
         
 
         <div class="links-of-author motion-element">
@@ -1631,7 +1650,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

@@ -74,6 +74,8 @@
 
 
 
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
 
 
 
@@ -99,8 +101,13 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_lkrelationshipwithharris.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_lkharris.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_pyramid.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_assignment_crossfade.gif">
 <meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_assignment_crossfade.png">
-<meta property="og:updated_time" content="2017-08-10T05:22:40.000Z">
+<meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_assignment_forwardwarped.gif">
+<meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_assignment_forwardwarped.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_assignment_flowwarped.gif">
+<meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_assignment_flowwarped.png">
+<meta property="og:updated_time" content="2019-11-24T11:24:03.269Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CS131-光流估计">
 <meta name="twitter:description" content="光流法是通过检测图像像素点的强度随时间的变化进而推断出物体移动速度及方向的方法。由于成像物体与相机之间存在相对运动，导致其成像后的像素强度值不同。通过连续观测运动物体图像序列帧间的像素强度变化，就可以估计物体的运动信息。
@@ -400,11 +407,18 @@
 <p><img src="/img/cs131_opticalflow_pyramid.png" alt="图像金字塔方法"></p>
 <h2 id="作业：基于光流法的帧间插值"><a href="#作业：基于光流法的帧间插值" class="headerlink" title="作业：基于光流法的帧间插值"></a>作业：基于光流法的帧间插值</h2><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>假设视频流中的相邻两帧$I_0$和$I_1$，分别标记其时刻为$t=0$和$t=1$。我们希望能够在这两帧之间生成新的插值帧$I_t, 0&lt;t&lt;1$。比如说你手头的视频是24帧的帧率，想在一台刷新频率为60Hz的显示器上播放，那么这项技术可以带来更流畅的观看体验。</p>
 <h3 id="简单粗暴法"><a href="#简单粗暴法" class="headerlink" title="简单粗暴法"></a>简单粗暴法</h3><p>我们可以简单粗暴地使用线性插值方法，简单的认为插值帧是第一帧和最后一帧的线性组合，也就是说：</p>
-<script type="math/tex; mode=display">I_t = (1-t)I_0+tI_1</script><p>这种方法称为”cross-fading”。效果如下。可以看到有较多的模糊抖动。<br><img src="/img/cs131_opticalflow_assignment_crossfade.png" alt="简单粗暴法效果"></p>
+<script type="math/tex; mode=display">I_t = (1-t)I_0+tI_1</script><p>这种方法称为”cross-fading”。效果如下。可以看到有较多的模糊抖动。<br><img src="/img/cs131_opticalflow_assignment_crossfade.gif" alt="动图"><br><img src="/img/cs131_opticalflow_assignment_crossfade.png" alt="简单粗暴法效果"></p>
 <h3 id="基于光流法"><a href="#基于光流法" class="headerlink" title="基于光流法"></a>基于光流法</h3><p>使用光流可以知道像素点在图像平面的运动信息，从而在帧间建立点的对应关系。我们记像素点在水平方向和竖直方向的速度分别为$u_t(x,y)$和$v_t(x,y)$。我们可以根据$t=0$和$t=1$的两帧图像解出光流信息，即$u_0(x,y)$和$v_0(x,y)$。那么我们认为光流保持不变，就可以计算插值帧的某一点在$t=0$时候的对应点坐标。接下来，赋值就可以了。如下式所示：</p>
 <script type="math/tex; mode=display">I_t(x+tu_0(x,y), y+tv_0(x,y)) = I_0(x,y)</script><p>用MATLAB实现如下：<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> y =<span class="number">1</span>:height</div><div class="line">    <span class="keyword">for</span> x = <span class="number">1</span>:width</div><div class="line">        dy = min(max(<span class="built_in">round</span>(y+v0(y,x)*t), <span class="number">1</span>), height);</div><div class="line">        dx = min(max(<span class="built_in">round</span>(x+u0(y,x)*t), <span class="number">1</span>), width);</div><div class="line">        img(dy,dx,:) = img0(y,x,:);</div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
-<h3 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h3><p>上面的式子假定光流不变，但是实际上光流很可能也是改变的。考虑到光流的变化，下式的计算应该更加接近：</p>
-<script type="math/tex; mode=display">I_t(x,y) = I_0(x-tu_t(x,y), y-tv_t(x,y))</script><p>然而，我们并不能得到$u_t$和$v_t$的准确值。我们使用下面的方法近似求解。</p>
+<p>这种方法叫做”ForwardWarpping”。效果如下。可以看到，与上一种方法对比，画面有了明显的提升。<br><img src="/img/cs131_opticalflow_assignment_forwardwarped.gif" alt="动图"><br><img src="/img/cs131_opticalflow_assignment_forwardwarped.png" alt="逐帧"></p>
+<h3 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h3><p>上面的方法我们假设光流一直保持不变，用$t=1$时刻的光流去代替之间所有时刻的光流。但实际上光流一定是在实时变化的。使用<em>backward warpping</em>改进，使用$t$时刻的光流反推。</p>
+<script type="math/tex; mode=display">I_t(x,y) = I_0(x-tu_t(x,y), y-tv_t(x,y))</script><p>然而，我们并不能得到$t$时刻光流$u_t$和$v_t$的准确值，只能近似计算。方法如下：</p>
+<script type="math/tex; mode=display">u_t(\hat{x},\hat{y}) = u_0(x,y)</script><script type="math/tex; mode=display">v_t(\hat{x},\hat{y}) = v_0(x,y)</script><p>其中，$x^\prime = x+u_0t$，$y^\prime = y+v_0t$，$\hat{x}\in\lbrace\text{floor}(x^\prime), \text{ceil}(x^\prime)\rbrace$，$\hat{y}\in\lbrace\text{floor}(y^\prime), \text{ceil}(y^\prime)\rbrace$。</p>
+<p>这在一定程度上补偿了光流计算的误差。</p>
+<p>如果某个点$(\hat{x}, \hat{y})$被多个初始点$(x, y)$对应，那么我们选取使得下面的式子取得最小值的那个点$(x, y)$，也就是选取那个亮度变化最小的点。</p>
+<script type="math/tex; mode=display">\vert I_0(x, y) − I_1(x + u_0(x, y), y + v_0(x, y))\vert</script><p>如果某个点没有找到相对应的初始点，那么我们使用线性插值方法为其填充光流。</p>
+<p>下面是这种方法的效果示意。</p>
+<p><img src="/img/cs131_opticalflow_assignment_flowwarped.gif" alt="动图"><br><img src="/img/cs131_opticalflow_assignment_flowwarped.png" alt="逐帧"></p>
 
       
     </div>
@@ -546,7 +560,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">82</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -557,7 +571,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">30</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -565,6 +579,13 @@
 
         </nav>
 
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
         
 
         <div class="links-of-author motion-element">
@@ -633,7 +654,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

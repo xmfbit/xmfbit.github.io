@@ -74,6 +74,8 @@
 
 
 
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml" />
+
 
 
 
@@ -93,7 +95,7 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/install_ubuntu_in_dell_kaiyuandafahao.jpg">
 <meta property="og:image" content="https://xmfbit.github.io/img/install_ubuntu_in_dell_weixiaodaizhepibei.jpg">
 <meta property="og:image" content="https://xmfbit.github.io/img/install_ubuntu_in_dell_weixiaojiuhao.jpg">
-<meta property="og:updated_time" content="2017-08-10T05:22:40.000Z">
+<meta property="og:updated_time" content="2019-11-24T11:24:03.288Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="DELL 游匣7559安装Ubuntu和CUDA记录">
 <meta name="twitter:description" content="虽说开源大法好，但是在我的DELL 游匣7559笔记本上安装Ubuntu+Windows双系统可是耗费了我不少精力。这篇博客是我参考这篇文章成功安装Ubuntu16.04和CUDA的记录。感谢上文作者的记录，我才能够最终解决这个问题。基本流程和上文作者相同，只不过没有安装后续的bumblee等工具，所以本文并不是原创，而更多是翻译和备份。">
@@ -387,9 +389,9 @@
 <p>安装CUDA包：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo dpkg -i YOUR_CUDA_DEB_PATH</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install cuda-8-0</div><div class="line">sudo apt-get autoremove</div></pre></td></tr></table></figure></p>
 <p>安装完毕之后使用<code>sudo reboot</code>重启，确定能够正常登陆系统。</p>
 <p>在这个过程中，作者提到登录界面会出现两次，再次重启之后没有这个问题了。我也遇到了相同的情况。所以，不要慌！</p>
-<h2 id="测试CUDA"><a href="#测试CUDA" class="headerlink" title="测试CUDA"></a>测试CUDA</h2><p>我们来测试一下CUDA。首先，依照你使用shell的不同，将环境变量加入到<code>~/.bashrc</code>或者<code>~/.zshrc</code>中去（不过我相信在经历完这些安装之后应该还没有闲心去搞oh-my-zsh。。。）。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> PATH=<span class="string">"<span class="variable">$PATH</span>:/usr/local/cuda-8.0/bin"</span></div><div class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=<span class="string">"<span class="variable">$LD_LIBRARY_PATH</span>:/usr/local/cuda-8.0/lib"</span></div></pre></td></tr></table></figure></p>
+<h2 id="测试CUDA"><a href="#测试CUDA" class="headerlink" title="测试CUDA"></a>测试CUDA</h2><p>我们来测试一下CUDA。首先，依照你使用shell的不同，将环境变量加入到<code>~/.bashrc</code>或者<code>~/.zshrc</code>（如果使用zsh）中去。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> PATH=<span class="string">"<span class="variable">$PATH</span>:/usr/local/cuda-8.0/bin"</span></div><div class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=<span class="string">"<span class="variable">$LD_LIBRARY_PATH</span>:/usr/local/cuda-8.0/lib"</span></div></pre></td></tr></table></figure></p>
 <p>接下来，我们将使用CUDA自带的example进行测试：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 导入我们刚加入的环境变量</span></div><div class="line"><span class="built_in">source</span> ~/.bashrc</div><div class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/cuda-8.0/bin</div><div class="line"><span class="comment"># 将CUDA example拷贝到$HOME下</span></div><div class="line">./cuda-install-samples-8.0.sh ~</div><div class="line"><span class="comment"># 进入拷贝到的那个目录 build</span></div><div class="line"><span class="built_in">cd</span> ~/NVIDIA_CUDA-8.0_Samples</div><div class="line">make -j12</div><div class="line"><span class="comment"># 自己挑选几个目录进去运行编译生成的可执行文件测试吧~</span></div></pre></td></tr></table></figure></p>
-<h2 id="Last-But-Not-Least"><a href="#Last-But-Not-Least" class="headerlink" title="Last But Not Least"></a>Last But Not Least</h2><p>安装玩CUDA之后，不要随便更新系统！！！否则可能会损坏你的Kernel和Xserver。<br><img src="/img/install_ubuntu_in_dell_weixiaojiuhao.jpg" alt="微笑就好"></p>
+<h2 id="Last-But-Not-Least"><a href="#Last-But-Not-Least" class="headerlink" title="Last But Not Least"></a>Last But Not Least</h2><p>安装完CUDA之后，不要随便更新系统！！！否则可能会损坏你的Kernel和Xserver。<br><img src="/img/install_ubuntu_in_dell_weixiaojiuhao.jpg" alt="微笑就好"></p>
 
       
     </div>
@@ -529,7 +531,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">82</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -540,7 +542,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">30</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -548,6 +550,13 @@
 
         </nav>
 
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
         
 
         <div class="links-of-author motion-element">
@@ -616,7 +625,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
