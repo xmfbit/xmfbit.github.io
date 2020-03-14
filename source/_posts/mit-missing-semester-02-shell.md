@@ -46,7 +46,7 @@ $$ # pid of current script
 if [ $? -ne 0 ]; then
   echo "fail"
 else
-  ehco "success"
+  echo "success"
 fi
 ```
 
@@ -256,7 +256,7 @@ locate libcudart.so | grep "/usr"
 
 ### 在文件中查找字符串 grep
 
-`grep` 用来在文件中正则匹配字符串，比如某个变量或函数定义啥的。`grep`命令想当强大，在胡须课程中还会着重介绍。
+`grep` 用来在文件中正则匹配字符串，比如某个变量或函数定义啥的。`grep`命令很有用，在后续课程中还会着重介绍。
 
 ``` bash
 # 在文件中查找xxx，并打印其所在的行
