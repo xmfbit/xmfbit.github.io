@@ -95,7 +95,7 @@
 <meta property="og:description" content="本系列是《Effective C++》一书的阅读摘记，分章整理各个条款。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://xmfbit.github.io/img/effectivecpp_01_cpp_rely_on_renpin.jpg">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.784Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.217Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Effective CPP 阅读 - Chapter 1 让自己习惯C++">
 <meta name="twitter:description" content="本系列是《Effective C++》一书的阅读摘记，分章整理各个条款。">
@@ -327,7 +327,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-20T05:49:42+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-20T13:49:42+00:00">
                 2017-04-20
               </time>
             
@@ -375,37 +375,37 @@
 <p>想要高效地使用C++，必须根据不同的情况遵守不同的编程规范。</p>
 <h3 id="02-尽量使用const-enum-inline替换-define（以编译器替换预处理器）"><a href="#02-尽量使用const-enum-inline替换-define（以编译器替换预处理器）" class="headerlink" title="02 尽量使用const, enum, inline替换 #define（以编译器替换预处理器）"></a>02 尽量使用<code>const</code>, <code>enum</code>, <code>inline</code>替换 <code>#define</code>（以编译器替换预处理器）</h3><p><code>#define</code>是C时代遗留下来的预编译指令。</p>
 <p>当<code>#define</code>用来定义某个常量时，通常<code>const</code>是一个更好的选择。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">define</span> PI 3.14</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">double</span> PI = <span class="number">3.14</span>;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PI 3.14</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> PI = <span class="number">3.14</span>;</span><br></pre></td></tr></table></figure>
 <p>当此常量为整数类型（<code>int</code>, <code>char</code>, <code>bool</code>）等时，也可以使用<code>enum</code>定义常量。这种做法常常用在模板元编程中。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">enum</span> &#123;K = <span class="number">1</span>&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> &#123;K = <span class="number">1</span>&#125;;</span><br></pre></td></tr></table></figure>
 <p>对于<code>const</code>常量，你可以获取变量的地址，但是对于<code>enum</code>来说，无法获取变量的地址。对于这一点来说，<code>enum</code>和<code>#define</code>相类似。</p>
 <p>另一种可能使用<code>#define</code>的场景是宏定义。这种情形可以使用<code>inline</code>声明内联函数解决。</p>
 <p>总之，尽可能相信编译器的力量。使用<code>#define</code>将遮蔽编译器的视野，带来奇怪的问题。</p>
 <h3 id="03-尽可能使用const"><a href="#03-尽可能使用const" class="headerlink" title="03 尽可能使用const"></a>03 尽可能使用<code>const</code></h3><p><code>const</code>不止是给程序员看的，而且为编译器指定了一个语义约束，即这个对象是不该被改变的。所以任何试图修改这个对象的操作，都会被编译器检查出来，并给出error。</p>
 <p>所以，如果某一变量满足<code>const</code>的要求，那么请加上<code>const</code>，和编译器签订一份契约，保护你的行为。</p>
 <p>这里不再讨论<code>const</code>的寻常用法。提示一下：当修饰指针变量时，<code>const</code>在星号左边，是指指针所指物是常量；当<code>const</code>在星号右边，是指指针本身是常量。如下所示：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> <span class="keyword">int</span>* p = &amp;a;</div><div class="line">*p = <span class="number">5</span>;   <span class="comment">// 非法</span></div><div class="line">p = &amp;b;   <span class="comment">// 合法</span></div><div class="line"><span class="keyword">int</span>* <span class="keyword">const</span> p = &amp;a;</div><div class="line">p = &amp;b;    <span class="comment">// 非法</span></div><div class="line">*p = <span class="number">5</span>;    <span class="comment">// 合法</span></div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span>* p = &amp;a;</span><br><span class="line">*p = <span class="number">5</span>;   <span class="comment">// 非法</span></span><br><span class="line">p = &amp;b;   <span class="comment">// 合法</span></span><br><span class="line"><span class="keyword">int</span>* <span class="keyword">const</span> p = &amp;a;</span><br><span class="line">p = &amp;b;    <span class="comment">// 非法</span></span><br><span class="line">*p = <span class="number">5</span>;    <span class="comment">// 合法</span></span><br></pre></td></tr></table></figure>
 <p>STL中，如果声明某个迭代器为<code>const</code>，是指该迭代器本身是常量；如果你的意思是迭代器指向的元素为常量，那么使用<code>const_iterator</code>。</p>
 <p><code>const</code>更丰富的用法是用于函数声明中，</p>
 <ul>
 <li>当修饰返回值时，意思是返回值不能修改。这可以让你避免无意义的赋值，尤其是以下的错误：</li>
 </ul>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (fun(a, b) = c)  <span class="comment">// 这里错把 == 打成了 =</span></div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (fun(a, b) = c)  <span class="comment">// 这里错把 == 打成了 =</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li>当修饰参数时，常常用做 pass-by-const-reference 的形式，不再多说了。</li>
 <li>当修饰函数本身时，常常用在类中的成员函数上，意思是这个函数将不改变对象的成员。</li>
 </ul>
 <p>这种情况下，可能会有<code>const</code>重载现象。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> my_string&#123;</div><div class="line">  <span class="keyword">const</span> <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">size_t</span> pos) &#123;</div><div class="line">	  <span class="keyword">return</span> <span class="keyword">this</span>-&gt;ptr[pos];</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">size_t</span> pos) &#123;</div><div class="line">	  <span class="keyword">return</span> <span class="keyword">this</span>-&gt;ptr[pos];</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">my_string</span>&#123;</span></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">size_t</span> pos) &#123;</span><br><span class="line">	  <span class="keyword">return</span> <span class="keyword">this</span>-&gt;ptr[pos];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">size_t</span> pos) &#123;</span><br><span class="line">	  <span class="keyword">return</span> <span class="keyword">this</span>-&gt;ptr[pos];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>实际调用时，根据调用该函数的对象是否是<code>const</code>的来决定究竟调用哪个版本。</p>
 <p>上面的实现未免过于复杂，我们还可以改成下面的形式：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> my_string&#123;</div><div class="line">  <span class="keyword">const</span> <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">size_t</span> pos) &#123;</div><div class="line">	  <span class="keyword">return</span> <span class="keyword">this</span>-&gt;ptr[pos];</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">size_t</span> pos) &#123;</div><div class="line">	  <span class="keyword">return</span> <span class="keyword">const_cast</span>&lt;<span class="keyword">char</span>&amp;&gt;(</div><div class="line">	         <span class="keyword">static_cast</span>&lt;<span class="keyword">const</span> my_string&amp;&gt;(*<span class="keyword">this</span>)[pos]);</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">my_string</span>&#123;</span></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">size_t</span> pos) &#123;</span><br><span class="line">	  <span class="keyword">return</span> <span class="keyword">this</span>-&gt;ptr[pos];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">size_t</span> pos) &#123;</span><br><span class="line">	  <span class="keyword">return</span> <span class="keyword">const_cast</span>&lt;<span class="keyword">char</span>&amp;&gt;(</span><br><span class="line">	         <span class="keyword">static_cast</span>&lt;<span class="keyword">const</span> my_string&amp;&gt;(*<span class="keyword">this</span>)[pos]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>注意上面的代码进行了两次类型转换。由<code>non-const reference</code>转为<code>const reference</code>是类型安全的，使用<code>static_cast</code>进行。最后我们要脱掉<code>const char&amp;</code>的<code>const</code>属性，使用了<code>const_cast</code>。</p>
 <p>对于<code>const</code>成员函数，有时不得不修改类中的某些成员变量，可以将这些变量声明为<code>mutable</code>。</p>
 <h3 id="04-确保对象在使用前已经被初始化"><a href="#04-确保对象在使用前已经被初始化" class="headerlink" title="04 确保对象在使用前已经被初始化"></a>04 确保对象在使用前已经被初始化</h3><p>使用未被初始化的变量有可能导致未定义的行为，导致奇怪的bug。所以推荐为所有变量进行初始化。</p>
 <p>对于内建类型，需要手动初始化。</p>
 <p>对于用户自定义类型，一般需要调用构造函数初始化。推荐在构造函数中使用初始化列表进行初始化，这样可以避免不必要的性能损失。原因见下：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">A</span><span class="params">(name, age)</span> </span>&#123;</div><div class="line">  <span class="keyword">this</span>-&gt;name = name; <span class="comment">// 这是赋值，不是初始化！</span></div><div class="line">  <span class="keyword">this</span>-&gt;age = age;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">A</span><span class="params">(name, age)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>-&gt;name = name; <span class="comment">// 这是赋值，不是初始化！</span></span><br><span class="line">  <span class="keyword">this</span>-&gt;age = age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>如果在类<code>A</code>的构造函数中使用初始化列表，就可以避免上面的赋值，而是使用<code>copy-construct</code>实现。</p>
 <p>需要注意，成员初始化的顺序与其在类中声明的顺序相同，与初始化列表中的顺序无关。所以推荐将两者统一。</p>
 <p>讨论完上述情况，再来看一种特殊变量：不同编译单元<code>non-local static</code>变量，是指不在某个函数scope下的<code>static</code>变量。这种变量的初始化顺序是未定义的，所以作者推荐使用单例模式，将它们移动到某个函数中去，明确初始化顺序。这里不再多说了。</p>
@@ -546,7 +546,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

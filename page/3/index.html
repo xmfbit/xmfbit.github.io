@@ -286,6 +286,128 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/03/24/paper-squeezenet/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/03/24/paper-squeezenet/" itemprop="url">
+                  论文 - SqueezeNet, AlexNet-level accuracy with 50x fewer parameters and <0.5mb model size < a>
+              
+            
+          </0.5mb></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-24T14:02:53+00:00">
+                2018-03-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p><a href="https://arxiv.org/abs/1602.07360" target="_blank" rel="noopener">SqueezeNet</a>由HanSong等人提出，和AlexNet相比，用少于$50$倍的参数量，在ImageNet上实现了comparable的accuracy。比较本文和HanSoing其他的工作，可以看出，其他工作，如Deep Compression是对已有的网络进行压缩，减小模型size；而SqueezeNet是从网络设计入手，从设计之初就考虑如何使用较少的参数实现较好的性能。可以说是模型压缩的两个不同思路。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/03/24/paper-squeezenet/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/03/23/paper-mobilenet/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -328,7 +450,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-23T02:53:43+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-23T10:53:43+00:00">
                 2018-03-23
               </time>
             
@@ -365,7 +487,7 @@
 
       
         
-          <p><a href="https://arxiv.org/abs/1704.04861">MobileNet</a>是建立在Depthwise Separable Conv基础之上的一个轻量级网络。在本论文中，作者定量计算了使用这一技术带来的计算量节省，提出了MobileNet的结构，同时提出了两个简单的超参数，可以灵活地进行模型性能和inference时间的折中。后续改进的<a href="https://arxiv.org/abs/1801.04381">MobileNet v2</a>以后讨论。<br>
+          <p><a href="https://arxiv.org/abs/1704.04861" target="_blank" rel="noopener">MobileNet</a>是建立在Depthwise Separable Conv基础之上的一个轻量级网络。在本论文中，作者定量计算了使用这一技术带来的计算量节省，提出了MobileNet的结构，同时提出了两个简单的超参数，可以灵活地进行模型性能和inference时间的折中。后续改进的<a href="https://arxiv.org/abs/1801.04381" target="_blank" rel="noopener">MobileNet v2</a>以后讨论。<br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/03/23/paper-mobilenet/#more" rel="contents">
@@ -451,7 +573,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-22T01:44:38+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-22T09:44:38+00:00">
                 2018-03-22
               </time>
             
@@ -488,7 +610,7 @@
 
       
         
-          <p>在MobileNet, ShuffleMet等轻量级网络中，<strong>depthwise separable conv</strong>是一个很流行的设计。借助<a href="https://arxiv.org/abs/1610.02357">Xception: Deep Learning with Depthwise separable Convolution</a>，对这种分解卷积的思路做一个总结。<br>
+          <p>在MobileNet, ShuffleMet等轻量级网络中，<strong>depthwise separable conv</strong>是一个很流行的设计。借助<a href="https://arxiv.org/abs/1610.02357" target="_blank" rel="noopener">Xception: Deep Learning with Depthwise separable Convolution</a>，对这种分解卷积的思路做一个总结。<br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/03/22/paper-xception/#more" rel="contents">
@@ -574,7 +696,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-21T03:08:14+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-21T11:08:14+00:00">
                 2018-03-21
               </time>
             
@@ -697,7 +819,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-16T11:01:32+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-16T19:01:32+00:00">
                 2018-03-16
               </time>
             
@@ -734,7 +856,7 @@
 
       
         
-          <p>这篇文章主要是<a href="https://github.com/nitnelave/pycaffe_tutorial/blob/master/04%20Hacking%20the%20Python%20API.ipynb">Github: PyCaffe Tutorial</a>中Hack Pycaffe的翻译整理。后续可能会加上一些使用boost和C++为Python接口提供后端的解释。这里主要讨论如何为Pycaffe添加自己想要的功能。至于Pycaffe的使用，留待以后的文章整理。<br><img src="/img/caffe-hack-pycaffe-python-cpp-binding.jpg" alt="Python&amp;&amp;CPP binding"><br>
+          <p>这篇文章主要是<a href="https://github.com/nitnelave/pycaffe_tutorial/blob/master/04%20Hacking%20the%20Python%20API.ipynb" target="_blank" rel="noopener">Github: PyCaffe Tutorial</a>中Hack Pycaffe的翻译整理。后续可能会加上一些使用boost和C++为Python接口提供后端的解释。这里主要讨论如何为Pycaffe添加自己想要的功能。至于Pycaffe的使用，留待以后的文章整理。<br><img src="/img/caffe-hack-pycaffe-python-cpp-binding.jpg" alt="Python&amp;&amp;CPP binding"><br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/03/16/caffe-hack-python-interface/#more" rel="contents">
@@ -820,7 +942,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-14T08:18:53+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-14T16:18:53+00:00">
                 2018-03-14
               </time>
             
@@ -857,7 +979,7 @@
 
       
         
-          <p>Han Song的Deep Compression是模型压缩方面很重要的论文。在Deep Compression中，作者提出了三个步骤来进行模型压缩：剪枝，量化和霍夫曼编码。其中，剪枝对应的方法就是基于本文要总结的这篇论文：<a href="https://arxiv.org/abs/1506.02626">Learning both Weights and Connections for Efficient Neural Networks</a>。在这篇论文中，作者介绍了如何在不损失精度的前提下，对深度学习的网络模型进行剪枝，从而达到减小模型大小的目的。<br><img src="/img/paper-pruning-network-demo.png" alt="Pruning的主要过程"><br>
+          <p>Han Song的Deep Compression是模型压缩方面很重要的论文。在Deep Compression中，作者提出了三个步骤来进行模型压缩：剪枝，量化和霍夫曼编码。其中，剪枝对应的方法就是基于本文要总结的这篇论文：<a href="https://arxiv.org/abs/1506.02626" target="_blank" rel="noopener">Learning both Weights and Connections for Efficient Neural Networks</a>。在这篇论文中，作者介绍了如何在不损失精度的前提下，对深度学习的网络模型进行剪枝，从而达到减小模型大小的目的。<br><img src="/img/paper-pruning-network-demo.png" alt="Pruning的主要过程"><br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/03/14/paper-network-prune-hansong/#more" rel="contents">
@@ -943,7 +1065,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-28T02:16:43+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-28T10:16:43+00:00">
                 2018-02-28
               </time>
             
@@ -1066,7 +1188,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-27T05:30:25+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-27T13:30:25+00:00">
                 2018-02-27
               </time>
             
@@ -1105,7 +1227,7 @@
         
           
             <p>JupyteNotebook是个很好的工具，但是在使用pycaffe试图在notebook中同时加载多个caffemodel模型的时候，却出现了无法加载的问题。</p>
-<h2 id="bug重现"><a href="#bug重现" class="headerlink" title="bug重现"></a>bug重现</h2><p>我想在notebook中比较两个使用不同方法训练出来的模型，它们使用了同样的LMDB文件进行训练。加载第一个模型没有问题，但当加载第二个模型时，却一直等待。在StackOverflow上我发现了类似的问题，可以见：<a href="https://stackoverflow.com/questions/37260158/cant-load-2-models-in-pycaffe" target="_blank" rel="external">Can’t load 2 models in pycaffe</a>。</p>
+<h2 id="bug重现"><a href="#bug重现" class="headerlink" title="bug重现"></a>bug重现</h2><p>我想在notebook中比较两个使用不同方法训练出来的模型，它们使用了同样的LMDB文件进行训练。加载第一个模型没有问题，但当加载第二个模型时，却一直等待。在StackOverflow上我发现了类似的问题，可以见：<a href="https://stackoverflow.com/questions/37260158/cant-load-2-models-in-pycaffe" target="_blank" rel="noopener">Can’t load 2 models in pycaffe</a>。</p>
 <h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>这是由于pycaffe（是否要加上jupyter-notebook？因为不用notebook，以前没有出现过类似问题）不能并发读取同样的LMDB所导致的。但是很遗憾，没有发现太好的解决办法。最后只能是将LMDB重新copy了一份，并修改prototxt文件，使得两个模型分别读取不同的LMDB。</p>
 
           
@@ -1187,7 +1309,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-26T07:26:09+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-26T15:26:09+00:00">
                 2018-02-26
               </time>
             
@@ -1224,7 +1346,7 @@
 
       
         
-          <p>参考资料：知乎：<a href="https://www.zhihu.com/question/28385679">在Caffe中如何计算卷积</a>。<br><img src="/img/conv-in-caffe-naive-loop.png" alt="Naive Loop"><br>
+          <p>参考资料：知乎：<a href="https://www.zhihu.com/question/28385679" target="_blank" rel="noopener">在Caffe中如何计算卷积</a>。<br><img src="/img/conv-in-caffe-naive-loop.png" alt="Naive Loop"><br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/02/26/conv-in-caffe/#more" rel="contents">
@@ -1310,7 +1432,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-24T02:21:14+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-24T10:21:14+00:00">
                 2018-02-24
               </time>
             
@@ -1347,7 +1469,7 @@
 
       
         
-          <p>DNN的稀疏化？用L1正则项不就好了？在很多场合，这种方法的确可行。但是当试图使用FPGA/AISC加速DNN的前向计算时，我们希望DNN的参数能有一些结构化的稀疏性质。这样才能减少不必要的cache missing等问题。在<a href="https://arxiv.org/pdf/1608.03665.pdf">这篇文章</a>中，作者提出了一种结构化稀疏的方法，能够在不损失精度的前提下，对深度神经网络进行稀疏化，达到加速的目的。本文作者<a href="http://www.pittnuts.com/">温伟</a>，目前是杜克大学Chen Yiran组的博士生，做了很多关于结构化稀疏和DNN加速相关的工作。本文发表在NIPS 2016上。本文的代码已经公开：<a href="https://github.com/wenwei202/caffe/tree/scnn">GitHub</a><br><img src="/img/paper-ssldnn.png" alt="SSL的原理示意图"><br>
+          <p>DNN的稀疏化？用L1正则项不就好了？在很多场合，这种方法的确可行。但是当试图使用FPGA/AISC加速DNN的前向计算时，我们希望DNN的参数能有一些结构化的稀疏性质。这样才能减少不必要的cache missing等问题。在<a href="https://arxiv.org/pdf/1608.03665.pdf" target="_blank" rel="noopener">这篇文章</a>中，作者提出了一种结构化稀疏的方法，能够在不损失精度的前提下，对深度神经网络进行稀疏化，达到加速的目的。本文作者<a href="http://www.pittnuts.com/" target="_blank" rel="noopener">温伟</a>，目前是杜克大学Chen Yiran组的博士生，做了很多关于结构化稀疏和DNN加速相关的工作。本文发表在NIPS 2016上。本文的代码已经公开：<a href="https://github.com/wenwei202/caffe/tree/scnn" target="_blank" rel="noopener">GitHub</a><br><img src="/img/paper-ssldnn.png" alt="SSL的原理示意图"><br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/02/24/paper-ssl-dnn/#more" rel="contents">
@@ -1358,129 +1480,6 @@
         
       
     </p></div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/02/08/bug-pycaffe-using-cublas/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="一个脱离了高级趣味的人">
-    <meta itemprop="description" content>
-    <meta itemprop="image" content="/avatar/liumengli.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="来呀，快活呀~">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2018/02/08/bug-pycaffe-using-cublas/" itemprop="url">
-                  捉bug记 - Cannot create Cublas handle. Cublas won't be available.
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-08T06:16:53+00:00">
-                2018-02-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>这两天在使用Caffe的时候出现了一个奇怪的bug。当使用C++接口时，完全没有问题；但是当使用python接口时，会出现错误提示如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">common.cpp:114] Cannot create Cublas handle. Cublas won&apos;t be available.</div><div class="line">common.cpp:121] Cannot create Curand generator. Curand won&apos;t be available.</div></pre></td></tr></table></figure></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/02/08/bug-pycaffe-using-cublas/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
 
     <div>
       
@@ -1550,7 +1549,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

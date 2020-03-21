@@ -96,7 +96,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://xmfbit.github.io/img/god_use_vpn.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/ipsec_ios_vpn_setting.png">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.777Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.217Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在DigitalOcean上配置Shadowsocks实现IPV4&#x2F;IPV6翻墙">
 <meta name="twitter:description" content="之前我使用GoAgent来FQ，后来又使用了一段时间的免费SS服务，后来机缘巧合从一个印度佬那里挣了一些美元，所以搬到了DigitalOcean上。DO的机器，对我一个学生来说，说实话并不算便宜了，不过好在手里还有一些美元，也在GitHub那里进行了学生认证，算是也可以应付了。 之前我已经在DO的机器上配置过shadowsocks，还顺手给iPad解决了FQ的问题。然而当时没有记录，这次我换了一台">
@@ -328,7 +328,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-08T09:31:35+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-08T17:31:35+00:00">
                 2017-02-08
               </time>
             
@@ -369,21 +369,21 @@
 <a id="more"></a>
 <h2 id="申请机器"><a href="#申请机器" class="headerlink" title="申请机器"></a>申请机器</h2><p>在进行GitHub学生认证后，可以使用它发给的一个优惠码注册DO，不过仍然要绑定自己的PayPal账户，先交上五美金。之后，DO会赠送50刀。</p>
 <p>申请机器时，直接选择Ubuntu 16.04操作系统，并勾选IPV6 Enable，省去后面的麻烦。</p>
-<h2 id="安装ss"><a href="#安装ss" class="headerlink" title="安装ss"></a>安装ss</h2><p>远程登录后，我们需要安装ss。安装命令很简单。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apt-get install python-pip</div><div class="line">pip install shadowsocks</div></pre></td></tr></table></figure></p>
-<p>然而，在安装时，我遇到了一个奇怪的问题，提示我<code>unsupported locale setting</code>，后来搜索得知，是语言配置的问题，见<a href="http://www.linfuyan.com/locale_error_unsupported_locale_setting/" target="_blank" rel="external">这篇博文</a>，解决办法如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> LC_ALL=C</div></pre></td></tr></table></figure></p>
-<h2 id="编辑配置文件"><a href="#编辑配置文件" class="headerlink" title="编辑配置文件"></a>编辑配置文件</h2><p>之后，进入<code>/etc</code>目录，建立一个名叫<code>shadowsocks.json</code>的文件（文件名任意，一会对应即可），文件配置内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">&quot;server&quot;:&quot;::&quot;,  </div><div class="line">&quot;server_port&quot;:8388,</div><div class="line">&quot;local_address&quot;: &quot;127.0.0.1&quot;,</div><div class="line">&quot;local_port&quot;: 1080,</div><div class="line">&quot;password&quot;:&quot;your_password（任写）&quot;,</div><div class="line">&quot;timeout&quot;:600,</div><div class="line">&quot;method&quot;:&quot;aes-256-cfb&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="安装ss"><a href="#安装ss" class="headerlink" title="安装ss"></a>安装ss</h2><p>远程登录后，我们需要安装ss。安装命令很简单。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get install python-pip</span><br><span class="line">pip install shadowsocks</span><br></pre></td></tr></table></figure></p>
+<p>然而，在安装时，我遇到了一个奇怪的问题，提示我<code>unsupported locale setting</code>，后来搜索得知，是语言配置的问题，见<a href="http://www.linfuyan.com/locale_error_unsupported_locale_setting/" target="_blank" rel="noopener">这篇博文</a>，解决办法如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> LC_ALL=C</span><br></pre></td></tr></table></figure></p>
+<h2 id="编辑配置文件"><a href="#编辑配置文件" class="headerlink" title="编辑配置文件"></a>编辑配置文件</h2><p>之后，进入<code>/etc</code>目录，建立一个名叫<code>shadowsocks.json</code>的文件（文件名任意，一会对应即可），文件配置内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">&quot;server&quot;:&quot;::&quot;,  </span><br><span class="line">&quot;server_port&quot;:8388,</span><br><span class="line">&quot;local_address&quot;: &quot;127.0.0.1&quot;,</span><br><span class="line">&quot;local_port&quot;: 1080,</span><br><span class="line">&quot;password&quot;:&quot;your_password（任写）&quot;,</span><br><span class="line">&quot;timeout&quot;:600,</span><br><span class="line">&quot;method&quot;:&quot;aes-256-cfb&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>其中第一行写成<code>::</code>即是为了IPV6连接。</p>
 <h2 id="编辑启动项，设置自动启动"><a href="#编辑启动项，设置自动启动" class="headerlink" title="编辑启动项，设置自动启动"></a>编辑启动项，设置自动启动</h2><p>之后，我们编辑启动项配置文件，使得ss服务能够开机自动启动。</p>
-<p>编辑<code>/etc/rc.local</code>文件，在<code>exit 0</code>之前添加如下命令。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssserver -c /etc/shadowsocks.json -d start  # 这里的json文件名要相对应</div></pre></td></tr></table></figure></p>
+<p>编辑<code>/etc/rc.local</code>文件，在<code>exit 0</code>之前添加如下命令。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssserver -c /etc/shadowsocks.json -d start  # 这里的json文件名要相对应</span><br></pre></td></tr></table></figure></p>
 <p>之后，使用<code>reboot</code>命令重启即可。</p>
 <h2 id="客户端配置"><a href="#客户端配置" class="headerlink" title="客户端配置"></a>客户端配置</h2><p>客户端使用ss，编辑服务器，按照json文件中的内容填写即可。注意密码相对应。</p>
 <h2 id="IOS平台设置"><a href="#IOS平台设置" class="headerlink" title="IOS平台设置"></a>IOS平台设置</h2><p>终于把Pad上的翻墙搞定了。。。参考资料为GitHub的相关页面，基本为傻瓜式操作。</p>
 <ul>
-<li><a href="https://github.com/hwdsl2/setup-ipsec-vpn/blob/master/README-zh.md" target="_blank" rel="external">IPsec VPN 服务器一键安装脚本</a></li>
-<li><a href="https://github.com/hwdsl2/setup-ipsec-vpn/blob/master/docs/clients-zh.md" target="_blank" rel="external">配置 IPsec/L2TP VPN 客户端</a></li>
+<li><a href="https://github.com/hwdsl2/setup-ipsec-vpn/blob/master/README-zh.md" target="_blank" rel="noopener">IPsec VPN 服务器一键安装脚本</a></li>
+<li><a href="https://github.com/hwdsl2/setup-ipsec-vpn/blob/master/docs/clients-zh.md" target="_blank" rel="noopener">配置 IPsec/L2TP VPN 客户端</a></li>
 </ul>
 <p>首先，使用如下命令在VPN服务器上搭建IPsec服务：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget https://git.io/vpnsetup -O vpnsetup.sh &amp;&amp; sudo sh vpnsetup.sh</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://git.io/vpnsetup -O vpnsetup.sh &amp;&amp; sudo sh vpnsetup.sh</span><br></pre></td></tr></table></figure>
 <p>然后按照下面的步骤在IOS平台上进行设置。<br><img src="/img/ipsec_ios_vpn_setting.png" alt></p>
 
       
@@ -522,7 +522,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

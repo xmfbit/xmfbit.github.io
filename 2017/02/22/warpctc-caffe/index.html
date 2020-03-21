@@ -97,7 +97,7 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/warpctc_intro.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/captcha_train_loss.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/captcha_test_accuracy.png">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.773Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在Caffe中使用Baidu warpctc实现CTC Loss的计算">
 <meta name="twitter:description" content="CTC(Connectionist Temporal Classification) Loss 函数多用于序列有监督学习，优点是不需要对齐输入数据及标签。本文内容并不涉及CTC Loss的原理介绍，而是关于如何在Caffe中移植Baidu美研院实现的warp-ctc，并利用其实现一个LSTM + CTC Loss的验证码识别demo。下面这张图引用自warp-ctc的项目页面。本文介绍内容的相关代">
@@ -329,7 +329,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-22T07:34:32+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-22T15:34:32+00:00">
                 2017-02-22
               </time>
             
@@ -365,17 +365,17 @@
       
 
       
-        <p>CTC(Connectionist Temporal Classification) Loss 函数多用于序列有监督学习，优点是不需要对齐输入数据及标签。本文内容并不涉及CTC Loss的原理介绍，而是关于如何在Caffe中移植Baidu美研院实现的<a href="https://github.com/baidu-research/warp-ctc" target="_blank" rel="external">warp-ctc</a>，并利用其实现一个LSTM + CTC Loss的验证码识别demo。下面这张图引用自warp-ctc的<a href="https://github.com/baidu-research/warp-ctc" target="_blank" rel="external">项目页面</a>。本文介绍内容的相关代码可以参见我的GitHub项目<a href="https://github.com/xmfbit/warpctc-caffe" target="_blank" rel="external">warpctc-caffe</a><br><img src="/img/warpctc_intro.png" alt="CTC Loss"><br><a id="more"></a></p>
+        <p>CTC(Connectionist Temporal Classification) Loss 函数多用于序列有监督学习，优点是不需要对齐输入数据及标签。本文内容并不涉及CTC Loss的原理介绍，而是关于如何在Caffe中移植Baidu美研院实现的<a href="https://github.com/baidu-research/warp-ctc" target="_blank" rel="noopener">warp-ctc</a>，并利用其实现一个LSTM + CTC Loss的验证码识别demo。下面这张图引用自warp-ctc的<a href="https://github.com/baidu-research/warp-ctc" target="_blank" rel="noopener">项目页面</a>。本文介绍内容的相关代码可以参见我的GitHub项目<a href="https://github.com/xmfbit/warpctc-caffe" target="_blank" rel="noopener">warpctc-caffe</a><br><img src="/img/warpctc_intro.png" alt="CTC Loss"><br><a id="more"></a></p>
 <h2 id="移植warp-ctc"><a href="#移植warp-ctc" class="headerlink" title="移植warp-ctc"></a>移植warp-ctc</h2><p>本节介绍了如何将<code>warp-ctc</code>的源码在Caffe中进行编译。</p>
 <p>首先，我们将<code>warp-ctc</code>的项目代码从GitHub上clone下来。在Caffe的<code>include/caffe</code>和<code>src/caffe</code>下分别创建名为<code>3rdparty</code>的文件夹，将warp-ctc中的头文件和实现文件分别放到对应的文件夹下。之后，我们需要对其代码和配置进行修改，才能在Caffe中顺利编译。</p>
-<p>由于<code>warp-ctc</code>中使用了<code>C++11</code>的相关技术，所以需要修改Caffe的<code>Makefile</code>文件，添加<code>C++11</code>支持，可以参见<a href="https://github.com/xmfbit/warpctc-caffe/blob/master/Makefile" target="_blank" rel="external">Makefile</a>。</p>
+<p>由于<code>warp-ctc</code>中使用了<code>C++11</code>的相关技术，所以需要修改Caffe的<code>Makefile</code>文件，添加<code>C++11</code>支持，可以参见<a href="https://github.com/xmfbit/warpctc-caffe/blob/master/Makefile" target="_blank" rel="noopener">Makefile</a>。</p>
 <p>对Caffe的修改就是这么简单，之后我们需要修改<code>warp-ctc</code>中的代码文件。这里的修改多且乱，边改边试着编译，所以可能其中也有不必要的修改。最后的目的就是能够使用GPU进行CTC Loss的计算。</p>
 <p><code>warp-ctc</code>提供了CPU多线程的计算，这里我直接将相应的<code>openmp</code>并行化语句删掉了。</p>
 <p>另外，需要将warp-ctc中包含CUDA代码的相关头文件后缀名改为<code>cuh</code>，这样才能够通过编译。否则编译器会给出找不到<code>__host__</code>和<code>__device__</code>等等关键字的错误。</p>
-<p>对于详细的修改配置，还请参见GitHub相应的<a href="https://github.com/xmfbit/warpctc-caffe/blob/master/include/caffe/3rdparty/detail/hostdevice.cuh" target="_blank" rel="external">代码文件</a>。</p>
+<p>对于详细的修改配置，还请参见GitHub相应的<a href="https://github.com/xmfbit/warpctc-caffe/blob/master/include/caffe/3rdparty/detail/hostdevice.cuh" target="_blank" rel="noopener">代码文件</a>。</p>
 <h2 id="实现CTC-Loss计算"><a href="#实现CTC-Loss计算" class="headerlink" title="实现CTC Loss计算"></a>实现CTC Loss计算</h2><p>编译没有问题后，我们可以编写<code>ctc_loss_layer</code>实现CTC Loss的计算。在实现时，注意参考文件<code>ctc.h</code>。这个文件中给出了使用<code>warp-ctc</code>进行CTC Loss计算的全部API接口。</p>
 <p><code>ctc_loss_layer</code>继承自<code>loss_layer</code>，主要是前向和反向计算的实现。由于<code>warp-ctc</code>中只对单精度浮点数<code>float</code>进行支持，所以，对于双精度网络参数，直接将其设置为<code>NOT_IMPLEMENTED</code>，如下所示。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span> &lt;&gt;</div><div class="line"><span class="keyword">void</span> CtcLossLayer&lt;<span class="keyword">double</span>&gt;::Forward_cpu(</div><div class="line">    <span class="keyword">const</span> <span class="built_in">vector</span>&lt;Blob&lt;<span class="keyword">double</span>&gt;*&gt;&amp; bottom, <span class="keyword">const</span> <span class="built_in">vector</span>&lt;Blob&lt;<span class="keyword">double</span>&gt;*&gt;&amp; top) &#123;</div><div class="line">    NOT_IMPLEMENTED;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">template</span> &lt;&gt;</div><div class="line"><span class="keyword">void</span> CtcLossLayer&lt;<span class="keyword">double</span>&gt;::Backward_cpu(<span class="keyword">const</span> <span class="built_in">vector</span>&lt;Blob&lt;<span class="keyword">double</span>&gt;*&gt;&amp; top,</div><div class="line">    <span class="keyword">const</span> <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt;&amp; propagate_down, <span class="keyword">const</span> <span class="built_in">vector</span>&lt;Blob&lt;<span class="keyword">double</span>&gt;*&gt;&amp; bottom) &#123;</div><div class="line">    NOT_IMPLEMENTED;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;&gt;</span><br><span class="line"><span class="keyword">void</span> CtcLossLayer&lt;<span class="keyword">double</span>&gt;::Forward_cpu(</span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">vector</span>&lt;Blob&lt;<span class="keyword">double</span>&gt;*&gt;&amp; bottom, <span class="keyword">const</span> <span class="built_in">vector</span>&lt;Blob&lt;<span class="keyword">double</span>&gt;*&gt;&amp; top) &#123;</span><br><span class="line">    NOT_IMPLEMENTED;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;&gt;</span><br><span class="line"><span class="keyword">void</span> CtcLossLayer&lt;<span class="keyword">double</span>&gt;::Backward_cpu(<span class="keyword">const</span> <span class="built_in">vector</span>&lt;Blob&lt;<span class="keyword">double</span>&gt;*&gt;&amp; top,</span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt;&amp; propagate_down, <span class="keyword">const</span> <span class="built_in">vector</span>&lt;Blob&lt;<span class="keyword">double</span>&gt;*&gt;&amp; bottom) &#123;</span><br><span class="line">    NOT_IMPLEMENTED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>使用<code>warp-ctc</code>相关接口进行CTC Loss计算的步骤如下：</p>
 <ul>
 <li>设置<code>ctcOptions</code>，指定使用CPU或GPU进行计算，并指定CPU计算的线程数和GPU计算的CUDA stream。</li>
@@ -391,11 +391,11 @@
 <li>将图像的每一列看做一个time step，网络模型使用<code>image data-&gt;2LSTM-&gt;fc-&gt;CTC Loss</code>，简单粗暴。</li>
 <li>模型训练过程中，数据输入使用<code>HDF5</code>格式。</li>
 </ul>
-<h3 id="数据产生"><a href="#数据产生" class="headerlink" title="数据产生"></a>数据产生</h3><p>使用<code>captcha</code>生成验证码图片。<a href="https://pypi.python.org/pypi/captcha/0.1.1" target="_blank" rel="external">这里</a>是一个简单的API demo。默认生成的图片大小为<code>160x60</code>。我们将其长宽缩小一半，使用<code>80x30</code>的彩色图片作为输入。</p>
+<h3 id="数据产生"><a href="#数据产生" class="headerlink" title="数据产生"></a>数据产生</h3><p>使用<code>captcha</code>生成验证码图片。<a href="https://pypi.python.org/pypi/captcha/0.1.1" target="_blank" rel="noopener">这里</a>是一个简单的API demo。默认生成的图片大小为<code>160x60</code>。我们将其长宽缩小一半，使用<code>80x30</code>的彩色图片作为输入。</p>
 <p>使用<code>python</code>中的<code>h5py</code>模块生成<code>HDF5</code>格式的数据文件。将全部图片分为两部分，80%作为训练集，20%作为验证集。</p>
 <h3 id="LSTM的输入"><a href="#LSTM的输入" class="headerlink" title="LSTM的输入"></a>LSTM的输入</h3><p>在Caffe中已经有了<code>lstm_layer</code>的实现。<code>lstm_layer</code>要求输入的序列<code>blob</code>为<code>TxNx...</code>，也就是说我们需要将输入的image进行转置。</p>
-<p>Caffe中Batch的内存布局顺序为<code>NxCxHxW</code>。我们将图像中的每一列作为一个time step输入的$x$向量。所以，在代码中使用了<a href="https://github.com/weiliu89/caffe/blob/ssd/include/caffe/layers/permute_layer.hpp" target="_blank" rel="external">liuwei的SSD工作中实现的<code>permute_layer</code></a>进行转置，将<code>W</code>维度放到最前方。与之对应的参数定义如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">layer &#123;</div><div class="line">    name: &quot;permuted_data&quot;</div><div class="line">    type: &quot;Permute&quot;</div><div class="line">    bottom: &quot;data&quot;</div><div class="line">    top: &quot;permuted_data&quot;</div><div class="line">    permute_param &#123;</div><div class="line">        order: 3   # W</div><div class="line">        order: 0   # N</div><div class="line">        order: 1   # C</div><div class="line">        order: 2   # H</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Caffe中Batch的内存布局顺序为<code>NxCxHxW</code>。我们将图像中的每一列作为一个time step输入的$x$向量。所以，在代码中使用了<a href="https://github.com/weiliu89/caffe/blob/ssd/include/caffe/layers/permute_layer.hpp" target="_blank" rel="noopener">liuwei的SSD工作中实现的<code>permute_layer</code></a>进行转置，将<code>W</code>维度放到最前方。与之对应的参数定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">layer &#123;</span><br><span class="line">    name: &quot;permuted_data&quot;</span><br><span class="line">    type: &quot;Permute&quot;</span><br><span class="line">    bottom: &quot;data&quot;</span><br><span class="line">    top: &quot;permuted_data&quot;</span><br><span class="line">    permute_param &#123;</span><br><span class="line">        order: 3   # W</span><br><span class="line">        order: 0   # N</span><br><span class="line">        order: 1   # C</span><br><span class="line">        order: 2   # H</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>另外，LSTM需要第二个输入，用于指示时序信号的起始位置。在代码中，我新加入了一个名为<code>ContinuationIndicator</code>的layer，产生对应的time indicator序列。</p>
 <h3 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h3><p>在某次试验中，迭代50,000次，实验过程中的损失函数变化如下：</p>
 <p><img src="/img/captcha_train_loss.png" alt="train loss"></p>
@@ -542,7 +542,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

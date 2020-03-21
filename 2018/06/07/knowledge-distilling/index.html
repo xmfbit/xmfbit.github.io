@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="来呀，快活呀~">
 <meta property="og:description" content="知识蒸馏（Knowledge Distilling）是模型压缩的一种方法，是指利用已经训练的一个较复杂的Teacher模型，指导一个较轻量的Student模型训练，从而在减小模型大小和计算资源的同时，尽量保持原Teacher模型的准确率的方法。这种方法受到大家的注意，主要是由于Hinton的论文Distilling the Knowledge in a Neural Network。这篇博客做一总">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.781Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="论文 - Distilling the Knowledge in a Neural Network">
 <meta name="twitter:description" content="知识蒸馏（Knowledge Distilling）是模型压缩的一种方法，是指利用已经训练的一个较复杂的Teacher模型，指导一个较轻量的Student模型训练，从而在减小模型大小和计算资源的同时，尽量保持原Teacher模型的准确率的方法。这种方法受到大家的注意，主要是由于Hinton的论文Distilling the Knowledge in a Neural Network。这篇博客做一总">
@@ -325,7 +325,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-07T13:56:12+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-07T21:56:12+00:00">
                 2018-06-07
               </time>
             
@@ -361,9 +361,9 @@
       
 
       
-        <p>知识蒸馏（Knowledge Distilling）是模型压缩的一种方法，是指利用已经训练的一个较复杂的Teacher模型，指导一个较轻量的Student模型训练，从而在减小模型大小和计算资源的同时，尽量保持原Teacher模型的准确率的方法。这种方法受到大家的注意，主要是由于Hinton的论文<a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="external">Distilling the Knowledge in a Neural Network</a>。这篇博客做一总结。后续还会有KD方法的改进相关论文的心得介绍。</p>
+        <p>知识蒸馏（Knowledge Distilling）是模型压缩的一种方法，是指利用已经训练的一个较复杂的Teacher模型，指导一个较轻量的Student模型训练，从而在减小模型大小和计算资源的同时，尽量保持原Teacher模型的准确率的方法。这种方法受到大家的注意，主要是由于Hinton的论文<a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noopener">Distilling the Knowledge in a Neural Network</a>。这篇博客做一总结。后续还会有KD方法的改进相关论文的心得介绍。</p>
 <a id="more"></a>
-<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>这里我将Wang Naiyang在知乎相关问题的<a href="https://www.zhihu.com/question/50519680/answer/136363665" target="_blank" rel="external">回答</a>粘贴如下，将KD方法的motivation讲的很清楚。图森也发了论文对KD进行了改进，下篇笔记总结。</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>这里我将Wang Naiyang在知乎相关问题的<a href="https://www.zhihu.com/question/50519680/answer/136363665" target="_blank" rel="noopener">回答</a>粘贴如下，将KD方法的motivation讲的很清楚。图森也发了论文对KD进行了改进，下篇笔记总结。</p>
 <blockquote>
 <p>Knowledge Distill是一种简单弥补分类问题监督信号不足的办法。传统的分类问题，模型的目标是将输入的特征映射到输出空间的一个点上，例如在著名的Imagenet比赛中，就是要将所有可能的输入图片映射到输出空间的1000个点上。这么做的话这1000个点中的每一个点是一个one hot编码的类别信息。这样一个label能提供的监督信息只有log(class)这么多bit。然而在KD中，我们可以使用teacher model对于每个样本输出一个连续的label分布，这样可以利用的监督信息就远比one hot的多了。另外一个角度的理解，大家可以想象如果只有label这样的一个目标的话，那么这个模型的目标就是把训练样本中每一类的样本强制映射到同一个点上，这样其实对于训练很有帮助的类内variance和类间distance就损失掉了。然而使用teacher model的输出可以恢复出这方面的信息。具体的举例就像是paper中讲的， 猫和狗的距离比猫和桌子要近，同时如果一个动物确实长得像猫又像狗，那么它是可以给两类都提供监督。综上所述，KD的核心思想在于”打散”原来压缩到了一个点的监督信息，让student模型的输出尽量match teacher模型的输出分布。其实要达到这个目标其实不一定使用teacher model，在数据标注或者采集的时候本身保留的不确定信息也可以帮助模型的训练。</p>
 </blockquote>
@@ -374,9 +374,9 @@
 <p>对Teacher网络的logit如此处理，得到的就是soft target。相比于one-hot的ground truth或softmax的prob输出，这个软化之后的target能够提供更多的类别间和类内信息。<br>可以对待训练的Student网络也如此处理，这样就得到了另外一个“交叉熵”损失：</p>
 <script type="math/tex; mode=display">\mathcal{L}_{soft}=-\sum_{i=1}^{K}p_i\log q_i</script><p>其中，$p_i$为Teacher模型给出的soft target，$q_i$为Student模型给出的soft output。作者发现，最好的方式是做一个multi task learning，将上面这个损失函数和真正的交叉熵损失加权相加。相应地，我们将其称为hard target。</p>
 <script type="math/tex; mode=display">\mathcal{L} = \mathcal{L}_{hard} + \lambda \mathcal{L}_{soft}</script><p>其中，$\mathcal{L}_{hard}$是分类问题中经典的交叉熵损失。由于做softened softmax计算时，需要除以$T$，导致soft target关联的梯度幅值被缩小了$T^2$倍，所以有必要在$\lambda$中预先考虑到$T^2$这个因子。</p>
-<p>PS:这里有一篇地平线烫叔关于多任务中loss函数设计的回答：<a href="https://www.zhihu.com/question/268105631/answer/335246543" target="_blank" rel="external">神经网络中，设计loss function有哪些技巧? - Alan Huang的回答 - 知乎</a>。</p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>这里给出一个开源的MXNet的实现:<a href="https://github.com/TuSimple/neuron-selectivity-transfer/blob/master/symbol/transfer.py#L4" target="_blank" rel="external">kd loss by mxnet</a>。MXNet中的<code>SoftmaxOutput</code>不仅能直接支持one-hot编码类型的array作为label输入，甚至label的<code>dtype</code>也可以不是整型！</p>
-<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">kd</span><span class="params">(student_hard_logits, teacher_hard_logits, temperature, weight_lambda, prefix)</span>:</span></div><div class="line">    student_soft_logits = student_hard_logits / temperature</div><div class="line">    teacher_soft_logits = teacher_hard_logits / temperature</div><div class="line">    teacher_soft_labels = mx.symbol.SoftmaxActivation(teacher_soft_logits,</div><div class="line">        name=<span class="string">"teacher%s_soft_labels"</span> % prefix)</div><div class="line">    kd_loss = mx.symbol.SoftmaxOutput(data=student_soft_logits, label=teacher_soft_labels,</div><div class="line">                                      grad_scale=weight_lambda, name=<span class="string">"%skd_loss"</span> % prefix)</div><div class="line">    <span class="keyword">return</span> kd_loss</div></pre></td></tr></table></figure>
+<p>PS:这里有一篇地平线烫叔关于多任务中loss函数设计的回答：<a href="https://www.zhihu.com/question/268105631/answer/335246543" target="_blank" rel="noopener">神经网络中，设计loss function有哪些技巧? - Alan Huang的回答 - 知乎</a>。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>这里给出一个开源的MXNet的实现:<a href="https://github.com/TuSimple/neuron-selectivity-transfer/blob/master/symbol/transfer.py#L4" target="_blank" rel="noopener">kd loss by mxnet</a>。MXNet中的<code>SoftmaxOutput</code>不仅能直接支持one-hot编码类型的array作为label输入，甚至label的<code>dtype</code>也可以不是整型！</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">kd</span><span class="params">(student_hard_logits, teacher_hard_logits, temperature, weight_lambda, prefix)</span>:</span></span><br><span class="line">    student_soft_logits = student_hard_logits / temperature</span><br><span class="line">    teacher_soft_logits = teacher_hard_logits / temperature</span><br><span class="line">    teacher_soft_labels = mx.symbol.SoftmaxActivation(teacher_soft_logits,</span><br><span class="line">        name=<span class="string">"teacher%s_soft_labels"</span> % prefix)</span><br><span class="line">    kd_loss = mx.symbol.SoftmaxOutput(data=student_soft_logits, label=teacher_soft_labels,</span><br><span class="line">                                      grad_scale=weight_lambda, name=<span class="string">"%skd_loss"</span> % prefix)</span><br><span class="line">    <span class="keyword">return</span> kd_loss</span><br></pre></td></tr></table></figure>
 <h2 id="matching-logit是特例"><a href="#matching-logit是特例" class="headerlink" title="matching logit是特例"></a>matching logit是特例</h2><p>（这部分没什么用，练习推导了一下交叉熵损失的梯度计算）</p>
 <p>在Hinton之前，有学者提出可以匹配Teacher和Student输出的logit，Hinton指出这是本文方法在一定假设下的近似。为了和论文中的符号相同，下面我们使用$C$表示soft target带来的loss，Teacher和Student第$i$个神经元输出的logit分别为$v_i$和$z_i$，输出的softened softmax分别为$p_i$和$q_i$。那么我们有：</p>
 <script type="math/tex; mode=display">C = -\sum_{j=1}^{C}p_j \log q_j</script><p>而且，</p>
@@ -397,7 +397,7 @@
 <script type="math/tex; mode=display">\frac{\partial C}{\partial z_i} \sim \frac{1}{NT^2}(z_i - v_i)</script><p>所以说，MSE下进行logit的匹配，是本文方法的一个特例。</p>
 <h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>作者使用了MNIST进行图片分类的实验，一个有趣的地方在于（和论文前半部分举的$2$和$3$识别的例子呼应），作者在数据集中有意地去除了标签为$3$的样本。没有KD的student网络不能识别测试时候提供的$3$，有KD的student网络能够识别一些$3$（虽然它从来没有在训练样本中出现过！）。后面，作者在语音识别和一个Google内部的很大的图像分类数据集（JFT dataset）上做了实验，</p>
 <h2 id="附"><a href="#附" class="headerlink" title="附"></a>附</h2><ul>
-<li>知乎上关于soft target的讨论，有Wang Naiyan和Zhou Bolei的分析：<a href="https://www.zhihu.com/question/50519680" target="_blank" rel="external">如何理解soft target这一做法？
+<li>知乎上关于soft target的讨论，有Wang Naiyan和Zhou Bolei的分析：<a href="https://www.zhihu.com/question/50519680" target="_blank" rel="noopener">如何理解soft target这一做法？
 </a></li>
 </ul>
 
@@ -541,7 +541,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

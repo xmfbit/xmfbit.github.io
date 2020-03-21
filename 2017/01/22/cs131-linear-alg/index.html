@@ -98,7 +98,7 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/rotation.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/original_superman.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/svd_superman.png">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.794Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.217Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CS131-线代基础">
 <meta name="twitter:description" content="CS131课程(Computer Vision: Foundations and Applications)，是斯坦福大学Li Feifei实验室开设的一门计算机视觉入门基础课程，该课程目的在于为刚接触计算机视觉领域的学生提供基本原理和应用介绍。目前2016年冬季课程刚刚结束。CS131博客系列主要是关于本课的slide知识点总结与作业重点问题归纳，作为个人学习本门课程的心得体会和复习材料。 20">
@@ -330,7 +330,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-22T07:38:01+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-22T15:38:01+00:00">
                 2017-01-22
               </time>
             
@@ -366,9 +366,9 @@
       
 
       
-        <p>CS131课程(Computer Vision: Foundations and Applications)，是斯坦福大学Li Feifei实验室开设的一门计算机视觉入门基础课程，<a href="http://vision.stanford.edu/teaching/cs131_fall1617/index.html" target="_blank" rel="external">该课程</a>目的在于为刚接触计算机视觉领域的学生提供基本原理和应用介绍。目前2016年冬季课程刚刚结束。CS131博客系列主要是关于本课的slide知识点总结与作业重点问题归纳，作为个人学习本门课程的心得体会和复习材料。</p>
-<p><em>2018/03/20 Update: 这门课的2017秋季课程已经全部放出来，和上个版本相比，作业采用Python实现，同时加入了更多机器学习的内容。详细内容见：<a href="http://vision.stanford.edu/teaching/cs131_fall1718/" target="_blank" rel="external">CS131 Computer Vision@Fall 2017</a></em></p>
-<p>由于是个人项目，所以会比较随意，只对个人感兴趣的内容做一总结。这篇文章是对课前<a href="http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture2_linalg_review_cs131_2016.pdf" target="_blank" rel="external">线代基础</a>的复习与整理。<br><img src="/img/cs131_linear_algebra.jpg" alt="线性代数词云"></p>
+        <p>CS131课程(Computer Vision: Foundations and Applications)，是斯坦福大学Li Feifei实验室开设的一门计算机视觉入门基础课程，<a href="http://vision.stanford.edu/teaching/cs131_fall1617/index.html" target="_blank" rel="noopener">该课程</a>目的在于为刚接触计算机视觉领域的学生提供基本原理和应用介绍。目前2016年冬季课程刚刚结束。CS131博客系列主要是关于本课的slide知识点总结与作业重点问题归纳，作为个人学习本门课程的心得体会和复习材料。</p>
+<p><em>2018/03/20 Update: 这门课的2017秋季课程已经全部放出来，和上个版本相比，作业采用Python实现，同时加入了更多机器学习的内容。详细内容见：<a href="http://vision.stanford.edu/teaching/cs131_fall1718/" target="_blank" rel="noopener">CS131 Computer Vision@Fall 2017</a></em></p>
+<p>由于是个人项目，所以会比较随意，只对个人感兴趣的内容做一总结。这篇文章是对课前<a href="http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture2_linalg_review_cs131_2016.pdf" target="_blank" rel="noopener">线代基础</a>的复习与整理。<br><img src="/img/cs131_linear_algebra.jpg" alt="线性代数词云"></p>
 <a id="more"></a>
 <h2 id="向量与矩阵"><a href="#向量与矩阵" class="headerlink" title="向量与矩阵"></a>向量与矩阵</h2><p>数字图像可以看做二维矩阵，向量是特殊的矩阵，本课程默认的向量都是列向量。<br>slide中给出了一些矩阵行列式和迹的性质，都比较简单，这里不再多说。</p>
 <h2 id="矩阵作为线性变换"><a href="#矩阵作为线性变换" class="headerlink" title="矩阵作为线性变换"></a>矩阵作为线性变换</h2><p>通过线代知识，我们知道，在线性空间中，如果给定一组基，线性变换可以通过对应的矩阵来进行描述。</p>
@@ -388,9 +388,9 @@ s_yy
 \mathbf{R} = \begin{bmatrix}
 \cos\theta &-\sin\theta \\\\
 \sin\theta &\cos\theta
-\end{bmatrix}</script><p>旋转矩阵是<a href="https://zh.wikipedia.org/wiki/酉矩阵" target="_blank" rel="external">酉矩阵</a>，矩阵内的各列（或者各行）相互正交。满足如下的关系式：</p>
+\end{bmatrix}</script><p>旋转矩阵是<a href="https://zh.wikipedia.org/wiki/酉矩阵" target="_blank" rel="noopener">酉矩阵</a>，矩阵内的各列（或者各行）相互正交。满足如下的关系式：</p>
 <script type="math/tex; mode=display">
-\mathbf{R}\mathbf{R^{\dagger}} = \mathbf{I}</script><p>由于$\det{\mathbf{R}} = \det{\mathbf{R^{\dagger}}}$，所以，对于酉矩阵，$\det{\mathbf{R}} = \pm 1$<br>旋转矩阵是<a href="https://zh.wikipedia.org/wiki/酉矩阵" target="_blank" rel="external">酉矩阵</a>，矩阵内的各列（或者各行）相互正交。满足如下的关系式：</p>
+\mathbf{R}\mathbf{R^{\dagger}} = \mathbf{I}</script><p>由于$\det{\mathbf{R}} = \det{\mathbf{R^{\dagger}}}$，所以，对于酉矩阵，$\det{\mathbf{R}} = \pm 1$<br>旋转矩阵是<a href="https://zh.wikipedia.org/wiki/酉矩阵" target="_blank" rel="noopener">酉矩阵</a>，矩阵内的各列（或者各行）相互正交。满足如下的关系式：</p>
 <script type="math/tex; mode=display">
 \mathbf{R}\mathbf{R^{\dagger}} = \mathbf{I}</script><p>由于$\det{\mathbf{R}} = \det{\mathbf{R^{\dagger}}}$，所以，对于酉矩阵，$\det{\mathbf{R}} = \pm 1$.</p>
 <h3 id="齐次变换-Homogeneous-Transform"><a href="#齐次变换-Homogeneous-Transform" class="headerlink" title="齐次变换(Homogeneous Transform)"></a>齐次变换(Homogeneous Transform)</h3><p>只用上面的二维矩阵不能表达平移，使用齐次矩阵可以表达放缩，旋转和平移操作。</p>
@@ -411,7 +411,7 @@ cx+dy+t_y\\\\
 <script type="math/tex; mode=display">\mathbf{U}\mathbf{\Sigma}\mathbf{V^\dagger} = \mathbf{A}</script><p>其中矩阵$\mathbf{A}$大小为$m\times n$，矩阵$\mathbf{U}$是大小为$m\times m$的酉矩阵，$\mathbf{V}$是大小为$n \times n$的酉矩阵，$\mathbf{\Sigma}$是大小为$m \times n$的旋转矩阵，即只有主对角元素不为0.</p>
 <p>SVD分解在主成分分析中年很有用。由于矩阵$\mathbf{\Sigma}$一般情况下是将奇异值按照从大到小的顺序摆放，所以矩阵$\mathbf{U}$中，前面的若干列被视作主成分，后面的列显得相对不这么重要。可以抛弃后面的列，进行图像压缩。</p>
 <p>如下图，是使用前10个分量对原图片进行压缩的效果。</p>
-<figure class="highlight matlab"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">im = imread(<span class="string">'./superman.png'</span>);</div><div class="line">im_gray = rbg2gray(im);</div><div class="line">[u, s, v] = svd(double(im_gray));</div><div class="line">k = <span class="number">10</span>;</div><div class="line">uk = u(:, <span class="number">1</span>:k);</div><div class="line">sigma = <span class="built_in">diag</span>(s);</div><div class="line">sk = <span class="built_in">diag</span>(sigma(<span class="number">1</span>:k));</div><div class="line">vk = v(:, <span class="number">1</span>:k);</div><div class="line">im_k = uk*sk*vk';</div><div class="line">imshow(uint8(im_k))</div></pre></td></tr></table></figure>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">im = imread(<span class="string">'./superman.png'</span>);</span><br><span class="line">im_gray = rbg2gray(im);</span><br><span class="line">[u, s, v] = svd(double(im_gray));</span><br><span class="line">k = <span class="number">10</span>;</span><br><span class="line">uk = u(:, <span class="number">1</span>:k);</span><br><span class="line">sigma = <span class="built_in">diag</span>(s);</span><br><span class="line">sk = <span class="built_in">diag</span>(sigma(<span class="number">1</span>:k));</span><br><span class="line">vk = v(:, <span class="number">1</span>:k);</span><br><span class="line">im_k = uk*sk*vk';</span><br><span class="line">imshow(uint8(im_k))</span><br></pre></td></tr></table></figure>
 <p><img src="/img/original_superman.png" alt="原始图像"><br><img src="/img/svd_superman.png" alt="压缩图像"></p>
 
       
@@ -447,8 +447,8 @@ cx+dy+t_y\\\\
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/12/16/gsl-with-vs/" rel="next" title="使用 Visual Studio 编译 GSL 科学计算库">
-                <i class="fa fa-chevron-left"></i> 使用 Visual Studio 编译 GSL 科学计算库
+              <a href="/2016/12/16/use-doxygen/" rel="next" title="Windows环境下使用Doxygen生成注释文档">
+                <i class="fa fa-chevron-left"></i> Windows环境下使用Doxygen生成注释文档
               </a>
             
           </div>
@@ -552,7 +552,7 @@ cx+dy+t_y\\\\
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

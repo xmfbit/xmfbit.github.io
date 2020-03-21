@@ -113,7 +113,7 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/camera_model_things_to_remember.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/epipolar_fig.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/epipolar_constraint_1.png">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.782Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.217Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CS131-立体视觉基础">
 <meta name="twitter:description" content="数字图像是现实世界的物体通过光学成像设备在感光材料上的投影。在3D到2D的转换过程中，深度信息丢失。如何从单幅或者多幅图像中恢复出有用的3D信息，需要使用立体视觉的知识进行分析。如下图所示。这篇博客对课程讲义中立体视觉部分做一整理，分别介绍了针孔相机模型和对极集合的基础知识。">
@@ -345,7 +345,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-02T12:38:55+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-02T20:38:55+00:00">
                 2017-02-02
               </time>
             
@@ -431,7 +431,7 @@ y^\prime = fy/z
 </ul>
 <h3 id="极线约束"><a href="#极线约束" class="headerlink" title="极线约束"></a>极线约束</h3><p>从上图可以看出，如果两台相机已经给定，那么给定物体点在左边相机像平面内的成像点，则右边相机成像平面内的点被唯一确定。如何能够找到这个对应点呢？或者换种说法，在对极几何中，如何描述这种不同相机成像点的约束关系呢？</p>
 <p>如下图所示，从上面的讨论我们已经知道，物点$P$在左右两个相机成像平面的坐标可以使用由相机内参数矩阵和外参数矩阵确定的齐次变换矩阵得到（下图在标注时，右侧相机的点应被标注为$p^\prime$）。为了简化问题，在下面的讨论时，我们假定相机都是理想的针孔相机模型，也就是说，变换矩阵只和外参数矩阵（也即是相机的位姿决定）。再做简化，认为世界坐标系与左侧相机的相机坐标系重合。那么，就得到了图上所示的变换矩阵$M$和$M^\prime$。其中，$R$是左右两个相机之间的旋转矩阵，$T$是$OO^\prime$有向线段，表明相机中心的位移。<br><img src="/img/epipolar_constraint_1.png" alt="极线约束1"></p>
-<p>（下面的推导参考了<a href="http://www.cnblogs.com/gemstone/articles/2294551.html" target="_blank" rel="external">博客：计算机视觉基础4——对极几何</a>）。在下面的推导中，我们使用$p^\prime$表示在相机$O^\prime$下的向量$O\prime P$，符号$p$同理。那么，有如下关系成立：<br>$R(p-T) = p^\prime$</p>
+<p>（下面的推导参考了<a href="http://www.cnblogs.com/gemstone/articles/2294551.html" target="_blank" rel="noopener">博客：计算机视觉基础4——对极几何</a>）。在下面的推导中，我们使用$p^\prime$表示在相机$O^\prime$下的向量$O\prime P$，符号$p$同理。那么，有如下关系成立：<br>$R(p-T) = p^\prime$</p>
 
       
     </div>
@@ -571,7 +571,7 @@ y^\prime = fy/z
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

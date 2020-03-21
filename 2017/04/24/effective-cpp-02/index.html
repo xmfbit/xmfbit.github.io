@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="来呀，快活呀~">
 <meta property="og:description" content="在第二章中，作者主要关注了在C++的OOP“联邦”中行事的注意事项。主要包括有虚函数的情况下的继承以及copying function（拷贝构造函数和拷贝赋值函数）的处理。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.789Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.217Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Effective CPP 阅读 - Chapter 2 构造拷贝和赋值函数">
 <meta name="twitter:description" content="在第二章中，作者主要关注了在C++的OOP“联邦”中行事的注意事项。主要包括有虚函数的情况下的继承以及copying function（拷贝构造函数和拷贝赋值函数）的处理。">
@@ -325,7 +325,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-24T12:50:10+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-24T20:50:10+00:00">
                 2017-04-24
               </time>
             
@@ -374,7 +374,7 @@
 </blockquote>
 <p>对于STL而言，记住其中的容器都不是为了继承而设计的，不要继承STL中的容器，包括<code>vector</code>，<code>string</code>等。</p>
 <p>有的时候，我们可能会想声明一个抽象基类作为接口。当手上没有纯虚函数时候，可以将析构函数声明为纯虚的。然而这时候问题来了，我们需要为这个纯虚析构函数提供了一个空定义。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> ABC &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">virtual</span> ~ABC() = <span class="number">0</span>;    </div><div class="line">&#125;;</div><div class="line">ABC::~ABC() &#123;&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ABC</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~ABC() = <span class="number">0</span>;    </span><br><span class="line">&#125;;</span><br><span class="line">ABC::~ABC() &#123;&#125;</span><br></pre></td></tr></table></figure>
 <p>这看上去很违背常理，因为一般情况下纯虚函数不需要实现。这里是因为当派生类被销毁时，其析构函数中会调用<code>~ABC()</code>，所以必须为这个函数提供一份定义。</p>
 <h2 id="08-别让异常逃离析构函数"><a href="#08-别让异常逃离析构函数" class="headerlink" title="08 别让异常逃离析构函数"></a>08 别让异常逃离析构函数</h2><p>如果在析构函数中抛出异常，会导致未定义的行为。</p>
 <p>析构函数不应该抛出异常。如果析构函数调用的函数可能会抛出异常，要在析构函数中捕获异常，然后结束程序（这不是未定义行为）或者吞掉它们。</p>
@@ -384,24 +384,24 @@
 <p>直接在构造函数中调用虚函数看上去很容易避免。然而在构造函数中你可能会调用其他的初始化函数，你应该确保这些初始化函数中没有调用虚函数。否则，你可能会陷入到苦涩头疼的调试中去。编译器通常不会发现此类问题，但是在程序运行中，如果基类的虚函数是纯虚函数，程序很可能中止（和后面的相比，也许这还算好的）。如果基类中的虚函数有自己的实现，那么你可能就会头疼于程序的表现为何出乎意料（期望调用派生类的重写版本，实际仍是基类的原始版本）。</p>
 <h2 id="10-令operator-返回一个-this的引用"><a href="#10-令operator-返回一个-this的引用" class="headerlink" title="10 令operator=返回一个*this的引用"></a>10 令<code>operator=</code>返回一个<code>*this</code>的引用</h2><p>为了实现连锁赋值，赋值操作符必须返回一个引用，指向操作符左侧的赋值实参。这条规范被大多数人遵守。除非有确实好的理由，否则最好按规范办事。</p>
 <p>所谓连锁赋值，是指下面这样的情况：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">a = b = c;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = b = c;</span><br></pre></td></tr></table></figure>
 <p>这一条款不仅适用于赋值运算符，也适用于<code>+=</code>等。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> A &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    A&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> A&amp; rhs) &#123;</div><div class="line">        <span class="comment">// ...</span></div><div class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    A&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> A&amp; rhs) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h2 id="11-在operator-中处理自我赋值"><a href="#11-在operator-中处理自我赋值" class="headerlink" title="11 在operator=中处理自我赋值"></a>11 在<code>operator=</code>中处理自我赋值</h2><p>所谓自我赋值，是指：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Widget w;</div><div class="line"><span class="comment">// ...</span></div><div class="line">w = w;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">w = w;</span><br></pre></td></tr></table></figure>
 <p>自我赋值常常发生在同一个对象的不同别名之间。在实现赋值运算符时，应注意处理这一现象。</p>
 <p>一种方法是进行“证同测试”，如下：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">A&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> A&amp; rhs) &#123;</div><div class="line">    <span class="keyword">if</span>(&amp;rhs == <span class="keyword">this</span>) <span class="keyword">return</span> *<span class="keyword">this</span>; <span class="comment">//证同测试</span></div><div class="line">    <span class="comment">// ...</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">A&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> A&amp; rhs) &#123;</span><br><span class="line">    <span class="keyword">if</span>(&amp;rhs == <span class="keyword">this</span>) <span class="keyword">return</span> *<span class="keyword">this</span>; <span class="comment">//证同测试</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>不过作者指出，这种方法不具备异常安全性。另一种方法是在函数内部，合理安排语句顺序，防止提前释放该对象本身的资源。</p>
 <p>还有一种方法，使用copy-swap方法，首先拷贝构造一个<code>rhs</code>的拷贝，然后交换该拷贝和<code>*this</code>，</p>
 <p>毫无疑问，使用证同测试方法和作者后文的方法都会造成性能的些许下降，这需要根据具体情况具体分析，合理采用。</p>
 <h2 id="12-复制对象时勿忘每一个成分"><a href="#12-复制对象时勿忘每一个成分" class="headerlink" title="12 复制对象时勿忘每一个成分"></a>12 复制对象时勿忘每一个成分</h2><p>这一条款是指存在继承时，实现copying函数（指拷贝构造函数和拷贝赋值函数）不要忘记base class部分成员。看下面的例子：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Derived: <span class="keyword">public</span> Base&#123;</div><div class="line"><span class="keyword">private</span>:</div><div class="line">    <span class="keyword">int</span> a;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    Derived(<span class="keyword">const</span> Derived&amp; rhs):a(rhs.a) &#123;&#125;</div><div class="line">    Derived&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Derived&amp; rhs) &#123;</div><div class="line">        a = rhs.a;</div><div class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> a;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Derived(<span class="keyword">const</span> Derived&amp; rhs):a(rhs.a) &#123;&#125;</span><br><span class="line">    Derived&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Derived&amp; rhs) &#123;</span><br><span class="line">        a = rhs.a;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>上面的代码只是拷贝了派生类新加入的成员<code>a</code>，而对基类中已有的成员未作处理。要记住，</p>
 <blockquote>
 <p>任何时候自己实现copying函数时，要担起重责大任，小心地复制其基类的成员。由于基类成员往往声明为<code>private</code>，所以，一般调用基类的成员函数进行拷贝。将上面的代码修改为：</p>
 </blockquote>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Derived(<span class="keyword">const</span> Derived&amp; rhs):Base(rhs), a(rhs.a) &#123;&#125;</div><div class="line">Derived&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Derived&amp; rhs) &#123;</div><div class="line">    Base::<span class="keyword">operator</span>=(rhs);</div><div class="line">    a = rhs.a;</div><div class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Derived(<span class="keyword">const</span> Derived&amp; rhs):Base(rhs), a(rhs.a) &#123;&#125;</span><br><span class="line">Derived&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Derived&amp; rhs) &#123;</span><br><span class="line">    Base::<span class="keyword">operator</span>=(rhs);</span><br><span class="line">    a = rhs.a;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>此外，两种copying函数的实现往往是相似的。然而，不要试图在一个函数中调用另一个函数。把相似代码提取出来，写成一个独立的<code>init()</code>函数是一个更好的选择。</p>
 
       
@@ -540,7 +540,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

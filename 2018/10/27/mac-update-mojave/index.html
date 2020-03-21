@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="来呀，快活呀~">
 <meta property="og:description" content="很奇怪，对于手机上的APP，我一般能不升级就不升级；但是对于PC上的软件或操作系统更新，则是能升级就升级。。在将手中的MacOS更新到最新版本Mojave后，发现了一些需要手动调节的问题，记录在这里，原谅我标题党的画风。。。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.774Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MacOS Mojave更新之后一定要做这几件事！">
 <meta name="twitter:description" content="很奇怪，对于手机上的APP，我一般能不升级就不升级；但是对于PC上的软件或操作系统更新，则是能升级就升级。。在将手中的MacOS更新到最新版本Mojave后，发现了一些需要手动调节的问题，记录在这里，原谅我标题党的画风。。。">
@@ -325,7 +325,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-27T06:57:12+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-27T14:57:12+00:00">
                 2018-10-27
               </time>
             
@@ -363,10 +363,10 @@
       
         <p>很奇怪，对于手机上的APP，我一般能不升级就不升级；但是对于PC上的软件或操作系统更新，则是能升级就升级。。在将手中的MacOS更新到最新版本Mojave后，发现了一些需要手动调节的问题，记录在这里，原谅我标题党的画风。。。<br><a id="more"></a></p>
 <h2 id="Git等工具"><a href="#Git等工具" class="headerlink" title="Git等工具"></a>Git等工具</h2><p>试图使用<code>git</code>是出现了如下错误：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git clone xx.git</div><div class="line">xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun</div></pre></td></tr></table></figure>
-<p>解决办法参考<a href="https://apple.stackexchange.com/questions/254380/macos-mojave-invalid-active-developer-path" target="_blank" rel="external">macOS Mojave: invalid active developer path</a>中的最高赞回答：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">xcode-select --install</div></pre></td></tr></table></figure></p>
-<h2 id="osxfuse"><a href="#osxfuse" class="headerlink" title="osxfuse"></a>osxfuse</h2><p>参考Github讨论帖<a href="https://github.com/osxfuse/osxfuse/issues/542" target="_blank" rel="external">osxfuse not compatible with MacOS Mojave</a>，从官网下载最新的3.8.2版本安装即可。</p>
-<h2 id="VSCode等编辑器字体变“瘦”"><a href="#VSCode等编辑器字体变“瘦”" class="headerlink" title="VSCode等编辑器字体变“瘦”"></a>VSCode等编辑器字体变“瘦”</h2><p>更新之后，发现VSCode编辑器中的字体变得“很瘦”，不美观。执行下面的命令，并重启机器，应该可以恢复。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">defaults write -g CGFontRenderingFontSmoothingDisabled -bool NO</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone xx.git</span><br><span class="line">xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun</span><br></pre></td></tr></table></figure>
+<p>解决办法参考<a href="https://apple.stackexchange.com/questions/254380/macos-mojave-invalid-active-developer-path" target="_blank" rel="noopener">macOS Mojave: invalid active developer path</a>中的最高赞回答：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure></p>
+<h2 id="osxfuse"><a href="#osxfuse" class="headerlink" title="osxfuse"></a>osxfuse</h2><p>参考Github讨论帖<a href="https://github.com/osxfuse/osxfuse/issues/542" target="_blank" rel="noopener">osxfuse not compatible with MacOS Mojave</a>，从官网下载最新的3.8.2版本安装即可。</p>
+<h2 id="VSCode等编辑器字体变“瘦”"><a href="#VSCode等编辑器字体变“瘦”" class="headerlink" title="VSCode等编辑器字体变“瘦”"></a>VSCode等编辑器字体变“瘦”</h2><p>更新之后，发现VSCode编辑器中的字体变得“很瘦”，不美观。执行下面的命令，并重启机器，应该可以恢复。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">defaults write -g CGFontRenderingFontSmoothingDisabled -bool NO</span><br></pre></td></tr></table></figure></p>
 <h2 id="Mos-Caffine-IINA-等APP"><a href="#Mos-Caffine-IINA-等APP" class="headerlink" title="Mos Caffine IINA 等APP"></a>Mos Caffine IINA 等APP</h2><p>Mos可以平滑Mac上外接鼠标的滚动，并调整鼠标滚动方向和Windows相同。更新后发现Mos失灵。这应该是和新版本中更强的权限管理有关，解决办法是在”安全隐私设置” -&gt; “辅助功能”中，先把Mos的勾勾去掉，然后重新勾选。Caffine同样的操作。</p>
 <p>IINA是一款Mac上的播放器软件，是我在Mac上的默认播放器。更新后点击媒体文件，发现只是弹出IINA软件的界面，却没有自动播放。解决办法是在媒体文件上右键，在打开方式中重新选择IINA，并勾选默认打开方式选项。</p>
 <p>更新新系统后，遇到的坑暂时就这么多。希望能够帮助到需要的人。</p>
@@ -507,7 +507,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

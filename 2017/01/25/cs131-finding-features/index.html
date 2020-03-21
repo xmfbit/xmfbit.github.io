@@ -100,7 +100,7 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/corner_type_1.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/corner_judge.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/corner_judge_2.png">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.797Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.217Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CS131-描述图像的特征(Harris 角点)">
 <meta name="twitter:description" content="feature是对图像的描述。比如，图像整体灰度值的均值和方差就可以作为feature。如果我们想在一副图像中检测足球时，可以使用滑动窗方法，逐一检查窗口内的灰度值分布是否和一张给定的典型黑白格子足球相似。可想而知，这种方法的性能一定让人捉急。而在image matching问题中，常常需要将不同视角的同一目标物进行matching，进而计算相机转过的角度。这在SLAM问题中很有意义。如下图所示，">
@@ -332,7 +332,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-25T02:51:47+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-25T10:51:47+00:00">
                 2017-01-25
               </time>
             
@@ -373,7 +373,7 @@
 <p><img src="/img/image_matching_hard.png" alt="image matching example"></p>
 <a id="more"></a>
 <h2 id="Harris角点"><a href="#Harris角点" class="headerlink" title="Harris角点"></a>Harris角点</h2><p>角点，即corner，和edge类似，区别在于其在两个方向上都有较为剧烈的灰度变化（而edge只在某一个方向上灰度值变化剧烈）。如图所示。<br><img src="/img/what_is_corner.png" alt="what is corner"></p>
-<p><a href="http://www.bmva.org/bmvc/1988/avc-88-023.pdf" target="_blank" rel="external">Harris角点</a>得名于其发明者Harris，是一种常见的角点检测方法。<br>给定观察窗口大小，计算平移后窗口内各个像素差值的加权平方和，如下式。</p>
+<p><a href="http://www.bmva.org/bmvc/1988/avc-88-023.pdf" target="_blank" rel="noopener">Harris角点</a>得名于其发明者Harris，是一种常见的角点检测方法。<br>给定观察窗口大小，计算平移后窗口内各个像素差值的加权平方和，如下式。</p>
 <script type="math/tex; mode=display">E(u,v) = \sum_x\sum_yw(x,y)[I(x+u, y+v) - I(x,y)]^2</script><p>其中，窗口加权函数$w$可以取做门限函数或gaussian函数。如图所示。<br><img src="/img/corner_window_fun.png" alt="window function"></p>
 <p>使用泰勒级数展开，并忽略非线性项，我们有</p>
 <script type="math/tex; mode=display">I(x+u,y+v) = I(x,y) + I_x(x,y)u+I_y(x,y)v</script><p>所以上式可以写成（线性二次型写成了矩阵形式），</p>
@@ -525,7 +525,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

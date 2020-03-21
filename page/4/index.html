@@ -286,6 +286,129 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/02/08/bug-pycaffe-using-cublas/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/02/08/bug-pycaffe-using-cublas/" itemprop="url">
+                  捉bug记 - Cannot create Cublas handle. Cublas won't be available.
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-08T14:16:53+00:00">
+                2018-02-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>这两天在使用Caffe的时候出现了一个奇怪的bug。当使用C++接口时，完全没有问题；但是当使用python接口时，会出现错误提示如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">common.cpp:114] Cannot create Cublas handle. Cublas won&apos;t be available.</span><br><span class="line">common.cpp:121] Cannot create Curand generator. Curand won&apos;t be available.</span><br></pre></td></tr></table></figure></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/02/08/bug-pycaffe-using-cublas/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/02/08/paper-visualize-convnet/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -328,7 +451,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-08T02:48:21+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-08T10:48:21+00:00">
                 2018-02-08
               </time>
             
@@ -365,7 +488,7 @@
 
       
         
-          <p><a href="https://arxiv.org/pdf/1311.2901.pdf">Visualizing &amp; Understanding ConvNet</a>这篇文章是比较早期关于CNN调试的文章，作者利用可视化方法，设计了一个超过AlexNet性能的网络结构。</p>
+          <p><a href="https://arxiv.org/pdf/1311.2901.pdf" target="_blank" rel="noopener">Visualizing &amp; Understanding ConvNet</a>这篇文章是比较早期关于CNN调试的文章，作者利用可视化方法，设计了一个超过AlexNet性能的网络结构。</p>
 <p><img src="/img/paper_visconvnet_demo.png" alt="可视化结果"><br>
           <!--noindex-->
           <div class="post-button text-center">
@@ -452,7 +575,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-25T07:30:28+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-25T15:30:28+00:00">
                 2018-01-25
               </time>
             
@@ -489,7 +612,7 @@
 
       
         
-          <p>卷积神经网络虽然已经在很多任务上取得了很棒的效果，但是模型大小和运算量限制了它们在移动设备和嵌入式设备上的使用。模型量化压缩等问题自然引起了大家的关注。<a href="https://arxiv.org/abs/1702.03044">Incremental Network Quantization</a>这篇文章关注的是如何使用更少的比特数进行模型参数量化以达到压缩模型，减少模型大小同时使得模型精度无损。如下图所示，使用5bit位数，INQ在多个模型上都取得了不逊于原始FP32模型的精度。实验结果还是很有说服力的。作者将其开源在了GitHub上，见<a href="https://github.com/Zhouaojun/Incremental-Network-Quantization">Incremental-Network-Quantization</a>。<br><img src="/img/paper-inq-result.png" alt="实验结果"><br>
+          <p>卷积神经网络虽然已经在很多任务上取得了很棒的效果，但是模型大小和运算量限制了它们在移动设备和嵌入式设备上的使用。模型量化压缩等问题自然引起了大家的关注。<a href="https://arxiv.org/abs/1702.03044" target="_blank" rel="noopener">Incremental Network Quantization</a>这篇文章关注的是如何使用更少的比特数进行模型参数量化以达到压缩模型，减少模型大小同时使得模型精度无损。如下图所示，使用5bit位数，INQ在多个模型上都取得了不逊于原始FP32模型的精度。实验结果还是很有说服力的。作者将其开源在了GitHub上，见<a href="https://github.com/Zhouaojun/Incremental-Network-Quantization" target="_blank" rel="noopener">Incremental-Network-Quantization</a>。<br><img src="/img/paper-inq-result.png" alt="实验结果"><br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/01/25/inq-paper/#more" rel="contents">
@@ -575,7 +698,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-12T06:05:59+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-12T14:05:59+00:00">
                 2018-01-12
               </time>
             
@@ -699,7 +822,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-08T12:12:44+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-08T20:12:44+00:00">
                 2018-01-08
               </time>
             
@@ -822,7 +945,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-10T05:06:30+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-10T13:06:30+00:00">
                 2017-11-10
               </time>
             
@@ -859,7 +982,7 @@
 
       
         
-          <p>介绍基本的shell编程方法，参考的教程是<a href="http://www.freeos.com/guides/lsst/">Linux Shell Scripting Tutorial, A Beginner’s handbook</a>。<br><img src="/img/shell-programming-bash-logo.png" alt="Bash Logo"><br>
+          <p>介绍基本的shell编程方法，参考的教程是<a href="http://www.freeos.com/guides/lsst/" target="_blank" rel="noopener">Linux Shell Scripting Tutorial, A Beginner’s handbook</a>。<br><img src="/img/shell-programming-bash-logo.png" alt="Bash Logo"><br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/11/10/shell-programming/#more" rel="contents">
@@ -945,7 +1068,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-27T01:56:00+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-27T09:56:00+00:00">
                 2017-10-27
               </time>
             
@@ -1068,7 +1191,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-22T12:12:09+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-22T20:12:09+00:00">
                 2017-10-22
               </time>
             
@@ -1191,7 +1314,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-29T06:07:55+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-29T14:07:55+00:00">
                 2017-08-29
               </time>
             
@@ -1228,7 +1351,7 @@
 
       
         
-          <p>Qt是一个流行的GUI框架，支持C++/Python。这篇文章是我在这两天通过PyQT制作一个串口通信并画图的小程序的时候，阅读<a href="http://zetcode.com/gui/pyqt5/introduction/">PyQT5的一篇教程</a>时候的记录。<br>
+          <p>Qt是一个流行的GUI框架，支持C++/Python。这篇文章是我在这两天通过PyQT制作一个串口通信并画图的小程序的时候，阅读<a href="http://zetcode.com/gui/pyqt5/introduction/" target="_blank" rel="noopener">PyQT5的一篇教程</a>时候的记录。<br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/08/29/learn-pyqt/#more" rel="contents">
@@ -1314,7 +1437,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-26T11:32:00+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-26T19:32:00+00:00">
                 2017-08-26
               </time>
             
@@ -1351,8 +1474,8 @@
 
       
         
-          <p>Dash是Mac上一款超棒的应用，提供了诸如C/C++/Python甚至是OpenCV/Vim等软件包或工具软件的参考文档。只要使用App的“Download Docsets”功能，就能轻松下载相应文档。使用的时候只需在Dash的搜索框内输入相应关键词，Dash会在所有文档中进行搜索，给出相关内容的列表。点击我们要寻找的条款，就能够直接在本地阅读文档。在Ubuntu/Windows平台上，Dash也有对应的替代品，例如<a href="https://zealdocs.org">zeal</a>就是一款Windows/Linux平台通用的Dash替代软件。</p>
-<p>这样强大的软件，如果只能使用官方提供的文档岂不是有些大材小用？<a href="https://doc2dash.readthedocs.io/en/stable/">doc2dash</a>就是一款能够自动生成Dash兼容docset文件的工具。例如，可以使用它为PyTorch生成本地化的docset文件，并导入Dash/zeal中，在本地进行搜索阅读。这不是美滋滋？</p>
+          <p>Dash是Mac上一款超棒的应用，提供了诸如C/C++/Python甚至是OpenCV/Vim等软件包或工具软件的参考文档。只要使用App的“Download Docsets”功能，就能轻松下载相应文档。使用的时候只需在Dash的搜索框内输入相应关键词，Dash会在所有文档中进行搜索，给出相关内容的列表。点击我们要寻找的条款，就能够直接在本地阅读文档。在Ubuntu/Windows平台上，Dash也有对应的替代品，例如<a href="https://zealdocs.org" target="_blank" rel="noopener">zeal</a>就是一款Windows/Linux平台通用的Dash替代软件。</p>
+<p>这样强大的软件，如果只能使用官方提供的文档岂不是有些大材小用？<a href="https://doc2dash.readthedocs.io/en/stable/" target="_blank" rel="noopener">doc2dash</a>就是一款能够自动生成Dash兼容docset文件的工具。例如，可以使用它为PyTorch生成本地化的docset文件，并导入Dash/zeal中，在本地进行搜索阅读。这不是美滋滋？</p>
 <p>本文章是基于doc2dash的官方介绍，对其使用进行的总结。<br><img src="/img/doc2dash_pytorch_example.jpg" alt="Demo"></p>
           <!--noindex-->
           <div class="post-button text-center">
@@ -1364,129 +1487,6 @@
         
       
     </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/08/21/debugging-with-ipdb/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="一个脱离了高级趣味的人">
-    <meta itemprop="description" content>
-    <meta itemprop="image" content="/avatar/liumengli.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="来呀，快活呀~">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/08/21/debugging-with-ipdb/" itemprop="url">
-                  使用IPDB调试Python代码
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-21T07:53:16+00:00">
-                2017-08-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>IPDB是什么？IPDB（Ipython Debugger），和GDB类似，是一款集成了Ipython的Python代码命令行调试工具，可以看做PDB的升级版。这篇文章总结IPDB的使用方法，主要是若干命令的使用。更多详细的教程或文档还请参考Google。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/08/21/debugging-with-ipdb/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
 
     <div>
       
@@ -1556,7 +1556,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

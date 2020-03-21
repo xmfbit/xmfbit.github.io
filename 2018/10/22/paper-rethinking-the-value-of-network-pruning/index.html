@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="来呀，快活呀~">
 <meta property="og:description" content="这篇文章是ICLR 2019的投稿文章，最近也引发了大家的注意。在我的博客中，已经对此做过简单的介绍，请参考论文总结 - 模型剪枝 Model Pruning。 这篇文章的主要观点在于想纠正人们之前的认识误区。当然这个认识误区和DL的发展是密不可分的。DL中最先提出的AlexNet是一个很大的模型。后面的研究者虽然也在不断发明新的网络结构（如inception，Global Pooling，Res">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.796Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="论文 - Rethinking The Value of Network Pruning">
 <meta name="twitter:description" content="这篇文章是ICLR 2019的投稿文章，最近也引发了大家的注意。在我的博客中，已经对此做过简单的介绍，请参考论文总结 - 模型剪枝 Model Pruning。 这篇文章的主要观点在于想纠正人们之前的认识误区。当然这个认识误区和DL的发展是密不可分的。DL中最先提出的AlexNet是一个很大的模型。后面的研究者虽然也在不断发明新的网络结构（如inception，Global Pooling，Res">
@@ -325,7 +325,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-22T14:25:42+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-22T22:25:42+00:00">
                 2018-10-22
               </time>
             
@@ -361,11 +361,11 @@
       
 
       
-        <p><a href="https://openreview.net/forum?id=rJlnB3C5Ym" target="_blank" rel="external">这篇文章</a>是ICLR 2019的投稿文章，最近也引发了大家的注意。在我的博客中，已经对此做过简单的介绍，请参考<a href="https://xmfbit.github.io/2018/10/03/paper-summary-model-pruning/">论文总结 - 模型剪枝 Model Pruning</a>。</p>
+        <p><a href="https://openreview.net/forum?id=rJlnB3C5Ym" target="_blank" rel="noopener">这篇文章</a>是ICLR 2019的投稿文章，最近也引发了大家的注意。在我的博客中，已经对此做过简单的介绍，请参考<a href="https://xmfbit.github.io/2018/10/03/paper-summary-model-pruning/">论文总结 - 模型剪枝 Model Pruning</a>。</p>
 <p>这篇文章的主要观点在于想纠正人们之前的认识误区。当然这个认识误区和DL的发展是密不可分的。DL中最先提出的AlexNet是一个很大的模型。后面的研究者虽然也在不断发明新的网络结构（如inception，Global Pooling，ResNet等）来获得参数更少更强大的模型，但模型的size总还是很大。既然研究社区是从这样的“大”模型出发的，那当面对工程上需要小模型以便在手机等移动设备上使用时，很自然的一条路就是去除大模型中已有的参数从而得到小模型。也是很自然的，我们需要保留大模型中“有用的”那些参数，让小模型以此为基础进行fine tune，补偿因为去除参数而导致的模型性能下降。</p>
-<p>然而，自然的想法就是合理的么？这篇文章对此提出了质疑。这篇论文的主要思路已经在上面贴出的博文链接中说过了。这篇文章主要是结合作者开源的代码对论文进行梳理：<a href="https://github.com/Eric-mingjie/rethinking-network-pruning" target="_blank" rel="external">Eric-mingjie/rethinking-network-pruning</a>。</p>
+<p>然而，自然的想法就是合理的么？这篇文章对此提出了质疑。这篇论文的主要思路已经在上面贴出的博文链接中说过了。这篇文章主要是结合作者开源的代码对论文进行梳理：<a href="https://github.com/Eric-mingjie/rethinking-network-pruning" target="_blank" rel="noopener">Eric-mingjie/rethinking-network-pruning</a>。</p>
 <a id="more"></a>
-<h2 id="FLOP的计算"><a href="#FLOP的计算" class="headerlink" title="FLOP的计算"></a>FLOP的计算</h2><p>代码中有关于PyTorch模型的FLOPs的计算，见<a href="https://github.com/Eric-mingjie/rethinking-network-pruning/blob/master/imagenet/l1-norm-pruning/compute_flops.py" target="_blank" rel="external">compute_flops.py</a>。可以很方便地应用到自己的代码中。</p>
+<h2 id="FLOP的计算"><a href="#FLOP的计算" class="headerlink" title="FLOP的计算"></a>FLOP的计算</h2><p>代码中有关于PyTorch模型的FLOPs的计算，见<a href="https://github.com/Eric-mingjie/rethinking-network-pruning/blob/master/imagenet/l1-norm-pruning/compute_flops.py" target="_blank" rel="noopener">compute_flops.py</a>。可以很方便地应用到自己的代码中。</p>
 <h2 id="ThiNet的实现"><a href="#ThiNet的实现" class="headerlink" title="ThiNet的实现"></a>ThiNet的实现</h2><h2 id="实验比较"><a href="#实验比较" class="headerlink" title="实验比较"></a>实验比较</h2><h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>几个仍然有疑问的地方：</p>
 <ol>
 <li><p>作者已经证明在ImageNet/CIFAR等样本分布均衡的数据集上的结论，如果样本分布不均衡呢？有三种思路有待验证：</p>
@@ -522,7 +522,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

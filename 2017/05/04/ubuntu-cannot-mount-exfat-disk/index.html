@@ -95,7 +95,7 @@
 <meta property="og:description" content="我的移动硬盘为东芝1TB容量，为了能够在Windows和MacOS下使用，我将其格式化为exfat格式。然而我发现这样一来，在Ubuntu14.04下不能挂载。虽然可见盘符，但是却提示unable to mount。这篇文章是对解决办法的记录。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://xmfbit.github.io/img/ubuntu_exfat.png">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.794Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ubuntu Cannot Mount exfat格式硬盘的解决办法">
 <meta name="twitter:description" content="我的移动硬盘为东芝1TB容量，为了能够在Windows和MacOS下使用，我将其格式化为exfat格式。然而我发现这样一来，在Ubuntu14.04下不能挂载。虽然可见盘符，但是却提示unable to mount。这篇文章是对解决办法的记录。">
@@ -327,7 +327,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-04T10:36:29+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-04T18:36:29+00:00">
                 2017-05-04
               </time>
             
@@ -365,8 +365,8 @@
       
         <p>我的移动硬盘为东芝1TB容量，为了能够在Windows和MacOS下使用，我将其格式化为exfat格式。然而我发现这样一来，在Ubuntu14.04下不能挂载。虽然可见盘符，但是却提示<code>unable to mount</code>。这篇文章是对解决办法的记录。<br><img src="/img/ubuntu_exfat.png" alt="Ubuntu Exfat"></p>
 <a id="more"></a>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>参见<a href="https://askubuntu.com/questions/531919/ubuntu-14-04-cant-mount-exfat-external-hard-disk" target="_blank" rel="external">页面</a>，运行以下命令：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ sudo -i  # 获取root权限</div><div class="line"># apt-get update</div><div class="line"># apt-get install --reinstall exfat-fuse exfat-utils</div><div class="line"># mkdir -p /media/user/exfat</div><div class="line"># chmod -Rf 777 /media/user/exfat</div><div class="line"># fdisk -l</div></pre></td></tr></table></figure>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>参见<a href="https://askubuntu.com/questions/531919/ubuntu-14-04-cant-mount-exfat-external-hard-disk" target="_blank" rel="noopener">页面</a>，运行以下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ sudo -i  # 获取root权限</span><br><span class="line"># apt-get update</span><br><span class="line"># apt-get install --reinstall exfat-fuse exfat-utils</span><br><span class="line"># mkdir -p /media/user/exfat</span><br><span class="line"># chmod -Rf 777 /media/user/exfat</span><br><span class="line"># fdisk -l</span><br></pre></td></tr></table></figure>
 <p>之后我发现直接点击盘符的挂载即可，而无需使用他的后续命令。</p>
 <p>在弹出驱动器的时候，会出现虽然顺利弹出，但是马上（大概3s），移动硬盘又被读取的情况。所以只能利用间隙，很快地将硬盘取下。不知道会不会有什么损害。所以如果方便的话，还是格式为NTFS格式，再花一些大洋去买Mac上读写NTFS格式硬盘的软件工具吧。。。</p>
 
@@ -506,7 +506,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

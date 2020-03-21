@@ -96,7 +96,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://xmfbit.github.io/img/doc2dash_pytorch_example.jpg">
 <meta property="og:image" content="https://xmfbit.github.io/img/doc2dash_how_to_add_docset.jpg">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.782Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.217Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="doc2dash——制作自己的dash文档">
 <meta name="twitter:description" content="Dash是Mac上一款超棒的应用，提供了诸如C/C++/Python甚至是OpenCV/Vim等软件包或工具软件的参考文档。只要使用App的“Download Docsets”功能，就能轻松下载相应文档。使用的时候只需在Dash的搜索框内输入相应关键词，Dash会在所有文档中进行搜索，给出相关内容的列表。点击我们要寻找的条款，就能够直接在本地阅读文档。在Ubuntu/Windows平台上，Dash">
@@ -328,7 +328,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-26T11:32:00+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-26T19:32:00+00:00">
                 2017-08-26
               </time>
             
@@ -364,22 +364,22 @@
       
 
       
-        <p>Dash是Mac上一款超棒的应用，提供了诸如C/C++/Python甚至是OpenCV/Vim等软件包或工具软件的参考文档。只要使用App的“Download Docsets”功能，就能轻松下载相应文档。使用的时候只需在Dash的搜索框内输入相应关键词，Dash会在所有文档中进行搜索，给出相关内容的列表。点击我们要寻找的条款，就能够直接在本地阅读文档。在Ubuntu/Windows平台上，Dash也有对应的替代品，例如<a href="https://zealdocs.org" target="_blank" rel="external">zeal</a>就是一款Windows/Linux平台通用的Dash替代软件。</p>
-<p>这样强大的软件，如果只能使用官方提供的文档岂不是有些大材小用？<a href="https://doc2dash.readthedocs.io/en/stable/" target="_blank" rel="external">doc2dash</a>就是一款能够自动生成Dash兼容docset文件的工具。例如，可以使用它为PyTorch生成本地化的docset文件，并导入Dash/zeal中，在本地进行搜索阅读。这不是美滋滋？</p>
+        <p>Dash是Mac上一款超棒的应用，提供了诸如C/C++/Python甚至是OpenCV/Vim等软件包或工具软件的参考文档。只要使用App的“Download Docsets”功能，就能轻松下载相应文档。使用的时候只需在Dash的搜索框内输入相应关键词，Dash会在所有文档中进行搜索，给出相关内容的列表。点击我们要寻找的条款，就能够直接在本地阅读文档。在Ubuntu/Windows平台上，Dash也有对应的替代品，例如<a href="https://zealdocs.org" target="_blank" rel="noopener">zeal</a>就是一款Windows/Linux平台通用的Dash替代软件。</p>
+<p>这样强大的软件，如果只能使用官方提供的文档岂不是有些大材小用？<a href="https://doc2dash.readthedocs.io/en/stable/" target="_blank" rel="noopener">doc2dash</a>就是一款能够自动生成Dash兼容docset文件的工具。例如，可以使用它为PyTorch生成本地化的docset文件，并导入Dash/zeal中，在本地进行搜索阅读。这不是美滋滋？</p>
 <p>本文章是基于doc2dash的官方介绍，对其使用进行的总结。<br><img src="/img/doc2dash_pytorch_example.jpg" alt="Demo"></p>
 <a id="more"></a>
-<h2 id="安装doc2dash"><a href="#安装doc2dash" class="headerlink" title="安装doc2dash"></a>安装doc2dash</h2><p>doc2dash是基于Python开发的。按照官方网站介绍，为了避免Python包的冲突，最好使用虚拟环境进行安装。我的机器上安装有Anaconda环境，所以首先使用<code>conda create</code>命令新建用于doc2dash的虚拟环境。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">conda create -n doc2dash</div></pre></td></tr></table></figure></p>
-<p>接下来，激活虚拟环境，并使用<code>pip install</code>命令安装。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">source</span> activate doc2dash</div><div class="line">pip install doc2dash</div></pre></td></tr></table></figure></p>
+<h2 id="安装doc2dash"><a href="#安装doc2dash" class="headerlink" title="安装doc2dash"></a>安装doc2dash</h2><p>doc2dash是基于Python开发的。按照官方网站介绍，为了避免Python包的冲突，最好使用虚拟环境进行安装。我的机器上安装有Anaconda环境，所以首先使用<code>conda create</code>命令新建用于doc2dash的虚拟环境。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda create -n doc2dash</span><br></pre></td></tr></table></figure></p>
+<p>接下来，激活虚拟环境，并使用<code>pip install</code>命令安装。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> activate doc2dash</span><br><span class="line">pip install doc2dash</span><br></pre></td></tr></table></figure></p>
 <p>doc2dash支持的输出格式可以通过sphinx或者pydoctor。其中前者更加常用。下面以PyTorch项目的文档生成为例，介绍doc2dash的具体用法。</p>
 <h2 id="生成PyTorch文档"><a href="#生成PyTorch文档" class="headerlink" title="生成PyTorch文档"></a>生成PyTorch文档</h2><p>doc2dash使用sphinx生成相应的文档。在上述安装doc2dash的过程中，应该已经安装了sphinx包。不过我们还需要手动安装，以便处理rst文档。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pip install sphinx_rtd_theme</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install sphinx_rtd_theme</span><br></pre></td></tr></table></figure>
 <p>进入PyTorch的文档目录<code>docs/</code>，PyTorch已经为我们提供了Makefile，调用sphinx包进行文档处理，可以选择<code>make html</code>命令生成相应的HTML文档，生成的位置为<code>build/html</code>。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># in directory $PYTORCH/docs, run</div><div class="line">make html</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># in directory $PYTORCH/docs, run</span><br><span class="line">make html</span><br></pre></td></tr></table></figure>
 <p>接下来，就可以使用doc2dash来继续sphinx的工作，生成Dash可用的文档文件了~使用<code>-n</code>指定生成的文件名称，后面跟source文件夹路径即可。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># $PYTORCH/docs/build/html即为生成的HTML目录</span></div><div class="line">doc2dash -n pytorch <span class="variable">$PYTORCH</span>/docs/build/html</div></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># $PYTORCH/docs/build/html即为生成的HTML目录</span></span><br><span class="line">doc2dash -n pytorch <span class="variable">$PYTORCH</span>/docs/build/html</span><br></pre></td></tr></table></figure>
 <p>之后，把生成的<code>pytorch.docset</code>导入到Dash中即可。如下图所示，点击“+”找到文件添加即可。<br><img src="/img/doc2dash_how_to_add_docset.jpg" alt="添加docset"></p>
-<h2 id="在Ubuntu上安装zeal"><a href="#在Ubuntu上安装zeal" class="headerlink" title="在Ubuntu上安装zeal"></a>在Ubuntu上安装zeal</h2><p>zeal是Dash在非Mac平台上的替代软件。在Ubuntu上可以使用如下方式轻松安装（见<a href="https://zealdocs.org/download.html#linux" target="_blank" rel="external">官方网站介绍</a>）。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo add-apt-repository ppa:zeal-developers/ppa</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install zeal</div></pre></td></tr></table></figure>
+<h2 id="在Ubuntu上安装zeal"><a href="#在Ubuntu上安装zeal" class="headerlink" title="在Ubuntu上安装zeal"></a>在Ubuntu上安装zeal</h2><p>zeal是Dash在非Mac平台上的替代软件。在Ubuntu上可以使用如下方式轻松安装（见<a href="https://zealdocs.org/download.html#linux" target="_blank" rel="noopener">官方网站介绍</a>）。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:zeal-developers/ppa</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install zeal</span><br></pre></td></tr></table></figure>
 <p>安装后，可以使用<code>Tool/Docsets</code>下载相应的公开文档。如果想要添加自己生成的文档，只需要将生成的docset文件放到软件的文档库中即可，默认位置应在<code>$HOME/.local/share/Zeal/Zeal/docsets</code>。</p>
 
       
@@ -518,7 +518,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

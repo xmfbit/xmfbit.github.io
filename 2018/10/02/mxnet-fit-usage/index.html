@@ -95,7 +95,7 @@
 <meta property="og:description" content="在MXNet中，Module提供了训练模型的方便接口。使用symbol将计算图建好之后，用Module包装一下，就可以通过fit()方法对其进行训练。当然，官方提供的接口一般只适合用来训练分类任务，如果是其他任务（如detection, segmentation等），单纯使用fit()接口就不太合适。这里把fit()代码梳理一下，也是为了后续方便在其基础上实现扩展，更好地用在自己的任务。 其实如果">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://xmfbit.github.io/img/differences-of-deep-learning-frameworks-22-638.jpg">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.798Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MXNet fit介绍">
 <meta name="twitter:description" content="在MXNet中，Module提供了训练模型的方便接口。使用symbol将计算图建好之后，用Module包装一下，就可以通过fit()方法对其进行训练。当然，官方提供的接口一般只适合用来训练分类任务，如果是其他任务（如detection, segmentation等），单纯使用fit()接口就不太合适。这里把fit()代码梳理一下，也是为了后续方便在其基础上实现扩展，更好地用在自己的任务。 其实如果">
@@ -327,7 +327,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-02T14:11:15+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-02T22:11:15+00:00">
                 2018-10-02
               </time>
             
@@ -364,14 +364,14 @@
 
       
         <p>在MXNet中，<code>Module</code>提供了训练模型的方便接口。使用<code>symbol</code>将计算图建好之后，用<code>Module</code>包装一下，就可以通过<code>fit()</code>方法对其进行训练。当然，官方提供的接口一般只适合用来训练分类任务，如果是其他任务（如detection, segmentation等），单纯使用<code>fit()</code>接口就不太合适。这里把<code>fit()</code>代码梳理一下，也是为了后续方便在其基础上实现扩展，更好地用在自己的任务。</p>
-<p>其实如果看开源代码数量的话，MXNet已经显得式微，远不如TensorFlow，PyTorch也早已经后来居上。不过据了解，很多公司内部都有基于MXNet自研的框架或平台工具。下面这张图来自LinkedIn上的一个<a href="https://www.slideshare.net/beam2d/differences-of-deep-learning-frameworks" target="_blank" rel="external">Slide分享</a>，姑且把它贴在下面，算是当前流行框架的一个比较（应该可以把Torch换成PyTorch）。</p>
+<p>其实如果看开源代码数量的话，MXNet已经显得式微，远不如TensorFlow，PyTorch也早已经后来居上。不过据了解，很多公司内部都有基于MXNet自研的框架或平台工具。下面这张图来自LinkedIn上的一个<a href="https://www.slideshare.net/beam2d/differences-of-deep-learning-frameworks" target="_blank" rel="noopener">Slide分享</a>，姑且把它贴在下面，算是当前流行框架的一个比较（应该可以把Torch换成PyTorch）。</p>
 <p><img src="/img/differences-of-deep-learning-frameworks-22-638.jpg" alt="Differences of Deep Learning Frameworks"></p>
 <a id="more"></a>
 <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>首先，需要将数据绑定到计算图上，并初始化模型的参数，并初始化求解器。这些是求解模型必不可少的。</p>
 <p>其次，还会建立训练的metric，方便我们掌握训练进程和当前模型在训练任务的表现。</p>
 <p>这些是在为后续迭代进行梯度下降更新做准备。</p>
 <h2 id="迭代更新"><a href="#迭代更新" class="headerlink" title="迭代更新"></a>迭代更新</h2><p>使用SGD进行训练的时候，我们需要不停地从数据迭代器中获取包含data和label的batch，并将其feed到网络模型中。进行forward computing后进行bp，获得梯度，并根据具体的优化方法（SGD, SGD with momentum, RMSprop等）进行参数更新。</p>
-<p>这部分可以抽成：<br><figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># in an epoch</span></div><div class="line"><span class="keyword">while</span> <span class="keyword">not</span> end_epoch:</div><div class="line">    batch = next(train_iter)</div><div class="line">    m.forward_backward(batch)</div><div class="line">    m.update()</div><div class="line">    <span class="keyword">try</span>:</div><div class="line">        next_batch = next(data_iter)</div><div class="line">        m.prepare(next_batch)</div><div class="line">    <span class="keyword">except</span> StopIteration:</div><div class="line">        end_epoch = <span class="keyword">True</span></div></pre></td></tr></table></figure></p>
+<p>这部分可以抽成：<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># in an epoch</span></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">not</span> end_epoch:</span><br><span class="line">    batch = next(train_iter)</span><br><span class="line">    m.forward_backward(batch)</span><br><span class="line">    m.update()</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        next_batch = next(data_iter)</span><br><span class="line">        m.prepare(next_batch)</span><br><span class="line">    <span class="keyword">except</span> StopIteration:</span><br><span class="line">        end_epoch = <span class="literal">True</span></span><br></pre></td></tr></table></figure></p>
 <h2 id="metric"><a href="#metric" class="headerlink" title="metric"></a>metric</h2><p>在训练的时候，观察输出的各种metric是必不可少的。我们对训练过程的把握就是通过metric给出的信息。通常在分类任务中常用到的metric有Accuracy，TopK-Accuracy以及交叉熵损失等，这些已经在MXNet中有了现成的实现。而在<code>fit</code>中，调用了<code>m.update_metric(eval_metric, data_batch.label)</code>实现。这里的<code>eval_metric</code>就是我们指定的metric，而<code>label</code>是batch提供的label。注意，在MXNet中，label一般都是以<code>list</code>的形式给出（对应于多任务学习），也就是说这里的label是<code>list of NDArray</code>。当自己魔改的时候要注意。</p>
 <h2 id="logging"><a href="#logging" class="headerlink" title="logging"></a>logging</h2><p>计算了eval_metric等信息，我们需要将其在屏幕上打印出来。MXNet中可以通过callback实现。另外，保存模型checkpoint这样的功能也是通过callback实现的。一种常用的场景是每过若干个batch，做一次logging，打印当前的metric信息，如交叉熵损失降到多少了，准确率提高到多少了等。MXNet会将以下信息打包成<code>BatchEndParam</code>类型（其实是一个自定义的<code>namedtuple</code>）的变量，包括当前epoch，当前迭代次数，评估的metric。如果你需要更多的信息或者更自由的logging监控，也可以参考代码自己实现。</p>
 <p>我们以常用的<code>Speedometer</code>看一下如何使用这些信息，其功能如下，将训练的速度和metric打印出来。</p>
@@ -380,7 +380,7 @@
 </blockquote>
 <p>PS:这里有个隐藏的坑。MXNet中的<code>Speedometer</code>每回调一次，会把<code>metric</code>的内容清除。这在训练的时候当然没问题。但是如果是在validation上跑，就会有问题了。这样最终得到的只是最后一个回调周期那些batch的metric，而不是整个验证集上的。如果在<code>fit</code>方法中传入了<code>eval_batch_end_callback</code>参数就要注意这个问题了。解决办法一是在<code>Speedometer</code>实例初始化时传入<code>auto_reset=False</code>，另一种干脆就不要加这个参数，默认为<code>None</code>好了。同样的问题也发生在调用<code>Module.score()</code>方法来获取模型在验证集上metric的时候。</p>
 <p>可以在<code>Speedometer</code>代码中寻找下面这几行，会更清楚：</p>
-<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> param.eval_metric <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">    name_value = param.eval_metric.get_name_value()</div><div class="line">    <span class="keyword">if</span> self.auto_reset:</div><div class="line">        param.eval_metric.reset()</div></pre></td></tr></table></figure>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> param.eval_metric <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">    name_value = param.eval_metric.get_name_value()</span><br><span class="line">    <span class="keyword">if</span> self.auto_reset:</span><br><span class="line">        param.eval_metric.reset()</span><br></pre></td></tr></table></figure>
 <h2 id="在验证集上测试"><a href="#在验证集上测试" class="headerlink" title="在验证集上测试"></a>在验证集上测试</h2><p>当在训练集上跑过一个epoch后，如果提供了验证集的迭代器，会在验证集上对模型进行测试。这里，MXNet直接封装了<code>score()</code>方法。在<code>score</code>中，基本流程和<code>fit()</code>相同，只是我们只需要forward computing即可。</p>
 <h2 id="附"><a href="#附" class="headerlink" title="附"></a>附</h2><p>用了一段时间的MXNet，给我的最大的感觉是MXNet就像一个写计算图的前端，提供了很方便的python接口生成静态图，以及很多“可插拔”的插件（虽然可能不是很全，更像是一份guide而不是拿来即用的tool），如上文中的metric等，使其更适合做成流程化的基础DL平台，供给更上层方便地配置使用。缺点就是隐藏了比较多的实现细节（当然，你完全可以从代码中自己学习，比如从<code>fit()</code>代码了解神经网络的大致训练流程）。至于MXNet宣扬的诸如速度快，图优化，省计算资源等优点，因为我没有过数据对比，就不说了。</p>
 <p>缺点就是写图的时候有时不太灵活（可能也是我写的看的还比较少），即使是和TensorFlow这种同为静态图的DL框架比。另外，貌似MXNet中很多东西都没有跟上最新的论文等，比如Cosine的learning rate decay就没有。Model Zoo也比较少(gluon可能会好一点，Gluon-CV和Gluon-NLP貌似是在搞一些论文复现的工作)。对开发来讲，很多东西都需要阅读代码才能知道是怎么回事，只是读文档的话容易踩坑。</p>
@@ -522,7 +522,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

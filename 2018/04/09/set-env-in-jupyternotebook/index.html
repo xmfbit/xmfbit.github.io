@@ -96,7 +96,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://xmfbit.github.io/img/set-env-in-notebook-choose-kernel.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/set-env-in-notebook-change-kernel.png">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.788Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JupyterNotebook设置Python环境">
 <meta name="twitter:description" content="使用Python时，常遇到的一个问题就是Python和库的版本不同。Anaconda的env算是解决这个问题的一个好用的方法。但是，在使用Jupyter Notebook的时候，我却发现加载的仍然是默认的Python Kernel。这篇博客记录了如何在Jupyter Notebook中也能够设置相应的虚拟环境。">
@@ -328,7 +328,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T05:44:04+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T13:44:04+00:00">
                 2018-04-09
               </time>
             
@@ -367,11 +367,11 @@
         <p>使用Python时，常遇到的一个问题就是Python和库的版本不同。Anaconda的env算是解决这个问题的一个好用的方法。但是，在使用Jupyter Notebook的时候，我却发现加载的仍然是默认的Python Kernel。这篇博客记录了如何在Jupyter Notebook中也能够设置相应的虚拟环境。<br><a id="more"></a></p>
 <h2 id="conda的虚拟环境"><a href="#conda的虚拟环境" class="headerlink" title="conda的虚拟环境"></a>conda的虚拟环境</h2><p>在Anaconda中，我们可以使用<code>conda create -n your_env_name python=your_python_version</code>的方法创建虚拟环境，并使用<code>source activate your_env_name</code>方式激活该虚拟环境，并在其中安装与默认（主）python环境不同的软件包等。</p>
 <p>当激活该虚拟环境时，ipython下是可以正常加载的。但是打开Jupyter Notebook，会发现其加载的仍然是默认的Python kernel，而我们需要在notebook中也能使用新添加的虚拟环境。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>解决方法见这个帖子：<a href="https://stackoverflow.com/questions/39604271/conda-environments-not-showing-up-in-jupyter-notebook" target="_blank" rel="external">Conda environments not showing up in Jupyter Notebook</a>.</p>
-<p>首先，安装<code>nb_conda_kernels</code>包：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">conda install nb_conda_kernels</div></pre></td></tr></table></figure></p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>解决方法见这个帖子：<a href="https://stackoverflow.com/questions/39604271/conda-environments-not-showing-up-in-jupyter-notebook" target="_blank" rel="noopener">Conda environments not showing up in Jupyter Notebook</a>.</p>
+<p>首先，安装<code>nb_conda_kernels</code>包：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install nb_conda_kernels</span><br></pre></td></tr></table></figure></p>
 <p>然后，打开Notebook，点击<code>New</code>，会出现当前所有安装的虚拟环境以供选择，如下所示。<br><img src="/img/set-env-in-notebook-choose-kernel.png" alt="选择特定的kernel加载"></p>
 <p>如果是已经编辑过的notebook，只需要打开该笔记本，在菜单栏中选择<code>Kernel -&gt; choose kernel -&gt; your env kernel</code>即可。<br><img src="/img/set-env-in-notebook-change-kernel.png" alt="改变当前notebook的kernel"></p>
-<p>关于<code>nb_conda_kernels</code>的详细信息，可以参考其GitHub页面：<a href="https://github.com/Anaconda-Platform/nb_conda_kernels" target="_blank" rel="external">nb_conda_kernels</a>。</p>
+<p>关于<code>nb_conda_kernels</code>的详细信息，可以参考其GitHub页面：<a href="https://github.com/Anaconda-Platform/nb_conda_kernels" target="_blank" rel="noopener">nb_conda_kernels</a>。</p>
 
       
     </div>
@@ -511,7 +511,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

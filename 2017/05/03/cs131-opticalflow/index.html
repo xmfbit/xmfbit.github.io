@@ -107,7 +107,7 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_assignment_forwardwarped.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_assignment_flowwarped.gif">
 <meta property="og:image" content="https://xmfbit.github.io/img/cs131_opticalflow_assignment_flowwarped.png">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.798Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.217Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CS131-光流估计">
 <meta name="twitter:description" content="光流法是通过检测图像像素点的强度随时间的变化进而推断出物体移动速度及方向的方法。由于成像物体与相机之间存在相对运动，导致其成像后的像素强度值不同。通过连续观测运动物体图像序列帧间的像素强度变化，就可以估计物体的运动信息。 是你让我的世界从那刻变成粉红色  划掉。。。">
@@ -339,7 +339,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-03T08:39:18+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-03T16:39:18+00:00">
                 2017-05-03
               </time>
             
@@ -408,7 +408,7 @@
 <h3 id="简单粗暴法"><a href="#简单粗暴法" class="headerlink" title="简单粗暴法"></a>简单粗暴法</h3><p>我们可以简单粗暴地使用线性插值方法，简单的认为插值帧是第一帧和最后一帧的线性组合，也就是说：</p>
 <script type="math/tex; mode=display">I_t = (1-t)I_0+tI_1</script><p>这种方法称为”cross-fading”。效果如下。可以看到有较多的模糊抖动。<br><img src="/img/cs131_opticalflow_assignment_crossfade.gif" alt="动图"><br><img src="/img/cs131_opticalflow_assignment_crossfade.png" alt="简单粗暴法效果"></p>
 <h3 id="基于光流法"><a href="#基于光流法" class="headerlink" title="基于光流法"></a>基于光流法</h3><p>使用光流可以知道像素点在图像平面的运动信息，从而在帧间建立点的对应关系。我们记像素点在水平方向和竖直方向的速度分别为$u_t(x,y)$和$v_t(x,y)$。我们可以根据$t=0$和$t=1$的两帧图像解出光流信息，即$u_0(x,y)$和$v_0(x,y)$。那么我们认为光流保持不变，就可以计算插值帧的某一点在$t=0$时候的对应点坐标。接下来，赋值就可以了。如下式所示：</p>
-<script type="math/tex; mode=display">I_t(x+tu_0(x,y), y+tv_0(x,y)) = I_0(x,y)</script><p>用MATLAB实现如下：<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> y =<span class="number">1</span>:height</div><div class="line">    <span class="keyword">for</span> x = <span class="number">1</span>:width</div><div class="line">        dy = min(max(<span class="built_in">round</span>(y+v0(y,x)*t), <span class="number">1</span>), height);</div><div class="line">        dx = min(max(<span class="built_in">round</span>(x+u0(y,x)*t), <span class="number">1</span>), width);</div><div class="line">        img(dy,dx,:) = img0(y,x,:);</div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
+<script type="math/tex; mode=display">I_t(x+tu_0(x,y), y+tv_0(x,y)) = I_0(x,y)</script><p>用MATLAB实现如下：<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> y =<span class="number">1</span>:height</span><br><span class="line">    <span class="keyword">for</span> x = <span class="number">1</span>:width</span><br><span class="line">        dy = <span class="built_in">min</span>(<span class="built_in">max</span>(<span class="built_in">round</span>(y+v0(y,x)*t), <span class="number">1</span>), height);</span><br><span class="line">        dx = <span class="built_in">min</span>(<span class="built_in">max</span>(<span class="built_in">round</span>(x+u0(y,x)*t), <span class="number">1</span>), width);</span><br><span class="line">        img(dy,dx,:) = img0(y,x,:);</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></p>
 <p>这种方法叫做”ForwardWarpping”。效果如下。可以看到，与上一种方法对比，画面有了明显的提升。<br><img src="/img/cs131_opticalflow_assignment_forwardwarped.gif" alt="动图"><br><img src="/img/cs131_opticalflow_assignment_forwardwarped.png" alt="逐帧"></p>
 <h3 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h3><p>上面的方法我们假设光流一直保持不变，用$t=1$时刻的光流去代替之间所有时刻的光流。但实际上光流一定是在实时变化的。使用<em>backward warpping</em>改进，使用$t$时刻的光流反推。</p>
 <script type="math/tex; mode=display">I_t(x,y) = I_0(x-tu_t(x,y), y-tv_t(x,y))</script><p>然而，我们并不能得到$t$时刻光流$u_t$和$v_t$的准确值，只能近似计算。方法如下：</p>
@@ -557,7 +557,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="来呀，快活呀~">
 <meta property="og:description" content="IPDB是什么？IPDB（Ipython Debugger），和GDB类似，是一款集成了Ipython的Python代码命令行调试工具，可以看做PDB的升级版。这篇文章总结IPDB的使用方法，主要是若干命令的使用。更多详细的教程或文档还请参考Google。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.788Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.217Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用IPDB调试Python代码">
 <meta name="twitter:description" content="IPDB是什么？IPDB（Ipython Debugger），和GDB类似，是一款集成了Ipython的Python代码命令行调试工具，可以看做PDB的升级版。这篇文章总结IPDB的使用方法，主要是若干命令的使用。更多详细的教程或文档还请参考Google。">
@@ -325,7 +325,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-21T07:53:16+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-21T15:53:16+00:00">
                 2017-08-21
               </time>
             
@@ -364,9 +364,9 @@
         <p>IPDB是什么？IPDB（Ipython Debugger），和GDB类似，是一款集成了Ipython的Python代码命令行调试工具，可以看做PDB的升级版。这篇文章总结IPDB的使用方法，主要是若干命令的使用。更多详细的教程或文档还请参考Google。<br><a id="more"></a></p>
 <h2 id="安装与使用"><a href="#安装与使用" class="headerlink" title="安装与使用"></a>安装与使用</h2><p>IPDB以Python第三方库的形式给出，使用<code>pip install ipdb</code>即可轻松安装。</p>
 <p>在使用时，有两种常见方式。</p>
-<h3 id="集成到源代码中"><a href="#集成到源代码中" class="headerlink" title="集成到源代码中"></a>集成到源代码中</h3><p>通过在代码开头导入包，可以直接在代码指定位置插入断点。如下所示：<br><figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> ipdb</div><div class="line"><span class="comment"># some code</span></div><div class="line">x = <span class="number">10</span></div><div class="line">ipdb.set_trace()</div><div class="line">y = <span class="number">20</span></div><div class="line"><span class="comment"># other code</span></div></pre></td></tr></table></figure></p>
+<h3 id="集成到源代码中"><a href="#集成到源代码中" class="headerlink" title="集成到源代码中"></a>集成到源代码中</h3><p>通过在代码开头导入包，可以直接在代码指定位置插入断点。如下所示：<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> ipdb</span><br><span class="line"><span class="comment"># some code</span></span><br><span class="line">x = <span class="number">10</span></span><br><span class="line">ipdb.set_trace()</span><br><span class="line">y = <span class="number">20</span></span><br><span class="line"><span class="comment"># other code</span></span><br></pre></td></tr></table></figure></p>
 <p>则程序会在执行完<code>x = 10</code>这条语句之后停止，展开Ipython环境，就可以自由地调试了。</p>
-<h3 id="命令式"><a href="#命令式" class="headerlink" title="命令式"></a>命令式</h3><p>上面的方法很方便，但是也有不灵活的缺点。对于一段比较棘手的代码，我们可能需要按步执行，边运行边跟踪代码流并进行调试，这时候使用交互式的命令式调试方法更加有效。启动IPDB调试环境的方法也很简单：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python -m ipdb your_code.py</div></pre></td></tr></table></figure></p>
+<h3 id="命令式"><a href="#命令式" class="headerlink" title="命令式"></a>命令式</h3><p>上面的方法很方便，但是也有不灵活的缺点。对于一段比较棘手的代码，我们可能需要按步执行，边运行边跟踪代码流并进行调试，这时候使用交互式的命令式调试方法更加有效。启动IPDB调试环境的方法也很简单：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m ipdb your_code.py</span><br></pre></td></tr></table></figure></p>
 <h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><p>IPDB调试环境提供的常见命令有：</p>
 <h3 id="帮助"><a href="#帮助" class="headerlink" title="帮助"></a>帮助</h3><p>帮助文档就是这样一个东西：当你写的时候觉得这TM也要写？当你看别人的东西的时候觉得这TM都没写？</p>
 <p>使用<code>h</code>即可调出IPDB的帮助。可以使用<code>help command</code>的方法查询特定命令的具体用法。</p>
@@ -379,7 +379,7 @@
 <h3 id="跳过某段代码"><a href="#跳过某段代码" class="headerlink" title="跳过某段代码"></a>跳过某段代码</h3><p>使用<code>j line_number</code>(jump)可以跳过某段代码，直接执行指定行号所在的代码。</p>
 <h3 id="更多上下文"><a href="#更多上下文" class="headerlink" title="更多上下文"></a>更多上下文</h3><p>在IPDB调试环境中，默认只显示当前执行的代码行，以及其上下各一行的代码。如果想要看到更多的上下文代码，可以使用<code>l first[, second]</code>(list)命令。</p>
 <p>其中<code>first</code>指示向上最多显示的行号，<code>second</code>指示向下最多显示的行号（可以省略）。当<code>second</code>小于<code>first</code>时，<code>second</code>指的是从<code>first</code>开始的向下的行数（相对值vs绝对值）。</p>
-<p>根据<a href="https://stackoverflow.com/questions/6240887/how-can-i-make-ipdb-show-more-lines-of-context-while-debugging" target="_blank" rel="external">SO上的这个问题</a>，你还可以修改IPDB的源码，一劳永逸地改变上下文的行数。</p>
+<p>根据<a href="https://stackoverflow.com/questions/6240887/how-can-i-make-ipdb-show-more-lines-of-context-while-debugging" target="_blank" rel="noopener">SO上的这个问题</a>，你还可以修改IPDB的源码，一劳永逸地改变上下文的行数。</p>
 <h3 id="我在哪里"><a href="#我在哪里" class="headerlink" title="我在哪里"></a>我在哪里</h3><p>调试兴起，可能你会忘了自己目前所在的行号。例如在打印了若干变量值后，屏幕完全被这些值占据。使用<code>w</code>或者<code>where</code>可以打印出目前所在的行号位置以及上下文信息。</p>
 <h3 id="这是啥"><a href="#这是啥" class="headerlink" title="这是啥"></a>这是啥</h3><p>我们可以使用<code>whatis variable_name</code>的方法，查看变量的类别（感觉有点鸡肋，用<code>type</code>也可以办到）。</p>
 <h3 id="列出当前函数的全部参数"><a href="#列出当前函数的全部参数" class="headerlink" title="列出当前函数的全部参数"></a>列出当前函数的全部参数</h3><p>当你身处一个函数内部的时候，可以使用<code>a</code>(argument)打印出传入函数的所有参数的值。</p>
@@ -527,7 +527,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

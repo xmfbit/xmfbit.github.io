@@ -95,7 +95,7 @@
 <meta property="og:description" content="简要介绍一下优化方法中的牛顿方法（Newton’s Method）。下面的动图demo来源于Wiki页面。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://xmfbit.github.io/img/newton-method-demo.gif">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.783Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数值优化之牛顿方法">
 <meta name="twitter:description" content="简要介绍一下优化方法中的牛顿方法（Newton’s Method）。下面的动图demo来源于Wiki页面。">
@@ -327,7 +327,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-03T13:43:16+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-03T21:43:16+00:00">
                 2018-04-03
               </time>
             
@@ -363,7 +363,7 @@
       
 
       
-        <p>简要介绍一下优化方法中的牛顿方法（Newton’s Method）。下面的动图demo来源于<a href="https://zh.wikipedia.org/wiki/%E7%89%9B%E9%A1%BF%E6%B3%95" target="_blank" rel="external">Wiki页面</a>。<br><img src="/img/newton-method-demo.gif" width="400" height="300" alt="牛顿法动图" align="center"><br><a id="more"></a></p>
+        <p>简要介绍一下优化方法中的牛顿方法（Newton’s Method）。下面的动图demo来源于<a href="https://zh.wikipedia.org/wiki/%E7%89%9B%E9%A1%BF%E6%B3%95" target="_blank" rel="noopener">Wiki页面</a>。<br><img src="/img/newton-method-demo.gif" width="400" height="300" alt="牛顿法动图" align="center"><br><a id="more"></a></p>
 <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>牛顿方法，是一种用来求解方程$f(x) = 0$的根的方法。从题图可以看出它是如何使用的。</p>
 <p>首先，需要给定根的初始值$x_0$。接下来，在函数曲线上找到其所对应的点$(x_0, f(x_0))$，并过该点做切线交$x$轴于一点$x_1$。从$x_1$出发，重复上述操作，直至收敛。</p>
 <p>根据图上的几何关系和导数的几何意义，有：</p>
@@ -375,8 +375,8 @@
 <h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>牛顿方法的收敛速度较SGD为快（二阶收敛），但是会涉及到求解一个$n\times n$的海森矩阵的逆，所以虽然需要的迭代次数更少，但反而可能比较耗时（$n$的大小）。</p>
 <h2 id="L-BFGS"><a href="#L-BFGS" class="headerlink" title="L-BFGS"></a>L-BFGS</h2><p>由于牛顿方法中需要计算海森矩阵的逆，所以很多时候并不实用。大家就想出了一些近似计算$H^{-1}$的方法，如L-BFGS等。</p>
 <p><em>推导过程待续。。。</em></p>
-<p>L-BFGS的资料网上还是比较多的，这里有一个PyTorch中L-BFGS方法的实现：<a href="https://github.com/pytorch/pytorch/blob/master/torch/optim/lbfgs.py" target="_blank" rel="external">optim.lbfgs</a>。</p>
-<p>这里有一篇不错的文章<a href="http://www.hankcs.com/ml/l-bfgs.html" target="_blank" rel="external">数值优化：理解L-BFGS算法</a>，本博客写作过程参考很多。</p>
+<p>L-BFGS的资料网上还是比较多的，这里有一个PyTorch中L-BFGS方法的实现：<a href="https://github.com/pytorch/pytorch/blob/master/torch/optim/lbfgs.py" target="_blank" rel="noopener">optim.lbfgs</a>。</p>
+<p>这里有一篇不错的文章<a href="http://www.hankcs.com/ml/l-bfgs.html" target="_blank" rel="noopener">数值优化：理解L-BFGS算法</a>，本博客写作过程参考很多。</p>
 
       
     </div>
@@ -514,7 +514,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

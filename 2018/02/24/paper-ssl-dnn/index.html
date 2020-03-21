@@ -98,7 +98,7 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/paper-ssldnn-random-sparity-is-bad.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/paper-ssldnn-lenet-penalizing-unimportant-filter-channel.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/paper-ssldnn-experiment-on-lenet.png">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.781Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="论文 - Learning Structured Sparsity in Deep Neural Networks">
 <meta name="twitter:description" content="DNN的稀疏化？用L1正则项不就好了？在很多场合，这种方法的确可行。但是当试图使用FPGA/AISC加速DNN的前向计算时，我们希望DNN的参数能有一些结构化的稀疏性质。这样才能减少不必要的cache missing等问题。在这篇文章中，作者提出了一种结构化稀疏的方法，能够在不损失精度的前提下，对深度神经网络进行稀疏化，达到加速的目的。本文作者温伟，目前是杜克大学Chen Yiran组的博士生，做">
@@ -330,7 +330,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-24T02:21:14+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-24T10:21:14+00:00">
                 2018-02-24
               </time>
             
@@ -366,7 +366,7 @@
       
 
       
-        <p>DNN的稀疏化？用L1正则项不就好了？在很多场合，这种方法的确可行。但是当试图使用FPGA/AISC加速DNN的前向计算时，我们希望DNN的参数能有一些结构化的稀疏性质。这样才能减少不必要的cache missing等问题。在<a href="https://arxiv.org/pdf/1608.03665.pdf" target="_blank" rel="external">这篇文章</a>中，作者提出了一种结构化稀疏的方法，能够在不损失精度的前提下，对深度神经网络进行稀疏化，达到加速的目的。本文作者<a href="http://www.pittnuts.com/" target="_blank" rel="external">温伟</a>，目前是杜克大学Chen Yiran组的博士生，做了很多关于结构化稀疏和DNN加速相关的工作。本文发表在NIPS 2016上。本文的代码已经公开：<a href="https://github.com/wenwei202/caffe/tree/scnn" target="_blank" rel="external">GitHub</a><br><img src="/img/paper-ssldnn.png" alt="SSL的原理示意图"><br><a id="more"></a></p>
+        <p>DNN的稀疏化？用L1正则项不就好了？在很多场合，这种方法的确可行。但是当试图使用FPGA/AISC加速DNN的前向计算时，我们希望DNN的参数能有一些结构化的稀疏性质。这样才能减少不必要的cache missing等问题。在<a href="https://arxiv.org/pdf/1608.03665.pdf" target="_blank" rel="noopener">这篇文章</a>中，作者提出了一种结构化稀疏的方法，能够在不损失精度的前提下，对深度神经网络进行稀疏化，达到加速的目的。本文作者<a href="http://www.pittnuts.com/" target="_blank" rel="noopener">温伟</a>，目前是杜克大学Chen Yiran组的博士生，做了很多关于结构化稀疏和DNN加速相关的工作。本文发表在NIPS 2016上。本文的代码已经公开：<a href="https://github.com/wenwei202/caffe/tree/scnn" target="_blank" rel="noopener">GitHub</a><br><img src="/img/paper-ssldnn.png" alt="SSL的原理示意图"><br><a id="more"></a></p>
 <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>为了满足DNN的计算速度要求，我们提出了Structure Sparisity Learning (SSL)技术来正则化DNN的“结构”（例如CNN filter的参数，filter的形状，包括channel和网络层深）。它可以带来：</p>
 <ul>
 <li>大的DNN —&gt; 紧凑的模型 —&gt; 计算开销节省</li>
@@ -374,7 +374,7 @@
 <li>提供了正则化，提高网络泛化能力 —&gt; 提高了精度</li>
 </ul>
 <p>实验结果显示，这种方法可以在CPU/GPU上对AlexNet分别达到平均$5.1$和$3,1$倍的加速。在CIFAR10上训练ResNet，从$20$层减少到$18$层，并提高了精度。</p>
-<h2 id="LASSO"><a href="#LASSO" class="headerlink" title="LASSO"></a>LASSO</h2><p>SSL是基于Group LASSO的，所以正式介绍文章之前，首先简单介绍LASSO和Group LASSO，<br><a href="https://en.wikipedia.org/wiki/Lasso_(statistics" target="_blank" rel="external">LASSO</a>)(least absolute shrinkage and selection operator)是指统计学习中的特征选择方法。以最小二乘法求解线性模型为例，可以加上L1 norm作为正则化约束，见下式，其中$\beta$是模型的参数。具体推导过程可以参见wiki页面。</p>
+<h2 id="LASSO"><a href="#LASSO" class="headerlink" title="LASSO"></a>LASSO</h2><p>SSL是基于Group LASSO的，所以正式介绍文章之前，首先简单介绍LASSO和Group LASSO，<br><a href="https://en.wikipedia.org/wiki/Lasso_(statistics" target="_blank" rel="noopener">LASSO</a>)(least absolute shrinkage and selection operator)是指统计学习中的特征选择方法。以最小二乘法求解线性模型为例，可以加上L1 norm作为正则化约束，见下式，其中$\beta$是模型的参数。具体推导过程可以参见wiki页面。</p>
 <script type="math/tex; mode=display">\min_{\beta \in R^p}\frac{1}{N} \Vert(y-X\beta)\Vert_2^2 + \lambda \Vert \beta \Vert_1</script><p>而Group LASSO就是将参数分组，进行LASSO操作。</p>
 <p>这里只是简单介绍一下LASSO。SSL下面还会详细介绍，不必过多执着于LASSO。</p>
 <h2 id="结构化稀疏"><a href="#结构化稀疏" class="headerlink" title="结构化稀疏"></a>结构化稀疏</h2><p>DNN通常参数很多，计算量很大。为了减少计算开销，目前的研究包括：稀疏化，connection pruning, low rank approximation等。然而前两种方法只能得到随机的稀疏，无规律的内存读取仍然制约了速度。下面这种图是一个例子。我们使用了L1正则进行稀疏。和原模型相比，精度损失了$2$个点。虽然稀疏度比较高，但是实际加速效果却很差。可以看到，在<code>conv3</code>，<code>conv4</code>和<code>conv5</code>中，有的情况下反而加速比是大于$1$的。<br><img src="/img/paper-ssldnn-random-sparity-is-bad.png" alt="随机稀疏的实际加速效果"></p>
@@ -541,7 +541,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

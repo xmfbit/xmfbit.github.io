@@ -97,7 +97,7 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/residualnet_improved_structure.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/resnet-164layer-cifar10-training.jpg">
 <meta property="og:image" content="https://xmfbit.github.io/img/resnet-164layer-cifar10-testing.jpg">
-<meta property="og:updated_time" content="2020-03-21T02:02:44.794Z">
+<meta property="og:updated_time" content="2020-03-21T03:07:15.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Residual Net论文阅读 - Identity Mapping in Deep Residual Networks">
 <meta name="twitter:description" content="这篇文章是He Kaiming继最初的那篇ResidualNet的论文后又发的一篇。这篇论文较为详细地探讨了由第一篇文章所引入的Identity Mapping，结合具体实验，测试了很多不同的组合结构，从实践方面验证了Identity Mapping的重要性。同时，也试图对Identity Mapping如此好的作用做一解释。尤其是本文在上篇文章的基础上，提出了新的残差单元结构，并指出这种新的结构">
@@ -329,7 +329,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-07T08:16:48+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-07T16:16:48+00:00">
                 2017-03-07
               </time>
             
@@ -384,8 +384,8 @@
 <script type="math/tex; mode=display">\frac{\partial \epsilon}{\partial x_l} = \frac{\partial \epsilon} {\partial x_L}\frac{\partial x_L}{\partial x_l} = \frac{\partial \epsilon}{\partial x_L}(1+\frac{\partial}{\partial x_l}\sum_{i=l}^{L-1}\mathcal{F}(x_i, W_i))</script><p>上式表明，由于残差单元的短路连接（shortcut），$x_l$处的梯度基本不会出现消失的情况（除非后面一项正好等于-1）。</p>
 <p>如果不做Identity Mapping，而是乘上一个系数$\lambda$呢？作者发现这会在上面的式子上出现$\lambda^k$的形式，造成梯度以指数规律vanish或者爆炸。同样的，如果乘上一个权重，也会有类似的效应。</p>
 <p>所以，Identity Mapping是坠吼的！</p>
-<h2 id="花式跑实验"><a href="#花式跑实验" class="headerlink" title="花式跑实验"></a>花式跑实验</h2><p>论文的后半部分，作者开始花式做实验，调研了很多不同的结构，具体实验方案和对比结果可以参看原论文。这里不再罗列了。附上自己用PyTorch实现的164层ResNet在CIFAR10上的训练代码：<a href="https://gist.github.com/xmfbit/67c407e34cbaf56e7820f09e774e56d8" target="_blank" rel="external">Gist Code: ResNet-164 training experiment on CIFAR10 using PyTorch</a>。</p>
-<p>下面的可视化结果由<a href="https://github.com/dmlc/tensorboard" target="_blank" rel="external">DMLC/tensorboard</a>实现。图上在$30K$次迭代附近有明显的性能提升，对应于学习率的调整，变为原来的$0.1$。<br><img src="/img/resnet-164layer-cifar10-training.jpg" alt="训练集损失和精度"><br><img src="/img/resnet-164layer-cifar10-testing.jpg" alt="测试集损失和精度"></p>
+<h2 id="花式跑实验"><a href="#花式跑实验" class="headerlink" title="花式跑实验"></a>花式跑实验</h2><p>论文的后半部分，作者开始花式做实验，调研了很多不同的结构，具体实验方案和对比结果可以参看原论文。这里不再罗列了。附上自己用PyTorch实现的164层ResNet在CIFAR10上的训练代码：<a href="https://gist.github.com/xmfbit/67c407e34cbaf56e7820f09e774e56d8" target="_blank" rel="noopener">Gist Code: ResNet-164 training experiment on CIFAR10 using PyTorch</a>。</p>
+<p>下面的可视化结果由<a href="https://github.com/dmlc/tensorboard" target="_blank" rel="noopener">DMLC/tensorboard</a>实现。图上在$30K$次迭代附近有明显的性能提升，对应于学习率的调整，变为原来的$0.1$。<br><img src="/img/resnet-164layer-cifar10-training.jpg" alt="训练集损失和精度"><br><img src="/img/resnet-164layer-cifar10-testing.jpg" alt="测试集损失和精度"></p>
 
       
     </div>
@@ -525,7 +525,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">83</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
