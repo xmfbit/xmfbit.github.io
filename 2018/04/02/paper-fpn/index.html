@@ -1,0 +1,932 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="deep learning,paper,detection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="图像金字塔或特征金字塔是传统CV方法中常用的技巧，例如求取SIFT特征就用到了DoG图像金字塔。但是在Deep Learning统治下的CV detection下，这种方法变得无人问津。一个重要的问题就是计算量巨大。而本文提出了一种仅用少量额外消耗建立特征金字塔的方法，提高了detector的性能。">
+<meta name="keywords" content="deep learning,paper,detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文 - Feature Pyramid Networks for Object Detection (FPN)">
+<meta property="og:url" content="https://xmfbit.github.io/2018/04/02/paper-fpn/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="图像金字塔或特征金字塔是传统CV方法中常用的技巧，例如求取SIFT特征就用到了DoG图像金字塔。但是在Deep Learning统治下的CV detection下，这种方法变得无人问津。一个重要的问题就是计算量巨大。而本文提出了一种仅用少量额外消耗建立特征金字塔的方法，提高了detector的性能。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-fpn-different-pyramids.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-fpn-different-with-related-work.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper-fpn-lateral-connection.png">
+<meta property="og:updated_time" content="2020-03-21T02:02:44.783Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="论文 - Feature Pyramid Networks for Object Detection (FPN)">
+<meta name="twitter:description" content="图像金字塔或特征金字塔是传统CV方法中常用的技巧，例如求取SIFT特征就用到了DoG图像金字塔。但是在Deep Learning统治下的CV detection下，这种方法变得无人问津。一个重要的问题就是计算量巨大。而本文提出了一种仅用少量额外消耗建立特征金字塔的方法，提高了detector的性能。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/paper-fpn-different-pyramids.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2018/04/02/paper-fpn/">
+
+
+
+
+
+  <title> 论文 - Feature Pyramid Networks for Object Detection (FPN) | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2018/04/02/paper-fpn/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                论文 - Feature Pyramid Networks for Object Detection (FPN)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-02T02:12:03+00:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>图像金字塔或特征金字塔是传统CV方法中常用的技巧，例如求取<a href="https://xmfbit.github.io/2017/01/30/cs131-sift/">SIFT特征</a>就用到了DoG图像金字塔。但是在Deep Learning统治下的CV detection下，这种方法变得无人问津。一个重要的问题就是计算量巨大。而本文提出了一种仅用少量额外消耗建立特征金字塔的方法，提高了detector的性能。<br><a id="more"></a></p>
+<h2 id="Pyramid-or-not-It’s-a-question"><a href="#Pyramid-or-not-It’s-a-question" class="headerlink" title="Pyramid or not? It’s a question."></a>Pyramid or not? It’s a question.</h2><p>在DL席卷CV之前，特征大多需要研究人员手工设计，如SIFT/Harr/HoG等。人们在使用这些特征的时候发现，往往需要使用图像金字塔，在multi scale下进行检测，才能得到不错的结果。然而，使用CNN时，由于其本身具有的一定的尺度不变性，大家常常是只在单一scale下（也就是原始图像作为输入），就可以达到不错的结果。不过很多时候参加COCO等竞赛的队伍还是会在TEST的时候使用这项技术，能够取得更好的成绩。但是这样会造成计算时间的巨大开销，TRAIN和TEST的不一致。TRAIN中引入金字塔，内存就会吃紧。所以主流的Fast/Faster RCNN并没有使用金字塔。</p>
+<p>换个角度，我们知道在CNN中，输入会逐层处理，经过Conv/Pooling的操作后，不同深度的layer产生的feature map的spatial dimension是不一样的，这就是作者在摘要中提到的“inherent multi-scale pyramidal hierarchy of deep CNN”。不过，还有一个问题，就是深层和浅层的feature map虽然构成了一个feature pyramid，但是它们的语义并不对等：深层layer的feature map有更抽象的语义信息，而浅层feature map有较高的resolution，但是语义信息还是too yong too simple。</p>
+<p>SSD做过这方面的探索。但是它采用的方法是从浅层layer引出，又加了一些layer，导致无法reuse high resolution的feature map。我们发现，浅层的high resolution feature map对检测小目标很有用处。</p>
+<p>那我们想要怎样呢？</p>
+<ul>
+<li>高层的low resolution，strong semantic info特征如何和浅层的high resolution，weak semantic info自然地结合？</li>
+<li>不引入过多的额外计算，最好也只需要用single scale的原始输入。</li>
+</ul>
+<p>用一张图总结一下。下图中蓝色的轮廓线框起来的就是不同layer输出的feature map。蓝色线越粗，代表其语义信息越强。在（a）中，是将图像做成金字塔，分别跑一个NN来做，这样计算量极大。（b）中是目前Faster RCNN等采用的方法，只在single scale上做。（c）中是直接将各个layer输出的层级feature map自然地看做feature pyramid来做。（d）是本文的方法，不同层级的feature map做了merge，能够使得每个level的语义信息都比较强（注意看蓝色线的粗细）。<br><img src="/img/paper-fpn-different-pyramids.png" alt="不同金字塔方法"></p>
+<p>我们使用这种名为FPN的技术，不用什么工程上的小花招，就打败了目前COCO上的最好结果。不止detection，FPN也能用在图像分割上（当然，现在我们知道，MaskRCNN中的关键技术之一就是FPN）。</p>
+<h2 id="FPN"><a href="#FPN" class="headerlink" title="FPN"></a>FPN</h2><p>有人可能会想，其实前面的网络有人也做过不同深度layer的merge啊，通过skip connection就可以了。作者指出，那种方法仍然是只能在最终的single scale的output feature map上做，而我们的方法是在all level上完成，如下图所示。<br><img src="/img/paper-fpn-different-with-related-work.png" alt="我们才是真正的金字塔"></p>
+<h3 id="Bottom-up-pathway"><a href="#Bottom-up-pathway" class="headerlink" title="Bottom-up pathway"></a>Bottom-up pathway</h3><p> Bottom-up pathway指的是网络的前向计算部分，会产生一系列scale相差2x的feature map。当然，在这些downsample中间，还会有layer的输出spatial dimension是一致的。那些连续的有着相同spatial dimension输出的layer是一个stage。这样，我们就完成了传统金字塔方法和CNN网络的名词的对应。</p>
+<p> 以ResNet为例，我们用每个stage中最后一个residual block的输出作为构建金字塔的feature map，也就是<code>C2~C5</code>。它们的步长分别是$4, 8, 16, 32$。我们没用<code>conv1</code>。</p>
+<h3 id="Top-down-pathway和lateral-connection"><a href="#Top-down-pathway和lateral-connection" class="headerlink" title="Top-down pathway和lateral connection"></a>Top-down pathway和lateral connection</h3><p>Top-down pathway是指将深层的有更强语义信息的feature经过upsampling变成higher resolution的过程。然后再与bottom-up得到的feature经过lateral connection（侧边连接）进行增强。</p>
+<p>下面这张图展示了做lateral connection的过程。注意在图中，越深的layer位于图的上部。我们以框出来放大的那部分举例子。从更深的层输出的feature经过<code>2x up</code>处理（spatial dimension一致了），从左面来的浅层的feature经过<code>1x1 conv</code>处理（channel dimension一致了），再进行element-wise的相加，得到了该stage最后用于prediction的feature（其实还要经过一个<code>3x3 conv</code>的处理，见下引文）。<br><img src="/img/paper-fpn-lateral-connection.png" alt="lateral connection"></p>
+<p>一些细节，直接引用：</p>
+<blockquote>
+<p>To start the iteration, we simply attach a 1x1 convolutional layer on C5 to produce the coarsest resolution map. Finally, we append a 3x3 convolution on each merged map to generate the final feature map, which is to reduce the aliasing effect of upsampling.</p>
+</blockquote>
+<p>此外，由于金字塔上的所有feature共享classifier和regressor，要求它们的channel dimension必须一致。本文固定使用$256$。而且这些外的conv layer没有使用非线性激活。</p>
+<p>这里给出一个基于PyTorch的FPN的第三方实现<a href="https://github.com/kuangliu/pytorch-fpn/blob/master/fpn.py" target="_blank" rel="external">kuangliu/pytorch-fpn</a>，可以对照论文捋一遍。<br><figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div></pre></td><td class="code"><pre><div class="line"><span class="comment">## ResNet的block</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bottleneck</span><span class="params">(nn.Module)</span>:</span></div><div class="line">    expansion = <span class="number">4</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_planes, planes, stride=<span class="number">1</span>)</span>:</span></div><div class="line">        super(Bottleneck, self).__init__()</div><div class="line">        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=<span class="number">1</span>, bias=<span class="keyword">False</span>)</div><div class="line">        self.bn1 = nn.BatchNorm2d(planes)</div><div class="line">        self.conv2 = nn.Conv2d(planes, planes, kernel_size=<span class="number">3</span>, stride=stride, padding=<span class="number">1</span>, bias=<span class="keyword">False</span>)</div><div class="line">        self.bn2 = nn.BatchNorm2d(planes)</div><div class="line">        self.conv3 = nn.Conv2d(planes, self.expansion*planes, kernel_size=<span class="number">1</span>, bias=<span class="keyword">False</span>)</div><div class="line">        self.bn3 = nn.BatchNorm2d(self.expansion*planes)</div><div class="line"></div><div class="line">        self.shortcut = nn.Sequential()</div><div class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> in_planes != self.expansion*planes:</div><div class="line">            self.shortcut = nn.Sequential(</div><div class="line">                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=<span class="number">1</span>, stride=stride, bias=<span class="keyword">False</span>),</div><div class="line">                nn.BatchNorm2d(self.expansion*planes)</div><div class="line">            )</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></div><div class="line">        out = F.relu(self.bn1(self.conv1(x)))</div><div class="line">        out = F.relu(self.bn2(self.conv2(out)))</div><div class="line">        out = self.bn3(self.conv3(out))</div><div class="line">        out += self.shortcut(x)</div><div class="line">        out = F.relu(out)</div><div class="line">        <span class="keyword">return</span> out</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">FPN</span><span class="params">(nn.Module)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, block, num_blocks)</span>:</span></div><div class="line">        super(FPN, self).__init__()</div><div class="line">        self.in_planes = <span class="number">64</span></div><div class="line"></div><div class="line">        self.conv1 = nn.Conv2d(<span class="number">3</span>, <span class="number">64</span>, kernel_size=<span class="number">7</span>, stride=<span class="number">2</span>, padding=<span class="number">3</span>, bias=<span class="keyword">False</span>)</div><div class="line">        self.bn1 = nn.BatchNorm2d(<span class="number">64</span>)</div><div class="line"></div><div class="line">        <span class="comment"># Bottom-up layers, backbone of the network</span></div><div class="line">        self.layer1 = self._make_layer(block,  <span class="number">64</span>, num_blocks[<span class="number">0</span>], stride=<span class="number">1</span>)</div><div class="line">        self.layer2 = self._make_layer(block, <span class="number">128</span>, num_blocks[<span class="number">1</span>], stride=<span class="number">2</span>)</div><div class="line">        self.layer3 = self._make_layer(block, <span class="number">256</span>, num_blocks[<span class="number">2</span>], stride=<span class="number">2</span>)</div><div class="line">        self.layer4 = self._make_layer(block, <span class="number">512</span>, num_blocks[<span class="number">3</span>], stride=<span class="number">2</span>)</div><div class="line"></div><div class="line">        <span class="comment"># Top layer</span></div><div class="line">        <span class="comment"># 我们需要在C5后面接一个1x1, 256 conv，得到金字塔最顶端的feature</span></div><div class="line">        self.toplayer = nn.Conv2d(<span class="number">2048</span>, <span class="number">256</span>, kernel_size=<span class="number">1</span>, stride=<span class="number">1</span>, padding=<span class="number">0</span>)  <span class="comment"># Reduce channels</span></div><div class="line"></div><div class="line">        <span class="comment"># Smooth layers</span></div><div class="line">        <span class="comment"># 这个是上面引文中提到的抗aliasing的3x3卷积</span></div><div class="line">        self.smooth1 = nn.Conv2d(<span class="number">256</span>, <span class="number">256</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>)</div><div class="line">        self.smooth2 = nn.Conv2d(<span class="number">256</span>, <span class="number">256</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>)</div><div class="line">        self.smooth3 = nn.Conv2d(<span class="number">256</span>, <span class="number">256</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>)</div><div class="line"></div><div class="line">        <span class="comment"># Lateral layers</span></div><div class="line">        <span class="comment"># 为了匹配channel dimension引入的1x1卷积</span></div><div class="line">        <span class="comment"># 注意这些backbone之外的extra conv，输出都是256 channel</span></div><div class="line">        self.latlayer1 = nn.Conv2d(<span class="number">1024</span>, <span class="number">256</span>, kernel_size=<span class="number">1</span>, stride=<span class="number">1</span>, padding=<span class="number">0</span>)</div><div class="line">        self.latlayer2 = nn.Conv2d( <span class="number">512</span>, <span class="number">256</span>, kernel_size=<span class="number">1</span>, stride=<span class="number">1</span>, padding=<span class="number">0</span>)</div><div class="line">        self.latlayer3 = nn.Conv2d( <span class="number">256</span>, <span class="number">256</span>, kernel_size=<span class="number">1</span>, stride=<span class="number">1</span>, padding=<span class="number">0</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_make_layer</span><span class="params">(self, block, planes, num_blocks, stride)</span>:</span></div><div class="line">        strides = [stride] + [<span class="number">1</span>]*(num_blocks<span class="number">-1</span>)</div><div class="line">        layers = []</div><div class="line">        <span class="keyword">for</span> stride <span class="keyword">in</span> strides:</div><div class="line">            layers.append(block(self.in_planes, planes, stride))</div><div class="line">            self.in_planes = planes * block.expansion</div><div class="line">        <span class="keyword">return</span> nn.Sequential(*layers)</div><div class="line"></div><div class="line">    <span class="comment">## FPN的lateral connection部分: upsample以后，element-wise相加</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_upsample_add</span><span class="params">(self, x, y)</span>:</span></div><div class="line">        <span class="string">'''Upsample and add two feature maps.</span></div><div class="line">        Args:</div><div class="line">          x: (Variable) top feature map to be upsampled.</div><div class="line">          y: (Variable) lateral feature map.</div><div class="line">        Returns:</div><div class="line">          (Variable) added feature map.</div><div class="line">        Note in PyTorch, when input size is odd, the upsampled feature map</div><div class="line">        with `F.upsample(..., scale_factor=2, mode='nearest')`</div><div class="line">        maybe not equal to the lateral feature map size.</div><div class="line">        e.g.</div><div class="line">        original input size: [N,_,15,15] -&gt;</div><div class="line">        conv2d feature map size: [N,_,8,8] -&gt;</div><div class="line">        upsampled feature map size: [N,_,16,16]</div><div class="line">        So we choose bilinear upsample which supports arbitrary output sizes.</div><div class="line">        '''</div><div class="line">        _,_,H,W = y.size()</div><div class="line">        <span class="keyword">return</span> F.upsample(x, size=(H,W), mode=<span class="string">'bilinear'</span>) + y</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></div><div class="line">        <span class="comment"># Bottom-up</span></div><div class="line">        c1 = F.relu(self.bn1(self.conv1(x)))</div><div class="line">        c1 = F.max_pool2d(c1, kernel_size=<span class="number">3</span>, stride=<span class="number">2</span>, padding=<span class="number">1</span>)</div><div class="line">        c2 = self.layer1(c1)</div><div class="line">        c3 = self.layer2(c2)</div><div class="line">        c4 = self.layer3(c3)</div><div class="line">        c5 = self.layer4(c4)</div><div class="line">        <span class="comment"># Top-down</span></div><div class="line">        <span class="comment"># P5: 金字塔最顶上的feature</span></div><div class="line">        p5 = self.toplayer(c5)</div><div class="line">        <span class="comment"># P4: 上一层 p5 + 侧边来的 c4</span></div><div class="line">        <span class="comment"># 其余同理</span></div><div class="line">        p4 = self._upsample_add(p5, self.latlayer1(c4))</div><div class="line">        p3 = self._upsample_add(p4, self.latlayer2(c3))</div><div class="line">        p2 = self._upsample_add(p3, self.latlayer3(c2))</div><div class="line">        <span class="comment"># Smooth</span></div><div class="line">        <span class="comment"># 输出做一下smooth</span></div><div class="line">        p4 = self.smooth1(p4)</div><div class="line">        p3 = self.smooth2(p3)</div><div class="line">        p2 = self.smooth3(p2)</div><div class="line">        <span class="keyword">return</span> p2, p3, p4, p5</div></pre></td></tr></table></figure></p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>下面作者会把FPN应用到FasterRCNN的两个重要步骤：RPN和Fast RCNN。</p>
+<h3 id="FPN加持的RPN"><a href="#FPN加持的RPN" class="headerlink" title="FPN加持的RPN"></a>FPN加持的RPN</h3><p>在Faster RCNN中，RPN用来提供ROI的proposal。backbone网络输出的single feature map上接了$3\times 3$大小的卷积核来实现sliding window的功能，后面接两个$1\times 1$的卷积分别用来做objectness的分类和bounding box基于anchor box的回归。我们把最后的classifier和regressor部分叫做head。</p>
+<p>使用FPN时，我们在金字塔每层的输出feature map上都接上这样的head结构（$3\times 3$的卷积 + two sibling $1\times 1$的卷积）。同时，我们不再使用多尺度的anchor box，而是在每个level上分别使用不同大小的anchor box。具体说，对应于特征金字塔的$5$个level的特征，<code>P2 - P6</code>，anchor box的大小分别是$32^2, 64^2, 128^2, 256^2, 512^2$。不过每层的anchor box仍然要照顾到不同的长宽比例，我们使用了$3$个不同的比例：$1:2, 1:1, 2:1$（和原来一样）。这样，我们一共有$5\times 3 = 15$个anchor box。</p>
+<p>训练过程中，我们需要给anchor boxes赋上对应的正负标签。对于那些与ground truth有最大IoU或者与任意一个ground truth的IoU超过$0.7$的anchor boxes，是positive label；那些与所有ground truth的IoU都小于$0.3$的是negtive label。</p>
+<p>有一个疑问是head的参数是否要在不同的level上共享。我们试验了共享与不共享两个方法，accuracy是相近的。这也说明不同level之间语义信息是相似的，只是resolution不同。</p>
+<h3 id="FPN加持的Fast-RCNN"><a href="#FPN加持的Fast-RCNN" class="headerlink" title="FPN加持的Fast RCNN"></a>FPN加持的Fast RCNN</h3><p>Fast RCNN的原始方法是只在single scale的feature map上做的，要想使用FPN，首先应该解决的问题是前端提供的ROI proposal应该对应到pyramid的哪一个label。由于我们的网络基本都是在ImageNet训练的网络上做transfer learning得到的，我们就以base model在ImageNet上训练时候的输入$224\times 224$作为参考，依据当前ROI和它的大小比例，确定该把这个ROI对应到哪个level。如下所示：</p>
+<script type="math/tex; mode=display">k = \lfloor k_0 + \log_2(\sqrt{wh}/224)\rfloor</script><p>后面接的predictor head我们这里直接连了两个$1024d$的fc layer，再接final classification和regression的部分。同样的，这些参数对于不同level来说是共享的。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/paper/" rel="tag"># paper</a>
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/01/paper-yolov3/" rel="next" title="论文 - YOLO v3">
+                <i class="fa fa-chevron-left"></i> 论文 - YOLO v3
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/03/newton-method/" rel="prev" title="数值优化之牛顿方法">
+                数值优化之牛顿方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/liumengli.jpg" alt="一个脱离了高级趣味的人">
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pyramid-or-not-It’s-a-question"><span class="nav-number">1.</span> <span class="nav-text">Pyramid or not? It’s a question.</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FPN"><span class="nav-number">2.</span> <span class="nav-text">FPN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bottom-up-pathway"><span class="nav-number">2.1.</span> <span class="nav-text">Bottom-up pathway</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Top-down-pathway和lateral-connection"><span class="nav-number">2.2.</span> <span class="nav-text">Top-down pathway和lateral connection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用"><span class="nav-number">3.</span> <span class="nav-text">应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FPN加持的RPN"><span class="nav-number">3.1.</span> <span class="nav-text">FPN加持的RPN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FPN加持的Fast-RCNN"><span class="nav-number">3.2.</span> <span class="nav-text">FPN加持的Fast RCNN</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

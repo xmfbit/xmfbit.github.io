@@ -1,0 +1,933 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="deep learning,tvm,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="TVM 是什么？A compiler stack，graph level / operator level optimization，目的是（不同框架的）深度学习模型在不同硬件平台上提高 performance (我要更快！)  TVM, a compiler that takes a high-level specification of a deep learning program from">
+<meta name="keywords" content="deep learning,tvm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hello TVM">
+<meta property="og:url" content="https://xmfbit.github.io/2019/06/29/tvm-helloworld/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="TVM 是什么？A compiler stack，graph level / operator level optimization，目的是（不同框架的）深度学习模型在不同硬件平台上提高 performance (我要更快！)  TVM, a compiler that takes a high-level specification of a deep learning program from">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://xmfbit.github.io/img/tvm_introduction.jpg">
+<meta property="og:image" content="https://xmfbit.github.io/img/tvm_hello_nnvm_as_a_bridge.jpg">
+<meta property="og:updated_time" content="2020-03-21T02:02:44.779Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hello TVM">
+<meta name="twitter:description" content="TVM 是什么？A compiler stack，graph level / operator level optimization，目的是（不同框架的）深度学习模型在不同硬件平台上提高 performance (我要更快！)  TVM, a compiler that takes a high-level specification of a deep learning program from">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/tvm_introduction.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2019/06/29/tvm-helloworld/">
+
+
+
+
+
+  <title> Hello TVM | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2019/06/29/tvm-helloworld/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Hello TVM
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-06-29T05:55:43+00:00">
+                2019-06-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>TVM 是什么？A compiler stack，graph level / operator level optimization，目的是（不同框架的）深度学习模型在不同硬件平台上提高 performance (我要更快！)</p>
+<blockquote>
+<p>TVM, a compiler that takes a high-level specification of a deep learning program from existing frameworks and generates low-level optimized code for a diverse set of hardware back-ends.</p>
+</blockquote>
+<p>compiler比较好理解。C编译器将C代码转换为汇编，再进一步处理成CPU可以理解的机器码。TVM的compiler是指将不同前端深度学习框架训练的模型，转换为统一的中间语言表示。stack我的理解是，TVM还提供了后续处理方法，对IR进行优化（graph / operator level），并转换为目标硬件上的代码逻辑（可能会进行benchmark，反复进行上述优化），从而实现了端到端的深度学习模型部署。</p>
+<p>我刚刚接触TVM，这篇主要介绍了如何编译TVM，以及如何使用TVM加载mxnet模型，进行前向计算。Hello TVM!</p>
+<p><img src="/img/tvm_introduction.jpg" alt="TVM概念图"></p>
+<a id="more"></a>
+<h2 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h2><p>随着深度学习逐渐从研究所的“伊甸园”迅速在工业界的铺开，摆在大家面前的问题是如何将深度学习模型部署到目标硬件平台上，能够多快好省地完成前向计算，从而提供更好的用户体验，<del>同时为老板省钱，还能减少碳排放来造福子孙</del>。</p>
+<p>和单纯做研究相比，在工业界我们主要遇到了两个问题：</p>
+<ul>
+<li>深度学习框架实在是太$^{\text{TM}}$多了。caffe / mxnet / tensorflow / pytorch训练出来的模型都彼此有不同的分发格式。如果你和我一样，做过不同框架的TensorRT的部署，我想你会懂的。。。</li>
+<li>GPU实在是太$^{\text{TM}}$贵了。深度学习春风吹满地，老黄股票真争气。另一方面，一些嵌入式平台没有使用GPU的条件。同时一些人也开始在做FPGA/ASIC的深度学习加速卡。如何将深度学习模型部署适配到多样的硬件平台上？</li>
+</ul>
+<p>为了解决第一个问题，TVM内部实现了自己的IR，可以将上面这些主流深度学习框架的模型转换为统一的内部表示，以便后续处理。若想要详细了解，可以看下NNVM这篇博客：<a href="https://tvm.ai/2017/10/06/nnvm-compiler-announcement" target="_blank" rel="external">NNVM Compiler: Open Compiler for AI Frameworks</a>。这张图应该能够说明NNVM在TVM中起到的作用。</p>
+<p><img src="/img/tvm_hello_nnvm_as_a_bridge.jpg" alt="NNVM在TVM中的作用"></p>
+<p>为了解决第二个问题，TVM内部有多重机制来做优化。其中一个特点是，使用机器学习（结合专家知识）的方法，通过在目标硬件上跑大量trial，来获得该硬件上相关运算（例如卷积）的最优实现。这使得TVM能够做到快速为新型硬件或新的op做优化。我们知道，在GPU上我们站在Nvidia内部专家的肩膀上，使用CUDA / CUDNN / CUBLAS编程。但相比于Conv / Pooling等Nvidia已经优化的很好了的op，我们自己写的op很可能效率不高。或者在新的硬件上，没有类似CUDA的生态，如何对网络进行调优？TVM这种基于机器学习的方法给出了一个可行的方案。我们只需给定参数的搜索空间（少量的人类专家知识），就可以将剩下的工作交给TVM。如果对此感兴趣，可以阅读TVM中关于AutoTuner的介绍和tutorial：<a href="https://docs.tvm.ai/tutorials/autotvm/tune_nnvm_arm.html" target="_blank" rel="external">Auto-tuning a convolutional network for ARM CPU</a>。</p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>我的环境为Debian 8，CUDA 9。</p>
+<h3 id="准备代码"><a href="#准备代码" class="headerlink" title="准备代码"></a>准备代码</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">git <span class="built_in">clone</span> https://github.com/dmlc/tvm.git</div><div class="line"><span class="built_in">cd</span> tvm</div><div class="line">git checkout e22b5802</div><div class="line">git submodule update --init --recursive</div></pre></td></tr></table></figure>
+<h3 id="config文件"><a href="#config文件" class="headerlink" title="config文件"></a>config文件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> tvm</div><div class="line">mkdir build</div><div class="line">cp ../cmake/config.cmake ./build</div><div class="line"><span class="built_in">cd</span> build</div></pre></td></tr></table></figure>
+<p>编辑config文件，打开CUDA / BLAS / cuBLAS / CUDNN的开关。注意下LLVM的开关。LLVM可以从这个页面<a href="http://releases.llvm.org/download.html" target="_blank" rel="external">LLVM Download</a>下载，我之前就已经下载好，版本为7.0。如果你像我一样是Debian8，可以使用for Ubuntu14.04的那个版本。由于是已经编译好的二进制包，下载之后解压即可。</p>
+<p>找到这一行，改成<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">set(USE_LLVM /path/to/llvm/bin/llvm-config)</div></pre></td></tr></table></figure></p>
+<h3 id="编译-1"><a href="#编译-1" class="headerlink" title="编译"></a>编译</h3><p>这里有个坑，因为我们使用了LLVM，最好使用LLVM中的clang。否则可能导致tvm生成的代码无法二次导入。见这个讨论帖：<a href="https://discuss.tvm.ai/t/runtime-llvm-cc-create-shared-error-while-run-tune-simple-template/1037" target="_blank" rel="external">_cc.create_shared error while run tune_simple_template</a>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> LLVM=/path/to/llvm</div><div class="line">cmake -DCMAKE_C_COMPILER=<span class="variable">$LLVM</span>/bin/clang -DCMAKE_CXX_COMPILER=<span class="variable">$LLVM</span>/bin/clang++ ..</div><div class="line"><span class="comment"># 火力全开，let's rock</span></div><div class="line">make -j$(nproc)</div></pre></td></tr></table></figure>
+<h3 id="python包安装"><a href="#python包安装" class="headerlink" title="python包安装"></a>python包安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> /path/to/tvm</div><div class="line"><span class="comment"># 我一般用清华的镜像，你呢。。。</span></div><div class="line"><span class="built_in">export</span> THU_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple</div><div class="line">pip install tornado tornado psutil xgboost numpy decorator attrs  --user -i <span class="variable">$THU_MIRROR</span></div><div class="line"><span class="built_in">cd</span> python; python setup.py install --user; <span class="built_in">cd</span> ..</div><div class="line"><span class="built_in">cd</span> topi/python; python setup.py install --user; <span class="built_in">cd</span> ../..</div><div class="line"><span class="built_in">cd</span> nnvm/python; python setup.py install --user; <span class="built_in">cd</span> ../..</div></pre></td></tr></table></figure>
+<h2 id="demo"><a href="#demo" class="headerlink" title="demo"></a>demo</h2><p>使用tvm为mxnet symbol计算图生成CUDA代码，并进行前向计算。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy</div><div class="line"><span class="keyword">import</span> tvm</div><div class="line"><span class="keyword">from</span> tvm <span class="keyword">import</span> relay</div><div class="line"><span class="keyword">from</span> tvm.relay <span class="keyword">import</span> testing</div><div class="line"><span class="keyword">from</span> tvm.contrib <span class="keyword">import</span> graph_runtime</div><div class="line"><span class="keyword">import</span> mxnet <span class="keyword">as</span> mx</div><div class="line"></div><div class="line"><span class="comment">## load mxnet model</span></div><div class="line">prefix = <span class="string">'/your/mxnet/checkpoint/prefix'</span></div><div class="line">epoch = <span class="number">0</span></div><div class="line">mx_sym, arg_params, aux_params = mx.model.load_checkpoint(prefix, epoch)</div><div class="line"></div><div class="line"><span class="comment">## import model into tvm from mxnet</span></div><div class="line">shape_dict = &#123;<span class="string">'data'</span>: (<span class="number">1</span>, <span class="number">3</span>, <span class="number">224</span>, <span class="number">224</span>)&#125;</div><div class="line"><span class="comment">## tvm提供了 frontend.from_XXX 接口，从不同的框架中导入模型</span></div><div class="line">relay_func, relay_params = relay.frontend.from_mxnet(mx_sym, shape_dict,</div><div class="line">        arg_params=arg_params, aux_params=aux_params)</div><div class="line"></div><div class="line"><span class="comment"># 设定目标硬件为 GPU，生成TVM模型</span></div><div class="line"><span class="comment">## ---------------------------- </span></div><div class="line"><span class="comment"># graph：execution graph in json format</span></div><div class="line"><span class="comment"># lib: tvm module library of compiled functions for the graph on the target hardware</span></div><div class="line"><span class="comment"># params: parameter blobs</span></div><div class="line"><span class="comment">## ---------------------------</span></div><div class="line">target = <span class="string">'cuda'</span></div><div class="line"><span class="keyword">with</span> relay.build_config(opt_level=<span class="number">3</span>):</div><div class="line">    graph, lib, params = relay.build(relay_func, target, params=relay_params)</div><div class="line"></div><div class="line"><span class="comment"># run forward</span></div><div class="line"><span class="comment">## 直接使用tvm提供的cat示例图片</span></div><div class="line"><span class="keyword">from</span> tvm.contrib.download <span class="keyword">import</span> download_testdata</div><div class="line">img_url = <span class="string">'https://github.com/dmlc/mxnet.js/blob/master/data/cat.png?raw=true'</span></div><div class="line">img_path = download_testdata(img_url, <span class="string">'cat.png'</span>, module=<span class="string">'data'</span>)</div><div class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</div><div class="line">image = Image.open(img_path).resize((<span class="number">224</span>, <span class="number">224</span>))</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">transform_image</span><span class="params">(im)</span>:</span></div><div class="line">    im = np.array(im).astype(np.float32)</div><div class="line">    im = np.transpose(im, [<span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>])</div><div class="line">    im = im[np.newaxis, :]</div><div class="line">    <span class="keyword">return</span> im</div><div class="line"></div><div class="line">x = transform_image(image)</div><div class="line"></div><div class="line"><span class="comment"># let's go</span></div><div class="line">ctx = tvm.gpu(<span class="number">0</span>)</div><div class="line">dtype = <span class="string">'float32'</span></div><div class="line"><span class="comment">## 加载模型</span></div><div class="line">m = graph_runtime.create(graph, lib, ctx)</div><div class="line"><span class="comment">## set input data</span></div><div class="line">m.set_input(<span class="string">'data'</span>, tvm.nd.array(x.astype(dtype)))</div><div class="line"><span class="comment">## set input params</span></div><div class="line">m.set_input(**params)</div><div class="line">m.run()</div><div class="line"><span class="comment"># get output</span></div><div class="line">outputs = m.get_output(<span class="number">0</span>)</div><div class="line">top1 = np.argmax(outputs.asnumpy()[<span class="number">0</span>])</div><div class="line"></div><div class="line"><span class="comment"># save model</span></div><div class="line"><span class="comment">## lib存为tar包文件，解压后可以发现，就是打包了动态链接库</span></div><div class="line">path_lib = <span class="string">'./deploy_resnet50_v2_lib.tar'</span></div><div class="line">lib.export_library(path_lib)</div><div class="line"></div><div class="line"><span class="comment">## 计算图存为json文件</span></div><div class="line"><span class="keyword">with</span> open(<span class="string">'./deploy_resnet50_v2_graph.json'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</div><div class="line">    f.write(graph)</div><div class="line"><span class="comment">## 权重存为二进制文件</span></div><div class="line"><span class="keyword">with</span> open(<span class="string">'./deploy_params'</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</div><div class="line">    f.write(relay.save_param_dict(params))</div><div class="line"></div><div class="line"><span class="comment"># load model back</span></div><div class="line">loaded_json = open(<span class="string">'./deploy_resnet50_v2_graph.json'</span>).read()</div><div class="line">loaded_lib = tvm.module.load(path_lib)</div><div class="line">loaded_params = bytearray(open(<span class="string">'./deploy_params'</span>, <span class="string">'rb'</span>).read())</div><div class="line">module = graph_runtime.create(loaded_json, loaded_lib, ctx)</div><div class="line"><span class="comment">## 好了，剩下的就都一样了</span></div></pre></td></tr></table></figure>
+<h2 id="最后的话"><a href="#最后的话" class="headerlink" title="最后的话"></a>最后的话</h2><p>我个人的观点，TVM是一个很有意思的项目。在深度学习模型的优化和部署上做了很多探索，在官方放出的benchmark上表现还是不错的。如果使用非GPU进行模型的部署，TVM值得一试。不过在GPU上，得益于Nvidia的CUDA生态，目前TensorRT仍然用起来更方便，综合性能更好。如果你和我一样，主要仍然在GPU上搞事情，可以密切关注TVM的发展，并尝试使用在自己的项目中，不过我觉得还是优先考虑TensorRT。<del>另一方面，TVM的代码实在是看不太懂啊。。。</del></p>
+<h2 id="想要更多"><a href="#想要更多" class="headerlink" title="想要更多"></a>想要更多</h2><ul>
+<li>TVM paper：<a href="https://arxiv.org/abs/1802.04799" target="_blank" rel="external">TVM: An Automated End-to-End Optimizing Compiler for Deep Learning</a></li>
+<li>TVM 项目主页：<a href="https://tvm.ai/" target="_blank" rel="external">TVM</a></li>
+</ul>
+<p>后续TVM的介绍，不知道啥时候有时间再写。。。随缘吧。。。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/tvm/" rel="tag"># tvm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/01/cpp-primer-review/" rel="next" title="重读 C++ Primer">
+                <i class="fa fa-chevron-left"></i> 重读 C++ Primer
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/06/bag-of-tricks-for-image-cls/" rel="prev" title="论文 - Bag of Tricks for Image Classification with Convolutional Neural Networks">
+                论文 - Bag of Tricks for Image Classification with Convolutional Neural Networks <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/liumengli.jpg" alt="一个脱离了高级趣味的人">
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景介绍"><span class="nav-number">1.</span> <span class="nav-text">背景介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译"><span class="nav-number">2.</span> <span class="nav-text">编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备代码"><span class="nav-number">2.1.</span> <span class="nav-text">准备代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#config文件"><span class="nav-number">2.2.</span> <span class="nav-text">config文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译-1"><span class="nav-number">2.3.</span> <span class="nav-text">编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python包安装"><span class="nav-number">2.4.</span> <span class="nav-text">python包安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#demo"><span class="nav-number">3.</span> <span class="nav-text">demo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最后的话"><span class="nav-number">4.</span> <span class="nav-text">最后的话</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#想要更多"><span class="nav-number">5.</span> <span class="nav-text">想要更多</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

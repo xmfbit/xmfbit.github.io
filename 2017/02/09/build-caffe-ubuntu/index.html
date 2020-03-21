@@ -1,0 +1,918 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="caffe,tool,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="Caffe作为较早的一款深度学习框架，很是流行。然而，由于依赖项众多，而且Jia Yangqing已经毕业，所以留下了不少的坑。这篇博客记录了我在一台操作系统为Ubuntu14.04.3的DELL游匣7559笔记本上编译Caffe的过程，主要是在编译python接口时遇到的import error问题的解决和找不到HDF5链接库的问题。">
+<meta name="keywords" content="caffe,tool">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Ubuntu14.04构建Caffe">
+<meta property="og:url" content="https://xmfbit.github.io/2017/02/09/build-caffe-ubuntu/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="Caffe作为较早的一款深度学习框架，很是流行。然而，由于依赖项众多，而且Jia Yangqing已经毕业，所以留下了不少的坑。这篇博客记录了我在一台操作系统为Ubuntu14.04.3的DELL游匣7559笔记本上编译Caffe的过程，主要是在编译python接口时遇到的import error问题的解决和找不到HDF5链接库的问题。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://xmfbit.github.io/img/caffe_image.jpg">
+<meta property="og:updated_time" content="2020-03-21T02:02:44.785Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Ubuntu14.04构建Caffe">
+<meta name="twitter:description" content="Caffe作为较早的一款深度学习框架，很是流行。然而，由于依赖项众多，而且Jia Yangqing已经毕业，所以留下了不少的坑。这篇博客记录了我在一台操作系统为Ubuntu14.04.3的DELL游匣7559笔记本上编译Caffe的过程，主要是在编译python接口时遇到的import error问题的解决和找不到HDF5链接库的问题。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/caffe_image.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2017/02/09/build-caffe-ubuntu/">
+
+
+
+
+
+  <title> 在Ubuntu14.04构建Caffe | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/02/09/build-caffe-ubuntu/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                在Ubuntu14.04构建Caffe
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-09T12:59:05+00:00">
+                2017-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Caffe作为较早的一款深度学习框架，很是流行。然而，由于依赖项众多，而且Jia Yangqing已经毕业，所以留下了不少的坑。这篇博客记录了我在一台操作系统为Ubuntu14.04.3的DELL游匣7559笔记本上编译Caffe的过程，主要是在编译python接口时遇到的import error问题的解决和找不到HDF5链接库的问题。</p>
+<p><img src="/img/caffe_image.jpg" alt="caffe"></p>
+<a id="more"></a>
+<h2 id="修改Makefile-config"><a href="#修改Makefile-config" class="headerlink" title="修改Makefile.config"></a>修改Makefile.config</h2><p>当从github上clone下来Caffe的源码之后，我们首先需要修改Makefile.config文件，自定义配置。下面是我的配置文件，主要修改了CUDNN部分和Anaconda Python部分。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div></pre></td><td class="code"><pre><div class="line"><span class="comment">## Refer to http://caffe.berkeleyvision.org/installation.html</span></div><div class="line"><span class="comment"># Contributions simplifying and improving our build system are welcome!</span></div><div class="line"></div><div class="line"><span class="comment"># cuDNN acceleration switch (uncomment to build with cuDNN).</span></div><div class="line">USE_CUDNN := 1    <span class="comment"># 这里我们使用cudnn加速</span></div><div class="line"></div><div class="line"><span class="comment"># CPU-only switch (uncomment to build without GPU support).</span></div><div class="line"><span class="comment"># CPU_ONLY := 1</span></div><div class="line"></div><div class="line"><span class="comment"># uncomment to disable IO dependencies and corresponding data layers</span></div><div class="line"><span class="comment"># USE_OPENCV := 0</span></div><div class="line"><span class="comment"># USE_LEVELDB := 0</span></div><div class="line"><span class="comment"># USE_LMDB := 0</span></div><div class="line"></div><div class="line"><span class="comment"># uncomment to allow MDB_NOLOCK when reading LMDB files (only if necessary)</span></div><div class="line"><span class="comment">#	You should not set this flag if you will be reading LMDBs with any</span></div><div class="line"><span class="comment">#	possibility of simultaneous read and write</span></div><div class="line"><span class="comment"># ALLOW_LMDB_NOLOCK := 1</span></div><div class="line"></div><div class="line"><span class="comment"># Uncomment if you're using OpenCV 3</span></div><div class="line"><span class="comment"># OPENCV_VERSION := 3</span></div><div class="line"></div><div class="line"><span class="comment"># To customize your choice of compiler, uncomment and set the following.</span></div><div class="line"><span class="comment"># N.B. the default for Linux is g++ and the default for OSX is clang++</span></div><div class="line"><span class="comment"># CUSTOM_CXX := g++</span></div><div class="line"></div><div class="line"><span class="comment"># CUDA directory contains bin/ and lib/ directories that we need.</span></div><div class="line">CUDA_DIR := /usr/<span class="built_in">local</span>/cuda</div><div class="line"><span class="comment"># On Ubuntu 14.04, if cuda tools are installed via</span></div><div class="line"><span class="comment"># "sudo apt-get install nvidia-cuda-toolkit" then use this instead:</span></div><div class="line"><span class="comment"># CUDA_DIR := /usr</span></div><div class="line"></div><div class="line"><span class="comment"># CUDA architecture setting: going with all of them.</span></div><div class="line"><span class="comment"># For CUDA &lt; 6.0, comment the *_50 lines for compatibility.</span></div><div class="line"><span class="comment"># 这里可以去掉sm_20和21，因为实在是已经太老了</span></div><div class="line"><span class="comment"># 如果保留的话，编译时nvcc会给出警告</span></div><div class="line">CUDA_ARCH := -gencode arch=compute_30,code=sm_30 \</div><div class="line">		-gencode arch=compute_35,code=sm_35 \</div><div class="line">		-gencode arch=compute_50,code=sm_50 \</div><div class="line">		-gencode arch=compute_50,code=compute_50</div><div class="line"></div><div class="line"><span class="comment"># BLAS choice:</span></div><div class="line"><span class="comment"># atlas for ATLAS (default)</span></div><div class="line"><span class="comment"># mkl for MKL</span></div><div class="line"><span class="comment"># open for OpenBlas</span></div><div class="line">BLAS := atlas</div><div class="line"><span class="comment"># Custom (MKL/ATLAS/OpenBLAS) include and lib directories.</span></div><div class="line"><span class="comment"># Leave commented to accept the defaults for your choice of BLAS</span></div><div class="line"><span class="comment"># (which should work)!</span></div><div class="line"><span class="comment"># BLAS_INCLUDE := /path/to/your/blas</span></div><div class="line"><span class="comment"># BLAS_LIB := /path/to/your/blas</span></div><div class="line"></div><div class="line"><span class="comment"># Homebrew puts openblas in a directory that is not on the standard search path</span></div><div class="line"><span class="comment"># BLAS_INCLUDE := $(shell brew --prefix openblas)/include</span></div><div class="line"><span class="comment"># BLAS_LIB := $(shell brew --prefix openblas)/lib</span></div><div class="line"></div><div class="line"><span class="comment"># This is required only if you will compile the matlab interface.</span></div><div class="line"><span class="comment"># MATLAB directory should contain the mex binary in /bin.</span></div><div class="line"><span class="comment"># MATLAB_DIR := /usr/local</span></div><div class="line"><span class="comment"># MATLAB_DIR := /Applications/MATLAB_R2012b.app</span></div><div class="line"></div><div class="line"><span class="comment"># <span class="doctag">NOTE:</span> this is required only if you will compile the python interface.</span></div><div class="line"><span class="comment"># We need to be able to find Python.h and numpy/arrayobject.h.</span></div><div class="line">PYTHON_INCLUDE := /usr/include/python2.7 \</div><div class="line">		/usr/lib/python2.7/dist-packages/numpy/core/include</div><div class="line"><span class="comment"># Anaconda Python distribution is quite popular. Include path:</span></div><div class="line"><span class="comment"># Verify anaconda location, sometimes it's in root.</span></div><div class="line"><span class="comment"># 这里我们使用Anaconda</span></div><div class="line">ANACONDA_HOME := $(HOME)/anaconda2</div><div class="line"> PYTHON_INCLUDE := $(ANACONDA_HOME)/include \</div><div class="line">		 $(ANACONDA_HOME)/include/python2.7 \</div><div class="line">		 $(ANACONDA_HOME)/lib/python2.7/site-packages/numpy/core/include</div><div class="line"></div><div class="line"><span class="comment"># Uncomment to use Python 3 (default is Python 2)</span></div><div class="line"><span class="comment"># PYTHON_LIBRARIES := boost_python3 python3.5m</span></div><div class="line"><span class="comment"># PYTHON_INCLUDE := /usr/include/python3.5m \</span></div><div class="line"><span class="comment">#                 /usr/lib/python3.5/dist-packages/numpy/core/include</span></div><div class="line"></div><div class="line"><span class="comment"># We need to be able to find libpythonX.X.so or .dylib.</span></div><div class="line"><span class="comment">#PYTHON_LIB := /usr/lib</span></div><div class="line"> PYTHON_LIB := $(ANACONDA_HOME)/lib</div><div class="line"></div><div class="line"><span class="comment"># Homebrew installs numpy in a non standard path (keg only)</span></div><div class="line"><span class="comment"># PYTHON_INCLUDE += $(dir $(shell python -c 'import numpy.core; print(numpy.core.__file__)'))/include</span></div><div class="line"><span class="comment"># PYTHON_LIB += $(shell brew --prefix numpy)/lib</span></div><div class="line"></div><div class="line"><span class="comment"># Uncomment to support layers written in Python (will link against Python libs)</span></div><div class="line">WITH_PYTHON_LAYER := 1</div><div class="line"></div><div class="line"><span class="comment"># Whatever else you find you need goes here.</span></div><div class="line">INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/<span class="built_in">local</span>/include</div><div class="line">LIBRARY_DIRS := $(PYTHON_LIB) /usr/<span class="built_in">local</span>/lib /usr/lib</div><div class="line"></div><div class="line"><span class="comment"># If Homebrew is installed at a non standard location (for example your home directory) and you use it for general dependencies</span></div><div class="line"><span class="comment"># INCLUDE_DIRS += $(shell brew --prefix)/include</span></div><div class="line"><span class="comment"># LIBRARY_DIRS += $(shell brew --prefix)/lib</span></div><div class="line"></div><div class="line"><span class="comment"># NCCL acceleration switch (uncomment to build with NCCL)</span></div><div class="line"><span class="comment"># https://github.com/NVIDIA/nccl (last tested version: v1.2.3-1+cuda8.0)</span></div><div class="line"><span class="comment"># USE_NCCL := 1</span></div><div class="line"></div><div class="line"><span class="comment"># Uncomment to use `pkg-config` to specify OpenCV library paths.</span></div><div class="line"><span class="comment"># (Usually not necessary -- OpenCV libraries are normally installed in one of the above $LIBRARY_DIRS.)</span></div><div class="line"><span class="comment"># USE_PKG_CONFIG := 1</span></div><div class="line"></div><div class="line"><span class="comment"># N.B. both build and distribute dirs are cleared on `make clean`</span></div><div class="line">BUILD_DIR := build</div><div class="line">DISTRIBUTE_DIR := distribute</div><div class="line"></div><div class="line"><span class="comment"># Uncomment for debugging. Does not work on OSX due to https://github.com/BVLC/caffe/issues/171</span></div><div class="line"><span class="comment"># DEBUG := 1</span></div><div class="line"></div><div class="line"><span class="comment"># The ID of the GPU that 'make runtest' will use to run unit tests.</span></div><div class="line">TEST_GPUID := 0</div><div class="line"></div><div class="line"><span class="comment"># enable pretty build (comment to see full commands)</span></div><div class="line">Q ?= @</div></pre></td></tr></table></figure>
+<p>对于CUDNN，从Nvidia官方网站上下载后，可不按照官方给定的方法安装。直接将<code>include</code>中的头文件放于<code>/usr/local/cuda-8.0/include</code>下，将<code>lib</code>中的库文件放于<code>/usr/loca/cuda-8.0/lib64</code>文件夹下即可。</p>
+<h2 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h2><p>使用<code>make -j8</code>进行编译，并使用<code>make pycaffe</code>生成python接口。并在<code>.bashrc</code>中添加内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export PYTHONPATH=/path_to_caffe/python:$PYTHONPATH</div></pre></td></tr></table></figure></p>
+<p>结果在<code>import caffe</code>时出现问题如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ImportError: libcudnn.so.5: cannot open shared object file: No such file or directory</div></pre></td></tr></table></figure></p>
+<p>解决方法如下，详见GitHub issue<a href="https://github.com/NVIDIA/DIGITS/issues/8" target="_blank" rel="external">讨论</a>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ldconfig /usr/local/cuda/lib64</div></pre></td></tr></table></figure></p>
+<p>然而仍有问题，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ImportError: No module named google.protobuf.internal</div></pre></td></tr></table></figure></p>
+<p>解决方法如下，详见G+ caffe-user group的<a href="https://groups.google.com/forum/#!topic/caffe-users/9Q10WkpCGxs" target="_blank" rel="external">帖子</a>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pip install protobuf</div></pre></td></tr></table></figure></p>
+<p>不过仍然存在的问题是远程SSH登录时，不能在<code>ipython</code>环境下导入caffe，不知为何。</p>
+<p>使用<code>make test; make runtest</code>进行测试，结果提示HDF5动态链接库出现问题，怀疑与Anaconda中的HDF5冲突有关。错误信息如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">error while loading shared libraries: libhdf5_hl.so.10: cannot open shared object file: No such file or directory</div></pre></td></tr></table></figure>
+<p>解决方法为手动添加符号链接，详见GitHub<a href="https://github.com/BVLC/caffe/issues/1463" target="_blank" rel="external">讨论帖</a>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cd /usr/lib/x86_64-linux-gnu</div><div class="line">sudo ln -s libhdf5.so.7 libhdf5.so.10</div><div class="line">sudo ln -s libhdf5_hl.so.7 libhdf5_hl.so.10</div></pre></td></tr></table></figure>
+<p>另外，在另一台机器上使用MKL库时，发现会提示找不到相关动态链接库的问题。找到MKL的安装位置，默认应该在目录<code>/opt/intel/mkl</code>下。使用<code>sudo</code>权限，在目录<code>/etc/ld.so.conf.d/</code>下建立一个名为<code>intel_mkl_setttings.conf</code>的文件，将MKL安装位置下的链接库目录添加进去，如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/opt/intel/mkl/lib/intel64_lin/</div></pre></td></tr></table></figure></p>
+<p>接着，运行<code>sudo ldconfig</code>命令，就可以了。</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>首先，通过<code>make runtest</code>看是否全部test可以通过。其次，可以试运行<code>example</code>下的LeNet训练。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cd $CAFFE_ROOT</div><div class="line">./data/mnist/get_mnist.sh</div><div class="line">./examples/mnist/create_mnist.sh</div><div class="line">./examples/mnist/train_lenet.sh</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/caffe/" rel="tag"># caffe</a>
+          
+            <a href="/tags/tool/" rel="tag"># tool</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/08/digitalocean-shadowsocks/" rel="next" title="在DigitalOcean上配置Shadowsocks实现IPV4/IPV6翻墙">
+                <i class="fa fa-chevron-left"></i> 在DigitalOcean上配置Shadowsocks实现IPV4/IPV6翻墙
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/12/cs131-mean-shift/" rel="prev" title="CS131-MeanShift">
+                CS131-MeanShift <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/liumengli.jpg" alt="一个脱离了高级趣味的人">
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#修改Makefile-config"><span class="nav-number">1.</span> <span class="nav-text">修改Makefile.config</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建"><span class="nav-number">2.</span> <span class="nav-text">构建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试"><span class="nav-number">3.</span> <span class="nav-text">测试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

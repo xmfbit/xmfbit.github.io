@@ -1,0 +1,962 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="cpp,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="重读C++ Primer第五版，整理一些糊涂的语法知识点。">
+<meta name="keywords" content="cpp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="重读 C++ Primer">
+<meta property="og:url" content="https://xmfbit.github.io/2019/05/01/cpp-primer-review/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="重读C++ Primer第五版，整理一些糊涂的语法知识点。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://xmfbit.github.io/img/cpp_is_terrible.jpg">
+<meta property="og:updated_time" content="2020-03-21T02:02:44.798Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="重读 C++ Primer">
+<meta name="twitter:description" content="重读C++ Primer第五版，整理一些糊涂的语法知识点。">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/cpp_is_terrible.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2019/05/01/cpp-primer-review/">
+
+
+
+
+
+  <title> 重读 C++ Primer | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2019/05/01/cpp-primer-review/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                重读 C++ Primer
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-05-01T05:32:58+00:00">
+                2019-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>重读C++ Primer第五版，整理一些糊涂的语法知识点。</p>
+<div align="center">    
+ <img src="/img/cpp_is_terrible.jpg" width="200" height="300" alt="入门到放弃" align="center">
+</div>
+
+<a id="more"></a>
+<h2 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h2><p>总结一些比较容易搞乱的基础语法。</p>
+<h3 id="const-限定说明符"><a href="#const-限定说明符" class="headerlink" title="const 限定说明符"></a>const 限定说明符</h3><ul>
+<li><code>const</code>对象一般只在当前文件可见，如果希望在其他文件访问，在声明和定义时，均需加上<code>extern</code>关键字。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">extern</span> <span class="keyword">const</span> <span class="keyword">int</span> BUF_SIZE = <span class="number">100</span>;</div></pre></td></tr></table></figure>
+<ul>
+<li>顶层<code>const</code>和底层<code>const</code></li>
+</ul>
+<p>指针本身也是对象，所以有所谓的“常量指针”（指针本身不能赋值）和“指向常量的指针”（指针指向的那个对象不能赋值）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> a = <span class="number">10</span>;</div><div class="line"><span class="comment">// 指针指向的对象不能经由指针赋值</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span>* p1 = &amp;a;</div><div class="line">*p = <span class="number">0</span>;  <span class="comment">// 错误</span></div><div class="line"><span class="comment">// 指针本身不能再赋值</span></div><div class="line"><span class="keyword">int</span>* <span class="keyword">const</span> p2 = &amp;a;</div><div class="line"><span class="keyword">int</span> b = <span class="number">0</span>;</div><div class="line">p2 = &amp;p;   <span class="comment">// 错误</span></div></pre></td></tr></table></figure>
+<p>如何记住这条规则？c++中类型说明从右向左读即可。例如<code>p1</code>，其左侧首先遇到<code>int*</code>，故其是个“普通”指针（没有被<code>const</code>修饰），再往左才读到<code>const</code>，故这个指针指向的内容是常量，不能修改。<code>p2</code>同理。</p>
+<p>把“指针本身是常量”的行为称为“顶层const”（top-level），把“指针指向内容是常量”的行为称为“底层const”（low-level）。</p>
+<h3 id="auto-和-decltype"><a href="#auto-和-decltype" class="headerlink" title="auto 和 decltype"></a>auto 和 decltype</h3><ul>
+<li><code>auto</code>类型推断的规则</li>
+</ul>
+<p>编译器推断<code>auto</code>声明变量的类型时，可能和初始值类型不一样。当初始值类型为引用时，编译器以被引用对象的类型作为<code>auto</code>的类型，除非显式指明。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line"><span class="keyword">int</span>&amp; ri = i;</div><div class="line"><span class="comment">// type of j: int</span></div><div class="line"><span class="keyword">auto</span> j = ri;</div><div class="line"><span class="comment">// type of rj: int&amp;</span></div><div class="line"><span class="keyword">auto</span>&amp; rj = ri;</div></pre></td></tr></table></figure>
+<p>另外，<code>auto</code>只会保留底层<code>const</code>，忽略顶层<code>const</code>，除非显式指定。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> a = <span class="number">0</span>;</div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span>* <span class="keyword">const</span> p = &amp;a;</div><div class="line"><span class="comment">// type of b: int</span></div><div class="line"><span class="keyword">auto</span> b = a;</div><div class="line"><span class="comment">// type of p1: const int*</span></div><div class="line"><span class="keyword">auto</span> p1 = p;</div><div class="line"><span class="comment">// type of p2: const int* const</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> p2 = p;</div><div class="line">p1 = &amp;b;   <span class="comment">// ok, p1 本身已经不是const的了</span></div><div class="line">p2 = &amp;b;   <span class="comment">// wrong! 显式指定了 p2 本身是 const</span></div><div class="line">*p1 = <span class="number">10</span>;  <span class="comment">// wrong! p1 保留了底层const，指向的内容仍然不可改变</span></div></pre></td></tr></table></figure>
+<ul>
+<li><code>decltype</code> 类型推断规则</li>
+</ul>
+<p>和<code>auto</code>不同，<code>decltype</code>保留表达式的顶层<code>const</code>和引用。</p>
+<ol>
+<li>如果表达式是变量，那么返回该变量的类型；</li>
+<li>如果表达式不是纯变量，返回表达式结果的类型；</li>
+<li>如果表达式是解引用，返回引用类型。</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> i = <span class="number">42</span>, *p = &amp;i, &amp;r = i;</div><div class="line"><span class="keyword">decltype</span>(i) j;    <span class="comment">// ok, j is a int</span></div><div class="line"><span class="keyword">decltype</span>(r) y;    <span class="comment">// wrong! y是引用类型，必须初始化</span></div><div class="line"><span class="keyword">decltype</span>(r + <span class="number">0</span>) z;  <span class="comment">// ok, r+0 返回值是int</span></div><div class="line"><span class="keyword">decltype</span>(*p) c;   <span class="comment">// wrong! 解引用的结果是引用，必须初始化</span></div></pre></td></tr></table></figure>
+<p>有一种情况特殊，如果是春变量，但是变量名加上括号，结果将是引用。原因：变量加上括号，将会被当做表达式。而变量又可以被赋值，所以得到了引用。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">dectype((i)) d;  <span class="comment">// wrong! d是引用</span></div></pre></td></tr></table></figure>
+<h2 id="泛型算法"><a href="#泛型算法" class="headerlink" title="泛型算法"></a>泛型算法</h2><p>C++的标准库中实现了很多泛型算法，如<code>find</code>, <code>sort</code>等。它们大多定义在<code>&lt;algorithm&gt;</code>头文件中，一些数值相关的定义在<code>&lt;numeric&gt;</code>中。通过“迭代器”这一层抽象，泛型算法可以不关心所操作数据实际储存的容器，不过仍然受制于实际数据类型。例如<code>find</code>中，为了比较当前元素是否为所求值，要求元素类型实现<code>==</code>运算。好在这些算法大多支持自定义操作。</p>
+<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><p>在标准库的<code>&lt;iterator&gt;</code>中，定义了如下几种通用迭代器。</p>
+<ul>
+<li>插入迭代器</li>
+</ul>
+<p>插入器是一个迭代器的适配器，接受一个容器，生成一个用于该容器的迭代器，能够实现向该容器插入元素。插入迭代器有三种，区别在于插入元素的位置：</p>
+<ol>
+<li><code>back_inserter</code>，创建一个使用<code>push_back</code>插入的迭代器</li>
+<li><code>front_inserter</code>，创建一个使用<code>push_front</code>插入的迭代器</li>
+<li><code>inserter</code>，创建一个使用<code>insert</code>的迭代器，在给定的迭代器前面插入元素</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iterator&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="comment">// 使用back_inserter插入数据</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;</div><div class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; b;</div><div class="line">    <span class="comment">// copy a -&gt; b, 动态改变b的大小</span></div><div class="line">    copy(begin(a), end(a), back_inserter(b));</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> v: b) &#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; v &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// b: 1, 2, 3, 4, 5</span></div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 使用inserter，将数据插入指定位置</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;</div><div class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; b &#123;<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;;</div><div class="line">    <span class="comment">// find iter of value 8</span></div><div class="line">    <span class="keyword">auto</span> iter = find(b.begin(), b.end(), <span class="number">8</span>);</div><div class="line">    <span class="comment">// copy a -&gt; b before value 8</span></div><div class="line">    copy(begin(a), end(a), inserter(b, iter));</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> v : b) &#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; v &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// b: 6, 7, 1, 2, 3, 4, 5, 8</span></div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里要注意的是，当使用<code>front_inserter</code>时，由于插入总是在容器头部发生，所以最后的插入结果是原始数据序列的逆序。</p>
+<ul>
+<li>流迭代器</li>
+</ul>
+<p>虽然输入输出流不是容器，不过也有用于这些IO对象的迭代器：<code>istream_iterator</code>和<code>ostream_iterator</code>。这样，我们可以通过它们向对应的输入输出流读写数据，</p>
+<p>创建输入流迭代器时，必须指定其要操作的数据类型，并将其绑定到某个流（标准输入输出流或文件流），或使用默认初始化，得到当做尾后值使用的迭代器。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">istream_iterator&lt;<span class="keyword">int</span>&gt; in_iter(<span class="built_in">cin</span>);</div><div class="line">istream_iterator&lt;<span class="keyword">int</span>&gt; in_eof;</div><div class="line"><span class="comment">// 使用迭代器构建vector</span></div><div class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; values(in_iter, in_eof);</div></pre></td></tr></table></figure>
+<p>创建输出流迭代器时，必须指定其要操作的数据类型，并向其绑定到某个流，还可以传入第二个参数，类型是C风格的字符串（字符串字面常量或指向<code>\0</code>结尾的字符数组指针），表示在输出数据之后，还会输出此字符串。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;</div><div class="line"><span class="comment">// 输出：1       2       3       4       5 </span></div><div class="line">copy(v.begin(), v.end(), ostream_iterator&lt;<span class="keyword">int</span>&gt;(<span class="built_in">cout</span>, <span class="string">"\t"</span>));</div></pre></td></tr></table></figure>
+<ul>
+<li>反向迭代器</li>
+</ul>
+<p>顾名思义，反向迭代器的迭代顺序和正常的迭代器是相反的。使用<code>rbegin</code>和<code>rend</code>可以获得绑定在该容器的反向迭代器。不过<code>forward_list</code>和流对象，由于没有同时实现<code>++</code>和<code>--</code>，所以没有反向迭代器。</p>
+<p>反向迭代器常常用来在容器中查找最后一个满足条件的元素。这时候要注意，如果继续使用该迭代器，顺序仍然是反向的。如果需要正向迭代器，可以使用<code>.base()</code>方法得到对应的正向迭代器。不过要注意，正向迭代器和反向迭代器的位置会不一样哦~</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 找到数组中最后一个5,并将其后数字打印出来</span></div><div class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v &#123;<span class="number">10</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">2</span>&#125;;</div><div class="line"><span class="keyword">auto</span> iter = find(v.rbegin(), v.rend(), <span class="number">5</span>);</div><div class="line"><span class="comment">// 输出：5,4,5,10,</span></div><div class="line">copy(iter, v.rend(), ostream_iterator&lt;<span class="keyword">int</span>&gt;(<span class="built_in">cout</span>, <span class="string">","</span>));</div><div class="line"><span class="built_in">cout</span> &lt;&lt; <span class="string">"\n"</span>;</div><div class="line"><span class="comment">// 输出：1,2, 注意并没有输出5</span></div><div class="line">copy(iter.base(), v.end(), ostream_iterator&lt;<span class="keyword">int</span>&gt;(<span class="built_in">cout</span>, <span class="string">","</span>));</div></pre></td></tr></table></figure>
+<h2 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h2><p>拖延症发作。。。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cpp/" rel="tag"># cpp</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/09/darknet-caffe-converter/" rel="next" title="YOLO Caffe模型转换BN的坑">
+                <i class="fa fa-chevron-left"></i> YOLO Caffe模型转换BN的坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/29/tvm-helloworld/" rel="prev" title="Hello TVM">
+                Hello TVM <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/liumengli.jpg" alt="一个脱离了高级趣味的人">
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础语法"><span class="nav-number">1.</span> <span class="nav-text">基础语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#const-限定说明符"><span class="nav-number">1.1.</span> <span class="nav-text">const 限定说明符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#auto-和-decltype"><span class="nav-number">1.2.</span> <span class="nav-text">auto 和 decltype</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#泛型算法"><span class="nav-number">2.</span> <span class="nav-text">泛型算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#迭代器"><span class="nav-number">2.1.</span> <span class="nav-text">迭代器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#未完待续"><span class="nav-number">3.</span> <span class="nav-text">未完待续</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

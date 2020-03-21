@@ -1,0 +1,965 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="cpp,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="C++中允许多重继承，并且可以指定继承是否是public or private等。成员函数也可以是虚函数或者非虚函数。如何在OOP这一C++联邦中的重要一员的规则下，写出易于拓展，易于维护且高效的代码？ 真•面向对象编程！">
+<meta name="keywords" content="cpp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective CPP 阅读 - Chapter 6 继承与面向对象设计">
+<meta property="og:url" content="https://xmfbit.github.io/2017/06/17/effective-cpp-06/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="C++中允许多重继承，并且可以指定继承是否是public or private等。成员函数也可以是虚函数或者非虚函数。如何在OOP这一C++联邦中的重要一员的规则下，写出易于拓展，易于维护且高效的代码？ 真•面向对象编程！">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://xmfbit.github.io/img/effectivecpp_06_joke.jpg">
+<meta property="og:image" content="https://xmfbit.github.io/img/effectivecpp_strategy_pattern.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/effectivecpp_diamond.png">
+<meta property="og:updated_time" content="2020-03-21T02:02:44.790Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Effective CPP 阅读 - Chapter 6 继承与面向对象设计">
+<meta name="twitter:description" content="C++中允许多重继承，并且可以指定继承是否是public or private等。成员函数也可以是虚函数或者非虚函数。如何在OOP这一C++联邦中的重要一员的规则下，写出易于拓展，易于维护且高效的代码？ 真•面向对象编程！">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/effectivecpp_06_joke.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2017/06/17/effective-cpp-06/">
+
+
+
+
+
+  <title> Effective CPP 阅读 - Chapter 6 继承与面向对象设计 | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2017/06/17/effective-cpp-06/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Effective CPP 阅读 - Chapter 6 继承与面向对象设计
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-17T02:40:19+00:00">
+                2017-06-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>C++中允许多重继承，并且可以指定继承是否是public or private等。成员函数也可以是虚函数或者非虚函数。如何在OOP这一C++联邦中的重要一员的规则下，写出易于拓展，易于维护且高效的代码？</p>
+<p>真•面向对象编程！<br><img src="/img/effectivecpp_06_joke.jpg" alt="面向对象编程"><br><a id="more"></a></p>
+<h2 id="32-确定public继承塑模出Is-a的关系"><a href="#32-确定public继承塑模出Is-a的关系" class="headerlink" title="32 确定public继承塑模出Is-a的关系"></a>32 确定<code>public</code>继承塑模出Is-a的关系</h2><p>请把这条规则记在心中：<code>public</code>继承意味着Is-a（XX是X的一种）的关系。适用于base class上的东西也一定能够用在derived class身上。因为每一个derived class对象也是一个base class的对象。</p>
+<p>不过，在实际使用时，可能并不是那么简单。举个例子，在鸟类这个基类中定义了<code>fly()</code>这一虚函数，而企鹅很显然是一种鸟，但是却没有飞翔的能力。类似的情况需要在编程实践中灵活处理。</p>
+<h2 id="33-避免遮掩继承而来的名称"><a href="#33-避免遮掩继承而来的名称" class="headerlink" title="33 避免遮掩继承而来的名称"></a>33 避免遮掩继承而来的名称</h2><p>这个题材实际和作用域有关。当C++遇到某个名称时，会首先在local域中寻找，如果找到，就不再继续寻找。这样，derived class中的名称可能会遮盖base class中的名称。</p>
+<p>一种解决办法是使用<code>using</code>声明。如下所示：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span> </span>= <span class="number">0</span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f3</span><span class="params">()</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f3</span><span class="params">(<span class="keyword">double</span>)</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> Derived: <span class="keyword">public</span> Base &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">using</span> Base::f3;</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f3</span><span class="params">()</span></span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">Derived d;</div><div class="line">d.f1();  <span class="comment">// 没问题，调用了Derived中的f1</span></div><div class="line">d.f3();  <span class="comment">// 没问题，调用了Derived中的f3</span></div><div class="line"><span class="keyword">double</span> x;</div><div class="line">d.f3(x);  <span class="comment">// 没问题，调用了Base中的f3。</span></div><div class="line"><span class="comment">// 但是如果没有using声明的话，Base::f3会被冲掉。</span></div></pre></td></tr></table></figure></p>
+<h2 id="34-区分接口继承和实现继承"><a href="#34-区分接口继承和实现继承" class="headerlink" title="34 区分接口继承和实现继承"></a>34 区分接口继承和实现继承</h2><p>表面上直截了当的<code>public</code>继承，可以细分为函数接口继承和函数实现继承。以下面的这个例子来说明：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Shape &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">error</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; msg)</span></span>;</div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getID</span><span class="params">()</span> <span class="keyword">const</span></span>;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> Rect: <span class="keyword">public</span> Shape &#123;...&#125;;</div><div class="line"><span class="keyword">class</span> Circle: <span class="keyword">public</span> Shape &#123;...&#125;;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>纯虚函数<br>声明纯虚函数（如<code>draw()</code>函数）是为了让derived class只继承函数接口。乃是一种约定：“你一定要实现某某，但是我不管你如何实现”。<br>不过，你仍然可以给纯虚函数提供函数定义。</p>
+</li>
+<li><p>虚函数<br>非纯虚函数（如<code>error()</code>函数）的目的是，让derived class继承该函数的接口和缺省实现。乃是约定“你必须支持XX，但是如果你不想自己实现，可以用我提供的这个”。<br>然而可能会出现这样一种局面：derived class的表现与base class不同，但是又忘记了重写这个虚函数。为了避免这种情况，可以使用下面的技术来达到“除非你明确要求，否则我才不给你提供那个缺省定义”的目的。</p>
+</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fun</span><span class="params">()</span> </span>= <span class="number">0</span>;   <span class="comment">// 注意，我们改写成了纯虚函数</span></div><div class="line"><span class="keyword">protected</span>:</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">default_fun</span><span class="params">()</span> </span>&#123;...&#125;;   <span class="comment">// 缺省实现</span></div><div class="line">&#125;;</div><div class="line"><span class="comment">// 此时，若想使用缺省实现，就必须显式地调用</span></div><div class="line"><span class="keyword">class</span> Derived: <span class="keyword">public</span> Base &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fun</span><span class="params">()</span> </span>&#123;</div><div class="line">        default_fun();</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>不过这样导致一个多余的<code>default_fun()</code>函数。如果不想添加额外的函数，我们可以使用上述提到的拥有定义的纯虚函数来实现。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Base &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fun</span><span class="params">()</span> </span>= <span class="number">0</span>;</div><div class="line">&#125;;</div><div class="line"><span class="comment">// 为纯虚函数提供定义</span></div><div class="line"><span class="keyword">void</span> Base::fun() &#123;</div><div class="line">    <span class="comment">// 缺省行为</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">class</span> Derived: <span class="keyword">public</span> Base &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="comment">// 显式调用基类的纯虚函数，实现缺省行为</span></div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fun</span><span class="params">()</span> </span>&#123;Base::fun(); &#125;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> Derived2: <span class="keyword">public</span> Base &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="comment">// 实现自定义的行为</span></div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fun</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// ...</span></div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<ul>
+<li>非虚函数<br>这意味着你不应该在derived class中定义不同的行为（老老实实用我给你的！），使得其继承了一份接口和强制实现。</li>
+</ul>
+<h2 id="35-考虑virtual函数之外的其他选择"><a href="#35-考虑virtual函数之外的其他选择" class="headerlink" title="35 考虑virtual函数之外的其他选择"></a>35 考虑<code>virtual</code>函数之外的其他选择</h2><p>虚函数使得多态成为可能。不过在一些情况下，为了实现多态，不一定非要使用虚函数。本条款介绍了一些相关技术。</p>
+<p>在某游戏中，需要设计一个计算角色剩余血量的函数。下面是一种惯常的设计。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> GameCharacter &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">healthValue</span><span class="params">()</span> <span class="keyword">const</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>使用non-virtual interface实现template method模式<br>这种流派主张<code>virtual</code>函数应该几乎总是私有的。较好的设计时将<code>healthValue()</code>函数设为非虚函数，并调用虚函数进行实现。这个调用函数中，可以做一些预先准备（互斥锁，日志等），后续可以做一些打扫工作。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> GameCharacter &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">healthValue</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</div><div class="line">        <span class="comment">// ... 前期准备</span></div><div class="line">        <span class="keyword">int</span> ret_val = doHealthValue();</div><div class="line">        <span class="comment">// ... 后续清理</span></div><div class="line">        <span class="keyword">return</span> ret_val</div><div class="line">    &#125;</div><div class="line"><span class="keyword">private</span>:</div><div class="line">    <span class="keyword">virtual</span> <span class="keyword">int</span> doHealthValue() <span class="keyword">const</span> &#123;...&#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这样做的好处是基类明确定义了该如何实现求血量这个行为，同时又给了一定的自由，派生类可以重写<code>doHealthValue()</code>函数，针对自身的特点计算血量。</p>
+<ul>
+<li>使用函数指针实现策略模式<br>上述方案实际上是对虚函数的调用进行了一次包装。我们还可以借由函数指针实现策略模式，为不同的派生类甚至不同的对象实例做出不同的实现。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> GameCharacter;   <span class="comment">// 前置声明</span></div><div class="line"><span class="comment">// 计算血量的缺省方法</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">defaultHealthValue</span><span class="params">(<span class="keyword">const</span> GameCharacter&amp;)</span></span>;</div><div class="line"></div><div class="line"><span class="keyword">class</span> GameCharacter &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">typedef</span> <span class="title">int</span> <span class="params">(*HealthCalcFun)</span> <span class="params">(<span class="keyword">const</span> GameCharacter&amp;)</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">GameCharacter</span><span class="params">(HealthCalcFun f=defaultHealthValue</span></span></div><div class="line">        :healthFunc(f)&#123;</div><div class="line">        <span class="comment">// ...</span></div><div class="line">    &#125;</div><div class="line"><span class="keyword">private</span>:</div><div class="line">    HealthCalcFun healthFunc;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这样，我们通过在构造时候传入相应的函数指针，就可以实现计算血量的个性化设置。比如两个同样的boss，血量下降方式就可以不一样。<br>或者我们可以在运行时候，通过设定<code>healthFunc</code>，来实现动态血量计算方法的变化。</p>
+<ul>
+<li>借由<code>std::function</code>实现策略模式<br>作为上面的改进，我们可以使用<code>std::function</code>（C++11），这样，不止函数指针可以使用，函数对象等也都可以了。（关于<code>std::function</code>的大致介绍，可以看<a href="http://en.cppreference.com/w/cpp/utility/functional/function" target="_blank" rel="external">这里</a>）。</li>
+</ul>
+<p>我们只需将上面的<code>typedef</code>改掉即可。不再使用函数指针，而是更加高级更加通用的<code>std::function</code>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="built_in">std</span>::function&lt;<span class="keyword">int</span>(<span class="keyword">const</span> GameCharacter&amp;)&gt; HealthCalcFun;</div></pre></td></tr></table></figure>
+<ul>
+<li>使用古典的策略模式<br>如下图所示。对于血量计算，我们单独抻出来一个基类，并有不同的实现。<code>GameCharacter</code>类中则含有一个指向<code>HealthCalcFun</code>类实例的指针。</li>
+</ul>
+<p><img src="/img/effectivecpp_strategy_pattern.png" alt="使用UML表示的策略模式"></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">//我们首先定义HealthCalcFunc基类</div><div class="line">class GameCharacter;    // 前向声明</div><div class="line">class HealthCalcFunc &#123;</div><div class="line">public:</div><div class="line">    virtual int calc(const GameCharacter&amp; gc) const &#123;...&#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">HealthCalcFunc defaultCalcFunc;</div><div class="line"></div><div class="line">class GameCharacter &#123;</div><div class="line">private:</div><div class="line">    HealthCalcFunc* pfun;</div><div class="line">public:</div><div class="line">    explicit GameCharacter(HealthCalcFunc* p=&amp;defaultCalcFunc):</div><div class="line">        pfun(p) &#123;&#125;</div><div class="line">    int healthValue() const &#123;</div><div class="line">        return pfun-&gt;calc(*this);</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>该条款给出了虚函数的若干替代方案。</p>
+<h2 id="36-绝不重新定义继承而来的非虚函数"><a href="#36-绝不重新定义继承而来的非虚函数" class="headerlink" title="36 绝不重新定义继承而来的非虚函数"></a>36 绝不重新定义继承而来的非虚函数</h2><p>在条款34中已经指出，非虚函数是一种实现继承的约定。派生类不应该重新定义非虚函数。这破坏了约定。</p>
+<p>如下所示。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> B &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">mf</span><span class="params">()</span> </span>&#123;...&#125;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> D: <span class="keyword">public</span> B &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">mf</span><span class="params">()</span> </span>&#123;...&#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">D d;</div><div class="line">B* pb = &amp;d;</div><div class="line">D* pd = &amp;d;</div><div class="line"></div><div class="line">pb-&gt;mf();   <span class="comment">// 调用的是B::mf()</span></div><div class="line">pd-&gt;mf();   <span class="comment">// 调用的是D::mf()</span></div></pre></td></tr></table></figure></p>
+<p>这是因为非虚函数的绑定是编译期行为（和虚函数的动态绑定相对，其发生在运行时）。由于<code>pb</code>被声明为一个指向<code>B</code>的指针，所以其调用的是<code>B</code>的成员函数<code>mf()</code>。</p>
+<p>为了不至于让自己陷入精神分裂与背信弃义的境地，请不要重新定义继承而来的非虚函数。</p>
+<h2 id="37-绝不重新定义继承而来的缺省参数值"><a href="#37-绝不重新定义继承而来的缺省参数值" class="headerlink" title="37 绝不重新定义继承而来的缺省参数值"></a>37 绝不重新定义继承而来的缺省参数值</h2><p>由于条款36的分析，所以我们只讨论继承而来的是带有缺省参数的虚函数。这样一来，本条款背后的逻辑就很清晰了：因为缺省参数同样是静态绑定的，而虚函数却是动态绑定。让我们再解释一下。</p>
+<p>静态类型是指在程序中被声明时的类型（不论其真实指向是什么）。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Circle是Shape的派生类</span></div><div class="line">Shape* ps;</div><div class="line">Shape* pc = <span class="keyword">new</span> Circle;   <span class="comment">// 静态类型都是Shape</span></div></pre></td></tr></table></figure></p>
+<p>动态类型是指当前所指对象的类型。就上例来说，<code>pc</code>的动态类型是<code>Circle*</code>，而<code>ps</code>没有动态类型，因为它并没有指向任何对象实例。动态类型常常可以通过赋值改变。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ps = <span class="keyword">new</span> Circle;   <span class="comment">// 现在ps的动态类型是Circle*</span></div></pre></td></tr></table></figure></p>
+<p>虚函数是运行时决定的，取决于发出调用的那个对象的动态类型。</p>
+<p>不过遵守此项条款，有时又会造成不便。看下例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Shape &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">enum</span> ShapeColor &#123;RED, GREEN&#125;;</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(ShapeColor c=RED)</span> <span class="keyword">const</span></span>=<span class="number">0</span>;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> Circle: <span class="keyword">public</span> Shape &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(ShapeColor c=RED)</span> <span class="keyword">const</span></span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>第一个问题，代码重复，我写了两遍缺省参数。第二造成了代码依存。比如我想换成<code>GREEN</code>为默认参数，需要在基类和派生类中同时修改。</p>
+<p>一种解决方法是采用条款35中的替代设计，如NVI方法。令基类中的一个public的非虚函数调用私有的虚函数，而后者可以被派生类重新定义。我们只需要在public的非虚函数中定义缺省参数即可。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> Shape &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">draw</span><span class="params">(ShapeColor c=RED)</span> <span class="keyword">const</span> </span>&#123;</div><div class="line">        doDraw(c);  <span class="comment">// 调用私有的虚函数</span></div><div class="line">    &#125;</div><div class="line"><span class="keyword">private</span>:</div><div class="line">    <span class="comment">//真正的工作在此完成</span></div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">doDraw</span><span class="params">(ShapeColor c)</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;  </div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> Circle: <span class="keyword">public</span> Shape &#123;</div><div class="line"><span class="keyword">private</span>:</div><div class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">doDraw</span><span class="params">(ShapeColor c)</span> <span class="keyword">const</span></span>;  <span class="comment">// 派生类重写这个真正的实现</span></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h2 id="38-通过复合塑模has-a或“根据某物实现出”"><a href="#38-通过复合塑模has-a或“根据某物实现出”" class="headerlink" title="38 通过复合塑模has-a或“根据某物实现出”"></a>38 通过复合塑模has-a或“根据某物实现出”</h2><p>复合是指某种对象内含其他对象。复合实际有两层意义，一种较好理解，即has-a，如人有名字、性别等他类，一种是指根据某物实现（is-implemented-in-terms-of）。例如实现消息管理的某个类中含有队列作为实现。</p>
+<h2 id="39-明智而审慎地使用private继承"><a href="#39-明智而审慎地使用private继承" class="headerlink" title="39 明智而审慎地使用private继承"></a>39 明智而审慎地使用<code>private</code>继承</h2><p>私有继承意味着条款38中的“根据某物实现出”。例如<code>D</code>私有继承自<code>B</code>，不是说<code>D</code>是某种<code>B</code>，私有继承完全是一种技术上的实现（和对现实的抽象没有半毛钱关系）。<code>B</code>的每样东西在<code>D</code>中都是不可见的，也就是成了黑箱，因为它们本身就是实现细节，你只是考虑用<code>B</code>来实现<code>D</code>的功能而已。</p>
+<p>但是复合也能达到相同的效果啊~我在<code>D</code>中加入一个<code>B</code>的对象实例不就好了？很多情况下的确是这样，如果没有必要，不建议使用私有继承。</p>
+<h2 id="40-明智而审慎地使用多重继承"><a href="#40-明智而审慎地使用多重继承" class="headerlink" title="40 明智而审慎地使用多重继承"></a>40 明智而审慎地使用多重继承</h2><p>使用多重继承有可能造成歧义。例如，<code>C</code>继承自<code>A</code>和<code>B</code>，而两个基类中都含有成员函数<code>mf()</code>。那么当<code>d.mf()</code>的时候，究竟是在调用哪个呢？你必须明确地指出,<code>d.A::mf()</code>。</p>
+<p>使用多重继承还可能会造成“钻石型”继承。任何时候继承体系中某个基类和派生类之间有一条以上的相通路线，就面临一个问题，是否要让基类中的每个成员变量经由每一条路线被复制？如果只想保留一份，那么需要将<code>File</code>定为虚基类，所有直接继承自它的类采用虚继承。<br><img src="/img/effectivecpp_diamond.png" alt="钻石型继承"></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> File &#123;...&#125;;</div><div class="line"><span class="keyword">class</span> InputFile: <span class="keyword">virtual</span> <span class="keyword">public</span> File &#123;...&#125;;</div><div class="line"><span class="keyword">class</span> OutputFile: <span class="keyword">virtual</span> <span class="keyword">public</span> File &#123;...&#125;;</div><div class="line"><span class="keyword">class</span> IOFile: <span class="keyword">public</span> InputFile, <span class="keyword">public</span> OutputFile &#123;...&#125;;</div></pre></td></tr></table></figure>
+<p>从正确的角度看，public的继承总应该是virtual的。不过这样会造成代码体积的膨胀和执行效率的下降。</p>
+<p>所以，如无必要，不要使用虚继承。即使使用，尽可能避免在其中放置数据（类似Java或C#中的接口Interface）</p>
+<h2 id="附注-std-function的基本使用"><a href="#附注-std-function的基本使用" class="headerlink" title="附注 std::function的基本使用"></a>附注 <code>std::function</code>的基本使用</h2><p><code>std::function</code>的作用类似于函数指针，但是能力更加强大。我们可以将函数指针，函数对象，lambda表达式或者类中的成员函数作为<code>std::function</code>。<br>如下所示：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;functional&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">struct</span> Foo &#123;</div><div class="line">    Foo(<span class="keyword">int</span> num) : num_(num) &#123;&#125;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">print_add</span><span class="params">(<span class="keyword">int</span> i)</span> <span class="keyword">const</span> </span>&#123; <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; num_+i &lt;&lt; <span class="string">'\n'</span>; &#125;</div><div class="line">    <span class="keyword">int</span> num_;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_num</span><span class="params">(<span class="keyword">int</span> i)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; i &lt;&lt; <span class="string">'\n'</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">struct</span> PrintNum &#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">int</span> i)</span> <span class="keyword">const</span></span></div><div class="line">    &#123;</div><div class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; i &lt;&lt; <span class="string">'\n'</span>;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line">&#123;</div><div class="line">    <span class="comment">// store a free function</span></div><div class="line">    <span class="comment">// 函数指针</span></div><div class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">int</span>)&gt; f_display = print_num;</div><div class="line">    f_display(<span class="number">-9</span>);</div><div class="line"></div><div class="line">    <span class="comment">// lambda表达式</span></div><div class="line">    <span class="comment">// store a lambda</span></div><div class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt; f_display_42 = []() &#123; print_num(<span class="number">42</span>); &#125;;</div><div class="line">    f_display_42();</div><div class="line"></div><div class="line">    <span class="comment">// store the result of a call to std::bind</span></div><div class="line">    <span class="comment">// 绑定之后的函数对象</span></div><div class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt; f_display_31337 = <span class="built_in">std</span>::bind(print_num, <span class="number">31337</span>);</div><div class="line">    f_display_31337();</div><div class="line"></div><div class="line">    <span class="comment">// store a call to a member function</span></div><div class="line">    <span class="comment">// 类中的成员函数，第一个参数为类实例的const reference</span></div><div class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">const</span> Foo&amp;, <span class="keyword">int</span>)&gt; f_add_display = &amp;Foo::print_add;</div><div class="line">    <span class="function"><span class="keyword">const</span> Foo <span class="title">foo</span><span class="params">(<span class="number">314159</span>)</span></span>;</div><div class="line">    f_add_display(foo, <span class="number">1</span>);</div><div class="line">    f_add_display(<span class="number">314159</span>, <span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="comment">// store a call to a data member accessor</span></div><div class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">int</span>(Foo <span class="keyword">const</span>&amp;)&gt; f_num = &amp;Foo::num_;</div><div class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"num_: "</span> &lt;&lt; f_num(foo) &lt;&lt; <span class="string">'\n'</span>;</div><div class="line"></div><div class="line">    <span class="comment">// store a call to a member function and object</span></div><div class="line">    <span class="keyword">using</span> <span class="built_in">std</span>::placeholders::_1;</div><div class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">int</span>)&gt; f_add_display2 = <span class="built_in">std</span>::bind( &amp;Foo::print_add, foo, _1 );</div><div class="line">    f_add_display2(<span class="number">2</span>);</div><div class="line"></div><div class="line">    <span class="comment">// store a call to a member function and object ptr</span></div><div class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">int</span>)&gt; f_add_display3 = <span class="built_in">std</span>::bind( &amp;Foo::print_add, &amp;foo, _1 );</div><div class="line">    f_add_display3(<span class="number">3</span>);</div><div class="line"></div><div class="line">    <span class="comment">// store a call to a function object</span></div><div class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">int</span>)&gt; f_display_obj = PrintNum();</div><div class="line">    f_display_obj(<span class="number">18</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cpp/" rel="tag"># cpp</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/06/silver-rl-dp/" rel="next" title="Silver RL课程 - DP Planning">
+                <i class="fa fa-chevron-left"></i> Silver RL课程 - DP Planning
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/23/effective-cpp-07/" rel="prev" title="Effective CPP 阅读 - Chapter 7 模板与泛型编程">
+                Effective CPP 阅读 - Chapter 7 模板与泛型编程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/liumengli.jpg" alt="一个脱离了高级趣味的人">
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#32-确定public继承塑模出Is-a的关系"><span class="nav-number">1.</span> <span class="nav-text">32 确定public继承塑模出Is-a的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#33-避免遮掩继承而来的名称"><span class="nav-number">2.</span> <span class="nav-text">33 避免遮掩继承而来的名称</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#34-区分接口继承和实现继承"><span class="nav-number">3.</span> <span class="nav-text">34 区分接口继承和实现继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#35-考虑virtual函数之外的其他选择"><span class="nav-number">4.</span> <span class="nav-text">35 考虑virtual函数之外的其他选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#36-绝不重新定义继承而来的非虚函数"><span class="nav-number">5.</span> <span class="nav-text">36 绝不重新定义继承而来的非虚函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#37-绝不重新定义继承而来的缺省参数值"><span class="nav-number">6.</span> <span class="nav-text">37 绝不重新定义继承而来的缺省参数值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#38-通过复合塑模has-a或“根据某物实现出”"><span class="nav-number">7.</span> <span class="nav-text">38 通过复合塑模has-a或“根据某物实现出”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#39-明智而审慎地使用private继承"><span class="nav-number">8.</span> <span class="nav-text">39 明智而审慎地使用private继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#40-明智而审慎地使用多重继承"><span class="nav-number">9.</span> <span class="nav-text">40 明智而审慎地使用多重继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附注-std-function的基本使用"><span class="nav-number">10.</span> <span class="nav-text">附注 std::function的基本使用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
