@@ -48,11 +48,66 @@
     <title>MIT Missing Semester - Data Wrangling</title>
     <url>/2020/03/15/mit-missing-semester-04-data-wrangling/</url>
     <content><![CDATA[<p>这是<a href="https://missing.csail.mit.edu/2020/data-wrangling/" target="_blank" rel="noopener">MIT Missing Semester系列</a>的第四讲。关于vim的第三讲跳过。Data Wrangling在这里的意思是对数据做变换（Transformation）。例如将一个MP4格式的视频转换为AVI，或或者是从日志中提取所需要的结构化文本信息。具体到本课，主要是处理文本信息：如何匹配到我们感兴趣的信息，如果构建一个处理的pipeline等。</p>
+<a id="more"></a>
+<p>`</p>
 <h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><p>在很久以前，总结了一篇关于python中的正则表达式的常用用法，竟然也是博客的第一篇文章：<a href="https://xmfbit.github.io/2014/07/17/python-reg-exp/">python正则表达式</a>。</p>
-<p>推荐一个<a href="https://regexone.com/" target="_blank" rel="noopener">交互式的正则表达式学习网站</a>。</p>
-<p>A more convenient way is to specify how many repetitions of each character we want using the curly braces notation. For example, a{3} will match the a character exactly three times. Certain regular expression engines will even allow you to specify a range for this repetition such that a{1,3} will match the a character no more than 3 times, but no less than once for example.</p>
-<p>This quantifier can be used with any character, or special metacharacters, for example w{3} (three w’s), [wxy]{5} (five characters, each of which can be a w, x, or y) and .{2,6} (between two and six of any character).</p>
-<p>for example a+ (one or more a’s), [abc]+ (one or more of any a, b, or c character) and .* (zero or more of any character)</p>
+<p>推荐一个<a href="https://regexone.com/" target="_blank" rel="noopener">交互式的正则表达式学习网站</a>。这里有一些简单的规则：</p>
+<ul>
+<li><code>.</code>匹配任意字符，除了<code>\n</code></li>
+<li><code>*</code>匹配前缀的任意个，包括0个</li>
+<li><code>+</code>匹配前缀的任意个，不包括0个</li>
+<li><code>?</code>匹配前缀的0个或1个</li>
+<li><code>[abc]</code>匹配给定集合里面的元素，例如这里匹配<code>a</code>或<code>b</code>或<code>c</code></li>
+<li><code>(ab)</code>匹配给定的组合，例如这里匹配<code>ab</code></li>
+<li><code>(exp1|exp2)</code>匹配<code>exp1</code>或<code>exp2</code></li>
+<li><code>^</code>指示一行的开头</li>
+<li><code>$</code>指示一行的结尾</li>
+</ul>
+<p>要注意的是，<code>(</code>在下面的sed中如果没有特殊说明，被视为普通字符，需要加上<code>-E</code>选项。</p>
+<p>如果我们想要指定具体的次数呢？可以使用<code>.{n}</code>的形式。例如，<code>a{3}</code>表明匹配3个<code>a</code>；<code>[ab]{4}</code>匹配4个<code>a</code>或<code>b</code>。使用range表达式，表明在某个范围内：<code>.{2,5}</code>表示2到5个任意字符。</p>
+<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed(Stream Editor)可以帮助我们变换文本。sed每次从输入流中读入一行，作相应变换，并输出。</p>
+<blockquote>
+<p>A stream editor is used to perform basic text transformations on an input stream (a file or input from a pipeline)</p>
+</blockquote>
+<p><img src="/img/sed_workflow.png" alt="sed workflow"></p>
+<p><a href="https://www.tutorialspoint.com/sed/index.htm" target="_blank" rel="noopener">这里</a>是一个sed的教程，下面结合该教程和讲师的实例，对sed使用做一说明。</p>
+<h3 id="sed的其他用法"><a href="#sed的其他用法" class="headerlink" title="sed的其他用法"></a>sed的其他用法</h3><p>这里首先对sed的其他用法做一说明。</p>
+<p>使用<code>-e</code>可以传入一些命令，例如<code>1d</code>就是删除第一行。通过串联，可以删除多行。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 删除第一行和第五行</span></span><br><span class="line">sed -e <span class="string">'1d'</span> -e `5d` input</span><br></pre></td></tr></table></figure>
+<p>还可以使用<code>-f</code>指示从某个文件内读取命令，</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"1d\n2d"</span> &gt; arg.txt</span><br><span class="line">sed -f arg.txt input</span><br></pre></td></tr></table></figure>
+<h3 id="sed对文本进行查找替换"><a href="#sed对文本进行查找替换" class="headerlink" title="sed对文本进行查找替换"></a>sed对文本进行查找替换</h3><p>sed最常用的场景之一，使用如下命令，将文本文件中的<code>pattern</code>（一个正则表达式）替换为<code>new</code>。当<code>new</code>为空时，将直接删去<code>pattern</code>。最后的<code>g</code>如果不加，则只匹配一次，加上<code>g</code>表示全局。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sed <span class="string">'s/pattern/new/ filename/g'</span></span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># .* 表示任意多个任意字符，包括0个。所以下面会把 says hello以及它前面的内容都删掉</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"cat says hello to dog"</span> | sed <span class="string">'s/.*says hello//'</span></span><br><span class="line"><span class="comment"># output: to dog</span></span><br></pre></td></tr></table></figure>
+<p>注意，<code>.*</code>组合是greedy的。这意味着它会尽可能多地去匹配任意字符。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"cat says hello to says hello to dog"</span> | sed <span class="string">'s/.*says hello//'</span></span><br><span class="line"><span class="comment">#output: to dog</span></span><br></pre></td></tr></table></figure>
+<h3 id="capture-group"><a href="#capture-group" class="headerlink" title="capture group"></a>capture group</h3><p>capture group是指我希望记住匹配到的值。在正则表达式中，使用<code>()</code>括起来的就是capture group。我们可以使用<code>\1</code>，<code>\2</code>来引用它们。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 想知道cat对谁打招呼了</span></span><br><span class="line"><span class="comment"># 我们使用`(.*)`来匹配任意多的字符，也就是dog</span></span><br><span class="line"><span class="comment"># 并将整行替换为`\1`，也就是capture group</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"cat says hello to dog"</span> | sed -E <span class="string">'s/.*says hello to (.*)/\1/'</span></span><br><span class="line"><span class="comment"># output：dog</span></span><br></pre></td></tr></table></figure>
+<h2 id="sort和uniq"><a href="#sort和uniq" class="headerlink" title="sort和uniq"></a>sort和uniq</h2><p>sort，顾名思义，读入input，排序，再将它们输出。uniq，可以将<strong>紧邻的</strong>相同行进行合并。因为uniq只能合并紧邻的向同行，所以常常和sort配合使用。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># -c 会在每一行前面加上一列，显示重复出现的次数</span></span><br><span class="line"><span class="comment"># 继续排序，并输出出现频率最高的10个 （sort升序排列，使用tail找到末尾，也就是最大的）</span></span><br><span class="line"><span class="comment"># sort -k        -k, --key=KEYDEF</span></span><br><span class="line"><span class="comment">#                sort via a key; KEYDEF gives location and type</span></span><br><span class="line"><span class="comment">#      -n        numeric sort</span></span><br><span class="line">xxx | sort | uniq -c | sort -nk1,1 | tail -10</span><br></pre></td></tr></table></figure>
+<h2 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h2><p>awk是另一种stream editor。与sed相比，它更针对于成列的数据。例如，我们可以打印文本文件的第一列：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">awk <span class="string">'&#123;print $1&#125;'</span> input</span><br></pre></td></tr></table></figure>
+<p>awk的一般用法还会加上<code>pattern</code>，例如<code>awk &#39;pattern {action}&#39; input</code>。例如：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># $0表示非特定列，而是整行</span></span><br><span class="line"><span class="comment"># 找出第一列符合给定pattern的那些行，并打印这个整行</span></span><br><span class="line">awk <span class="string">'$1 ~ /pattern/ &#123;print $0&#125;'</span> input</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"hello world\nsmile world"</span> | awk <span class="string">'$1 ~ /^h.*o$/ &#123;print $1&#125;'</span></span><br><span class="line"><span class="comment"># output: hello</span></span><br><span class="line"><span class="comment"># 这里smile这行因为不符合pattern，所以被filter掉了</span></span><br></pre></td></tr></table></figure>
+<p>awk的功能还远不止此。awk中可以使用循环，分支等语句构成更复杂的逻辑。</p>
+<p>paste命令可以用来合并多行为一行。下面的命令将输入文件的第一列顺序拼接为一行，并使用逗号分隔。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">awk <span class="string">'&#123;print $1&#125;'</span> input | paste -sd,</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>The paste utility concatenates the corresponding lines of the given input files, replacing all but the last file’s newline characters with a single tab character, and writes the resulting lines to standard output.</p>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本课主要介绍了一些常用的文本处理命令，包括sed, awk, sort, uniq, paste等。下面使用tldr命令给出这些命令的常用用法供参考。</p>
+<h3 id="sed-1"><a href="#sed-1" class="headerlink" title="sed"></a>sed</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">➜  ~ tldr sed</span><br><span class="line"><span class="comment"># sed</span></span><br><span class="line"></span><br><span class="line">  Edit text <span class="keyword">in</span> a scriptable manner.</span><br><span class="line"></span><br><span class="line">- Replace the first occurrence of a regular expression <span class="keyword">in</span> each line of a file, and <span class="built_in">print</span> the result:</span><br><span class="line"></span><br><span class="line">  sed <span class="string">'s/regex/replace/'</span> filename</span><br><span class="line"></span><br><span class="line">- Replace all occurrences of an extended regular expression <span class="keyword">in</span> a file, and <span class="built_in">print</span> the result:</span><br><span class="line"></span><br><span class="line">  sed -r <span class="string">'s/regex/replace/g'</span> filename</span><br><span class="line"></span><br><span class="line">- Replace all occurrences of a string <span class="keyword">in</span> a file, overwriting the file (i.e. <span class="keyword">in</span>-place):</span><br><span class="line"></span><br><span class="line">  sed -i <span class="string">'s/find/replace/g'</span> filename</span><br><span class="line"></span><br><span class="line">- Replace only on lines matching the line pattern:</span><br><span class="line"></span><br><span class="line">  sed <span class="string">'/line_pattern/s/find/replace/'</span> filename</span><br><span class="line"></span><br><span class="line">- Delete lines matching the line pattern:</span><br><span class="line"></span><br><span class="line">  sed <span class="string">'/line_pattern/d'</span> filename</span><br><span class="line"></span><br><span class="line">- Print only text between n-th line till the next empty line:</span><br><span class="line"></span><br><span class="line">  sed -n <span class="string">'n,/^$/p'</span> filename</span><br><span class="line"></span><br><span class="line">- Apply multiple find-replace expressions to a file:</span><br><span class="line"></span><br><span class="line">  sed -e <span class="string">'s/find/replace/'</span> -e <span class="string">'s/find/replace/'</span> filename</span><br><span class="line"></span><br><span class="line">- Replace separator / by any other character not used <span class="keyword">in</span> the find or replace patterns, e.g., <span class="comment">#:</span></span><br><span class="line"></span><br><span class="line">  sed <span class="string">'s#find#replace#'</span> filename</span><br><span class="line"></span><br><span class="line">- Print only the n-th line of a file:</span><br><span class="line"></span><br><span class="line">  sed <span class="string">'nq;d'</span> filename</span><br></pre></td></tr></table></figure>
+<h3 id="awk-1"><a href="#awk-1" class="headerlink" title="awk"></a>awk</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">➜  ~ tldr awk</span><br><span class="line"><span class="comment"># awk</span></span><br><span class="line"></span><br><span class="line">  A versatile programming language <span class="keyword">for</span> working on files.</span><br><span class="line"></span><br><span class="line">- Print the fifth column (a.k.a. field) <span class="keyword">in</span> a space-separated file:</span><br><span class="line"></span><br><span class="line">  awk <span class="string">'&#123;print $5&#125;'</span> filename</span><br><span class="line"></span><br><span class="line">- Print the second column of the lines containing <span class="string">"something"</span> <span class="keyword">in</span> a space-separated file:</span><br><span class="line"></span><br><span class="line">  awk <span class="string">'/something/ &#123;print $2&#125;'</span> filename</span><br><span class="line"></span><br><span class="line">- Print the last column of each line <span class="keyword">in</span> a file, using a comma (instead of space) as a field separator:</span><br><span class="line"></span><br><span class="line">  awk -F <span class="string">','</span> <span class="string">'&#123;print $NF&#125;'</span> filename</span><br><span class="line"></span><br><span class="line">- Sum the values <span class="keyword">in</span> the first column of a file and <span class="built_in">print</span> the total:</span><br><span class="line"></span><br><span class="line">  awk <span class="string">'&#123;s+=$1&#125; END &#123;print s&#125;'</span> filename</span><br><span class="line"></span><br><span class="line">- Sum the values <span class="keyword">in</span> the first column and pretty-print the values and <span class="keyword">then</span> the total:</span><br><span class="line"></span><br><span class="line">  awk <span class="string">'&#123;s+=$1; print $1&#125; END &#123;print "--------"; print s&#125;'</span> filename</span><br><span class="line"></span><br><span class="line">- Print every third line starting from the first line:</span><br><span class="line"></span><br><span class="line">  awk <span class="string">'NR%3==1'</span> filename</span><br></pre></td></tr></table></figure>
+<h3 id="sort"><a href="#sort" class="headerlink" title="sort"></a>sort</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">➜  ~ tldr tldr</span><br><span class="line"><span class="comment"># sort</span></span><br><span class="line"></span><br><span class="line">  Sort lines of text files.</span><br><span class="line"></span><br><span class="line">- Sort a file <span class="keyword">in</span> ascending order:</span><br><span class="line"></span><br><span class="line">  sort filename</span><br><span class="line"></span><br><span class="line">- Sort a file <span class="keyword">in</span> descending order:</span><br><span class="line"></span><br><span class="line">  sort -r filename</span><br><span class="line"></span><br><span class="line">- Sort a file <span class="keyword">in</span> <span class="keyword">case</span>-insensitive way:</span><br><span class="line"></span><br><span class="line">  sort --ignore-case filename</span><br><span class="line"></span><br><span class="line">- Sort a file using numeric rather than alphabetic order:</span><br><span class="line"></span><br><span class="line">  sort -n filename</span><br><span class="line"></span><br><span class="line">- Sort the passwd file by the 3rd field, numerically:</span><br><span class="line"></span><br><span class="line">  sort -t: -k 3n /etc/passwd</span><br><span class="line"></span><br><span class="line">- Sort a file preserving only unique lines:</span><br><span class="line"></span><br><span class="line">  sort -u filename</span><br><span class="line"></span><br><span class="line">- Sort human-readable numbers (<span class="keyword">in</span> this <span class="keyword">case</span> the 5th field of `ls -lh`):</span><br><span class="line"></span><br><span class="line">  ls -lh | sort -h -k 5</span><br></pre></td></tr></table></figure>
+<h3 id="uniq"><a href="#uniq" class="headerlink" title="uniq"></a>uniq</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">➜  ~ tldr uniq</span><br><span class="line"><span class="comment"># uniq</span></span><br><span class="line"></span><br><span class="line">  Output the unique lines from the given input or file.</span><br><span class="line">  Since it does not detect repeated lines unless they are adjacent, we need to sort them first.</span><br><span class="line"></span><br><span class="line">- Display each line once:</span><br><span class="line"></span><br><span class="line">  sort file | uniq</span><br><span class="line"></span><br><span class="line">- Display only unique lines:</span><br><span class="line"></span><br><span class="line">  sort file | uniq -u</span><br><span class="line"></span><br><span class="line">- Display only duplicate lines:</span><br><span class="line"></span><br><span class="line">  sort file | uniq -d</span><br><span class="line"></span><br><span class="line">- Display number of occurrences of each line along with that line:</span><br><span class="line"></span><br><span class="line">  sort file | uniq -c</span><br><span class="line"></span><br><span class="line">- Display number of occurrences of each line, sorted by the most frequent:</span><br><span class="line"></span><br><span class="line">  sort file | uniq -c | sort -nr</span><br></pre></td></tr></table></figure>
+<h3 id="paste"><a href="#paste" class="headerlink" title="paste"></a>paste</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">➜  ~ tldr paste</span><br><span class="line"># paste</span><br><span class="line"></span><br><span class="line">  Merge lines of files.</span><br><span class="line"></span><br><span class="line">- Join all the lines into a single line, using TAB as delimiter:</span><br><span class="line"></span><br><span class="line">  paste -s file</span><br><span class="line"></span><br><span class="line">- Join all the lines into a single line, using the specified delimiter:</span><br><span class="line"></span><br><span class="line">  paste -s -d delimiter file</span><br><span class="line"></span><br><span class="line">- Merge two files side by side, each in its column, using TAB as delimiter:</span><br><span class="line"></span><br><span class="line">  paste file1 file2</span><br><span class="line"></span><br><span class="line">- Merge two files side by side, each in its column, using the specified delimiter:</span><br><span class="line"></span><br><span class="line">  paste -d delimiter file1 file2</span><br><span class="line"></span><br><span class="line">- Merge two files, with lines added alternatively:</span><br><span class="line"></span><br><span class="line">  paste -d &apos;\n&apos; file1 file2</span><br></pre></td></tr></table></figure>
+<h2 id="Exercise"><a href="#Exercise" class="headerlink" title="Exercise"></a>Exercise</h2><h3 id="关于正则匹配的应用"><a href="#关于正则匹配的应用" class="headerlink" title="关于正则匹配的应用"></a>关于正则匹配的应用</h3><ul>
+<li>Find the number of words (in <code>/usr/share/dict/words</code>) that contain at least three <code>a</code>s and don’t have a <code>&#39;s</code> ending.</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cat /usr/share/dict/words | grep -E <span class="string">'(.*a)&#123;3&#125;'</span> | grep -Ev <span class="string">"\'s$"</span> | wc -l</span><br><span class="line"><span class="comment">#    7047</span></span><br></pre></td></tr></table></figure>
+<h3 id="sed-使用"><a href="#sed-使用" class="headerlink" title="sed 使用"></a>sed 使用</h3><p>就地修改文件，使用<code>-i</code>。最好在后面指定backup文件的后缀名，否则将不会做backup。有丢失原始数据的风险。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">-i extension</span><br><span class="line">         Edit files <span class="keyword">in</span>-place, saving backups with the specified extension.  If a zero-length extension is given, no </span><br><span class="line">         backup will be saved. It is not recommended to give a zero-length extension when <span class="keyword">in</span>-place editing files, as </span><br><span class="line">         you risk corruption or partial content <span class="keyword">in</span> situations <span class="built_in">where</span> disk space is exhausted, etc.</span><br></pre></td></tr></table></figure>
 ]]></content>
       <tags>
         <tag>tool</tag>
@@ -3727,38 +3782,6 @@ cx+dy+t_y\\\\
       </tags>
   </entry>
   <entry>
-    <title>Windows环境下使用Doxygen生成注释文档</title>
-    <url>/2016/12/16/use-doxygen/</url>
-    <content><![CDATA[<p>Doxygen 是一种很好用的代码注释生成工具，然而和很多国外的工具软件一样，在中文环境下，它的使用总是会出现一些问题，也就是中文注释文档出现乱码。经过调试，终于是解决了这个问题。</p>
-<p><img src="/img/doxygen_picture.png" alt="Doxygen"><br><a id="more"></a></p>
-<h2 id="安装-Doxygen"><a href="#安装-Doxygen" class="headerlink" title="安装 Doxygen"></a>安装 Doxygen</h2><p>Doxygen 在Windows平台下的安装比较简单，<a href="http://www.doxygen.nl/" target="_blank" rel="noopener">Doxygen的项目主页</a>提供了下载和安装的使用说明，可以下载它们的官方使用手册进行阅读。对于Windows，提供了源代码编译安装和直接安装程序安装两种方式，可以自行选择。</p>
-<p>安装成功后，使用命令行命令</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-<p>就可以查看帮助文档，对应参数含义一目了然，降低了入手难度。</p>
-<p>使用命令，</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen -g doxygen_filename</span><br></pre></td></tr></table></figure>
-<p>就可以在当前目录下建立一个doxygen配置文件，用文本编辑器打开就可以编辑里面的配置选项。</p>
-<p>使用命令，</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen doxygen_filename</span><br></pre></td></tr></table></figure>
-<p>就可以生成注释文档了。</p>
-<p>下面就来说一说对中文的支持。</p>
-<h2 id="生成-HTML-格式文档"><a href="#生成-HTML-格式文档" class="headerlink" title="生成 HTML 格式文档"></a>生成 HTML 格式文档</h2><p>中文之所以乱码，很多时候是由于编码和译码格式不同，所以我们需要先知道自己代码文件的编码方式。我的代码都是建立在Visual Studio上的，可以通过VS的高级保存选项查看自己代码文件的存储编码格式。对于中文版的VS，一般应该是GB2312。</p>
-<p>我们打开 Doxygen 的配置文件，将里面的 INPUT_ENCODING 改为我们代码文件的编码格式，这里就改成 GB2312。</p>
-<p>这样一来，编译出来的 HTML 页面就不会有中文乱码了。</p>
-<h2 id="生成Latex-格式文档"><a href="#生成Latex-格式文档" class="headerlink" title="生成Latex 格式文档"></a>生成Latex 格式文档</h2><p>生成 Latex 需要本机上安装有 Latex 的编译环境。如果是中文用户，推荐的是CTEX套件，可以到他们的网站上去下载。</p>
-<p>可以看到，Doxygen为Latex文件的编译生成了make文件，我们在命令行窗口中执行make命令就可以完成编译，然而这时候会发现编译出错，pdf文档无法生成。</p>
-<p>打开生成的refman.latex文档，添加宏包 CJKutf8。然后找到 <code>\begin{document}</code>一行，将其改为</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\begin&#123;document&#125;</span><br><span class="line">\begin&#123;CJK&#125;&#123;UTF8&#125;&#123;gbsn&#125;</span><br></pre></td></tr></table></figure>
-<p>也就是说为正文提供了CJK环境，这样中文文本就可以正常编译了。</p>
-<p>相应的，我们要将结尾的 <code>\end{document)</code>改为：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\end&#123;CJK&#125;</span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这样，运行make命令之后，就可以看到中文的注释文档了。</p>
-]]></content>
-      <tags>
-        <tag>tool</tag>
-        <tag>doxygen</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>使用 Visual Studio 编译 GSL 科学计算库</title>
     <url>/2016/12/16/gsl-with-vs/</url>
     <content><![CDATA[<p>GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。</p>
@@ -3874,6 +3897,38 @@ cx+dy+t_y\\\\
 <script type="math/tex; mode=display">\mathbf{A}\mathbf{v} = \mathbf{y}</script>]]></content>
       <tags>
         <tag>扯淡</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Windows环境下使用Doxygen生成注释文档</title>
+    <url>/2016/12/16/use-doxygen/</url>
+    <content><![CDATA[<p>Doxygen 是一种很好用的代码注释生成工具，然而和很多国外的工具软件一样，在中文环境下，它的使用总是会出现一些问题，也就是中文注释文档出现乱码。经过调试，终于是解决了这个问题。</p>
+<p><img src="/img/doxygen_picture.png" alt="Doxygen"><br><a id="more"></a></p>
+<h2 id="安装-Doxygen"><a href="#安装-Doxygen" class="headerlink" title="安装 Doxygen"></a>安装 Doxygen</h2><p>Doxygen 在Windows平台下的安装比较简单，<a href="http://www.doxygen.nl/" target="_blank" rel="noopener">Doxygen的项目主页</a>提供了下载和安装的使用说明，可以下载它们的官方使用手册进行阅读。对于Windows，提供了源代码编译安装和直接安装程序安装两种方式，可以自行选择。</p>
+<p>安装成功后，使用命令行命令</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+<p>就可以查看帮助文档，对应参数含义一目了然，降低了入手难度。</p>
+<p>使用命令，</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen -g doxygen_filename</span><br></pre></td></tr></table></figure>
+<p>就可以在当前目录下建立一个doxygen配置文件，用文本编辑器打开就可以编辑里面的配置选项。</p>
+<p>使用命令，</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen doxygen_filename</span><br></pre></td></tr></table></figure>
+<p>就可以生成注释文档了。</p>
+<p>下面就来说一说对中文的支持。</p>
+<h2 id="生成-HTML-格式文档"><a href="#生成-HTML-格式文档" class="headerlink" title="生成 HTML 格式文档"></a>生成 HTML 格式文档</h2><p>中文之所以乱码，很多时候是由于编码和译码格式不同，所以我们需要先知道自己代码文件的编码方式。我的代码都是建立在Visual Studio上的，可以通过VS的高级保存选项查看自己代码文件的存储编码格式。对于中文版的VS，一般应该是GB2312。</p>
+<p>我们打开 Doxygen 的配置文件，将里面的 INPUT_ENCODING 改为我们代码文件的编码格式，这里就改成 GB2312。</p>
+<p>这样一来，编译出来的 HTML 页面就不会有中文乱码了。</p>
+<h2 id="生成Latex-格式文档"><a href="#生成Latex-格式文档" class="headerlink" title="生成Latex 格式文档"></a>生成Latex 格式文档</h2><p>生成 Latex 需要本机上安装有 Latex 的编译环境。如果是中文用户，推荐的是CTEX套件，可以到他们的网站上去下载。</p>
+<p>可以看到，Doxygen为Latex文件的编译生成了make文件，我们在命令行窗口中执行make命令就可以完成编译，然而这时候会发现编译出错，pdf文档无法生成。</p>
+<p>打开生成的refman.latex文档，添加宏包 CJKutf8。然后找到 <code>\begin{document}</code>一行，将其改为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\begin&#123;document&#125;</span><br><span class="line">\begin&#123;CJK&#125;&#123;UTF8&#125;&#123;gbsn&#125;</span><br></pre></td></tr></table></figure>
+<p>也就是说为正文提供了CJK环境，这样中文文本就可以正常编译了。</p>
+<p>相应的，我们要将结尾的 <code>\end{document)</code>改为：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\end&#123;CJK&#125;</span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样，运行make命令之后，就可以看到中文的注释文档了。</p>
+]]></content>
+      <tags>
+        <tag>tool</tag>
+        <tag>doxygen</tag>
       </tags>
   </entry>
   <entry>
