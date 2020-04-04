@@ -1,0 +1,921 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="tf,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="TFRecord是TensorFlow中常用的数据打包格式。通过将训练数据或测试数据打包成TFRecord文件，就可以配合TF中相关的DataLoader / Transformer等API实现数据的加载和处理，便于高效地训练和评估模型。 TF官方tutorial：TFRecord and tf.Example">
+<meta name="keywords" content="tf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TFRecord 简介">
+<meta property="og:url" content="https://xmfbit.github.io/2020/04/03/tfrecord-introduction/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="TFRecord是TensorFlow中常用的数据打包格式。通过将训练数据或测试数据打包成TFRecord文件，就可以配合TF中相关的DataLoader / Transformer等API实现数据的加载和处理，便于高效地训练和评估模型。 TF官方tutorial：TFRecord and tf.Example">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://xmfbit.github.io/img/tfrecord_logo.jpeg">
+<meta property="og:updated_time" content="2020-04-04T12:31:22.854Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TFRecord 简介">
+<meta name="twitter:description" content="TFRecord是TensorFlow中常用的数据打包格式。通过将训练数据或测试数据打包成TFRecord文件，就可以配合TF中相关的DataLoader / Transformer等API实现数据的加载和处理，便于高效地训练和评估模型。 TF官方tutorial：TFRecord and tf.Example">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/tfrecord_logo.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2020/04/03/tfrecord-introduction/">
+
+
+
+
+
+  <title> TFRecord 简介 | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2020/04/03/tfrecord-introduction/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                TFRecord 简介
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-04-03T23:36:29+00:00">
+                2020-04-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>TFRecord是TensorFlow中常用的数据打包格式。通过将训练数据或测试数据打包成TFRecord文件，就可以配合TF中相关的DataLoader / Transformer等API实现数据的加载和处理，便于高效地训练和评估模型。</p>
+<p>TF官方tutorial：<a href="https://www.tensorflow.org/tutorials/load_data/tfrecord" target="_blank" rel="noopener">TFRecord and tf.Example</a></p>
+<p><img src="/img/tfrecord_logo.jpeg" alt="TFRecord好！"></p>
+<a id="more"></a>
+<h1 id="组成TFReocrd的砖石：tf-Example"><a href="#组成TFReocrd的砖石：tf-Example" class="headerlink" title="组成TFReocrd的砖石：tf.Example"></a>组成TFReocrd的砖石：<code>tf.Example</code></h1><p><code>tf.Example</code>是一个Protobuffer定义的message，表达了一组string到bytes value的映射。TFRecord文件里面其实就是存储的序列化的<code>tf.Example</code>。如果对Protobuffer不熟悉，可以去看下Google的<a href="https://developers.google.com/protocol-buffers/docs/overview" target="_blank" rel="noopener">文档</a>和<a href="https://developers.google.com/protocol-buffers/docs/pythontutorial" target="_blank" rel="noopener">教程</a>。</p>
+<h2 id="Example-是什么"><a href="#Example-是什么" class="headerlink" title="Example 是什么"></a>Example 是什么</h2><p>我们可以具体到相关代码去详细地看下<code>tf.Example</code>的构成。作为一个Protobuffer message，它被定义在文件<a href="https://github.com/tensorflow/tensorflow/blob/v2.1.0/tensorflow/core/example/example.proto#L88" target="_blank" rel="noopener">core/example/example.proto</a>中：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">Example</span> </span>&#123;</span><br><span class="line">  Features features = <span class="number">1</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>好吧，原来只是包了一层<code>Features</code>的message。我们还需要进一步去查找<code>Features</code>的message<a href="https://github.com/tensorflow/tensorflow/blob/v2.1.0/tensorflow/core/example/feature.proto#L85-L88" target="_blank" rel="noopener">定义</a>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">message Features &#123;</span><br><span class="line">  // Map from feature name to feature.</span><br><span class="line">  map&lt;string, Feature&gt; feature = 1;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>到这里，我们可以看出，<code>tf.Example</code>确实表达了一组string到Feature的映射。其中，这个string表示feature name，后面的Feature又是一个message。继续寻找：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// Containers for non-sequential data.</span><br><span class="line">message Feature &#123;</span><br><span class="line">  // Each feature can be exactly one kind.</span><br><span class="line">  oneof kind &#123;</span><br><span class="line">    BytesList bytes_list = 1;</span><br><span class="line">    FloatList float_list = 2;</span><br><span class="line">    Int64List int64_list = 3;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 这里摘一个 Int64List 的定义如下，float/bytes同理</span><br><span class="line">message Int64List &#123;</span><br><span class="line">  // 可以看到，如其名所示，表示的是int64数值的列表</span><br><span class="line">  repeated int64 value = 1 [packed = true];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看起来，是描述了一组各种数据类型的list，包括二进制字节流，float或者int64的数值列表。</p>
+<h2 id="属于自己的Example"><a href="#属于自己的Example" class="headerlink" title="属于自己的Example"></a>属于自己的Example</h2><p>有了上面的分解，要想构造自己数据集的<code>tf.Example</code>，就可以一步步组合起来。</p>
+<p>首先用下面的几个帮助函数，将给定的Python类型数据转换为对应的Feature。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># The following functions can be used to convert a value to a type compatible</span></span><br><span class="line"><span class="comment"># with tf.Example.</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_bytes_feature</span><span class="params">(value)</span>:</span></span><br><span class="line">  <span class="string">"""Returns a bytes_list from a string / byte."""</span></span><br><span class="line">  <span class="keyword">if</span> isinstance(value, type(tf.constant(<span class="number">0</span>))):</span><br><span class="line">    value = value.numpy() <span class="comment"># BytesList won't unpack a string from an EagerTensor.</span></span><br><span class="line">  <span class="keyword">return</span> tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里我们直接认为value是个标量，如果是tf.Tensor，可以使用</span></span><br><span class="line"><span class="comment"># `tf.io.serialize_tensor`将其序列化为bytes</span></span><br><span class="line"><span class="comment"># `tf.io.parse_tensor`可以反序列化为tf.Tensor</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_float_feature</span><span class="params">(value)</span>:</span></span><br><span class="line">  <span class="string">"""Returns a float_list from a float / double."""</span></span><br><span class="line">  <span class="keyword">return</span> tf.train.Feature(float_list=tf.train.FloatList(value=[value]))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_int64_feature</span><span class="params">(value)</span>:</span></span><br><span class="line">  <span class="string">"""Returns an int64_list from a bool / enum / int / uint."""</span></span><br><span class="line">  <span class="keyword">return</span> tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))</span><br></pre></td></tr></table></figure>
+<p>有了<code>Feature</code>，就可以组成<code>Features</code>，只要把对应的名字作为string传进去就行了。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">features_dict = &#123;<span class="string">'image'</span>: _bytes_feature(image_data), <span class="string">'label'</span>: _int64_feature(label)&#125;</span><br><span class="line">features = tf.train.Features(feature=features_dict)</span><br></pre></td></tr></table></figure>
+<p><code>Example</code>自然也就有了：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">example = tf.train.Example(features=features)</span><br></pre></td></tr></table></figure>
+<h1 id="TFRecord"><a href="#TFRecord" class="headerlink" title="TFRecord"></a>TFRecord</h1><p>TFRecord是一个二进制文件，只能顺序读取。它的数据打包格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">uint64 length</span><br><span class="line">uint32 masked_crc32_of_length</span><br><span class="line">byte   data[length]</span><br><span class="line">uint32 masked_crc32_of_data</span><br></pre></td></tr></table></figure>
+<p>其中，<code>data[length]</code>通常是一个<code>Example</code>序列化之后的数据。</p>
+<h2 id="将Example写入TFRecord"><a href="#将Example写入TFRecord" class="headerlink" title="将Example写入TFRecord"></a>将<code>Example</code>写入TFRecord</h2><p>可以使用python API，将<code>Example</code>proto写入TFRecord文件。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.io.TFRecordWriter(filename) <span class="keyword">as</span> writer:</span><br><span class="line">    <span class="keyword">for</span> image_file <span class="keyword">in</span> image_files: </span><br><span class="line">        image_data = open(image_file, <span class="string">'rb'</span>).read()</span><br><span class="line">        features = tf.train.Features(feature=&#123;<span class="string">'image'</span>: _bytes_feature(image_Data)&#125;)</span><br><span class="line">        <span class="comment"># 得到 example</span></span><br><span class="line">        example = tf.train.Example(features=features)</span><br><span class="line">        <span class="comment"># 通过调用message.SerializeToString() 将其序列化</span></span><br><span class="line">        writer.write(example.SerializeToString())</span><br></pre></td></tr></table></figure>
+<h2 id="读取TFRecord中的Example"><a href="#读取TFRecord中的Example" class="headerlink" title="读取TFRecord中的Example"></a>读取TFRecord中的<code>Example</code></h2><p>通过<code>tf.data.TFRecordDataset</code>得到<code>Dataset</code>，然后遍历它，并反序列化，就可以得到原始数据。下面的代码段从TFRecord文件中读取刚刚写入的image：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_from_single_example</span><span class="params">(example_proto)</span>:</span></span><br><span class="line">    <span class="string">""" 从example message反序列化得到当初写入的内容 """</span></span><br><span class="line">    <span class="comment"># 描述features</span></span><br><span class="line">    desc = &#123;<span class="string">'image'</span>: tf.io.FixedLenFeature([], dtype=tf.string)&#125;</span><br><span class="line">    <span class="comment"># 使用tf.io.parse_single_example反序列化</span></span><br><span class="line">    <span class="keyword">return</span> tf.io.parse_single_example(example_proto, desc)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decode_image_from_bytes</span><span class="params">(image_data)</span>:</span></span><br><span class="line">    <span class="string">""" use cv2.imdecode decode image from raw binary data """</span></span><br><span class="line">    bytes_array = np.array(bytearray(image_data))</span><br><span class="line">    <span class="keyword">return</span> cv2.imdecode(bytes_array, cv2.IMREAD_COLOR)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_image_from_single_example</span><span class="params">(example_proto)</span>:</span></span><br><span class="line">    <span class="string">""" get image fom example serialized data """</span></span><br><span class="line">    data = parse_from_single_example(example_proto)</span><br><span class="line">    image_data = data[<span class="string">'image'</span>].numpy()</span><br><span class="line">    <span class="comment"># the image_data is str</span></span><br><span class="line">    <span class="comment"># decode the binary bytes to get the image</span></span><br><span class="line">    <span class="keyword">return</span> decode_image_from_bytes(image_data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">dataset = tf.data.TFRecordDataset(tfrecord_file)</span><br><span class="line">data_iter = iter(dataset)</span><br><span class="line">first_example = next(data_iter)</span><br><span class="line"></span><br><span class="line">first_image = get_image_from_single_example(first_example)</span><br></pre></td></tr></table></figure>
+<p>或者可以用<code>map</code>来将parser的pipeline应用于原dataset：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注意这里不能用get_image_from_single_example</span></span><br><span class="line"><span class="comment"># 因为 `.numpy()` 不能用于静态 Map</span></span><br><span class="line">image_data = dataset.map(parse_from_single_example)</span><br><span class="line"></span><br><span class="line">first_image_data = next(iter(image_data))</span><br><span class="line">image = decode_image_from_bytes(first_image_data[<span class="string">'image'</span>].numpy())</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tf/" rel="tag"># tf</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/21/publish-blog-with-travis/" rel="next" title="使用 travis 发布博客">
+                <i class="fa fa-chevron-left"></i> 使用 travis 发布博客
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/liumengli.jpg" alt="一个脱离了高级趣味的人">
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">85</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#组成TFReocrd的砖石：tf-Example"><span class="nav-number">1.</span> <span class="nav-text">组成TFReocrd的砖石：tf.Example</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Example-是什么"><span class="nav-number">1.1.</span> <span class="nav-text">Example 是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#属于自己的Example"><span class="nav-number">1.2.</span> <span class="nav-text">属于自己的Example</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TFRecord"><span class="nav-number">2.</span> <span class="nav-text">TFRecord</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#将Example写入TFRecord"><span class="nav-number">2.1.</span> <span class="nav-text">将Example写入TFRecord</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取TFRecord中的Example"><span class="nav-number">2.2.</span> <span class="nav-text">读取TFRecord中的Example</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
