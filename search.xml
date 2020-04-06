@@ -1,6 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>MIT Missing Semester - Command-line Environment</title>
+    <url>/2020/04/06/mit-missing-semester-05-commandline-env/</url>
+    <content><![CDATA[<p>这是<a href="https://missing.csail.mit.edu/2020/command-line/" target="_blank" rel="noopener">MIT Missing Semester系列</a>的第五讲，主要关于shell下对于进程（Process)的控制。</p>
+<a id="more"></a>
+<h1 id="Job-Control"><a href="#Job-Control" class="headerlink" title="Job Control"></a>Job Control</h1><h2 id="Kill-Process"><a href="#Kill-Process" class="headerlink" title="Kill Process"></a>Kill Process</h2><p>最简单的，要想结束当前正在进行的进程，使用<code>Ctrl+c</code>即可。而实际上，这是通过向其发送了<code>SIGINT</code>（INT是interrupt的意思）的信号量实现的。例如，执行如下脚本时候，如果按下<code>Ctrl+c</code>，并不会退出，而只是会执行<code>handler</code>函数。更多信号量的文档可以参考<code>man signal</code>。</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> signal, time</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handler</span><span class="params">(signum, time)</span>:</span></span><br><span class="line">    <span class="comment"># 中断会进这里</span></span><br><span class="line">    print(<span class="string">"\nI got a SIGINT, but I am not stopping"</span>)</span><br><span class="line"></span><br><span class="line">signal.signal(signal.SIGINT, handler)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    time.sleep(<span class="number">.1</span>)</span><br><span class="line">    print(<span class="string">"\r&#123;&#125;"</span>.format(i), end=<span class="string">""</span>)</span><br><span class="line">    i += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h2 id="休眠-suspend"><a href="#休眠-suspend" class="headerlink" title="休眠 (suspend)"></a>休眠 (suspend)</h2><p>使用<code>Ctrl-z</code>发送<code>SIGSTOP</code>信号可以使得进程暂时休眠，并可以后续继续运行。我们可以用下面的代码做实验。在<code>Ctrl+z</code>后，程序暂时休眠停止运行，计数器的值也不再更新，直到使用<code>fg</code>命令，才重新开始。</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 每隔1s打印当前计数器的值</span></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> itertools <span class="keyword">import</span> count</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> count(<span class="number">0</span>):</span><br><span class="line">        print(<span class="string">'current time: &#123;&#125;'</span>.format(i))</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p><img src="/img/mit_missing_semester_05_example_suspend_process.png" alt="运行实例"></p>
+<p>除了<code>fg</code>以外，还可以使用<code>bg</code>来开始被休眠的进程。只不过<code>bg</code>会让重新开始的进程在后台运行。</p>
+<p>这里直接贴出讲师的一个例子：</p>
+<p><img src="/img/mit_missing_semester_05_example_job_control.png" alt="job control"></p>
+<p>需要注意的是：</p>
+<ul>
+<li><code>bg</code>的使用：将进程状态从suspending转到running</li>
+<li><code>jobs</code>可以列出当前所有未完成的进程</li>
+<li>可以使用<code>%number</code>的形式引用<code>jobs</code>列出的进程</li>
+<li>除了快捷键，也可以使用<code>kill</code>向指定进程发送信号量，具体可以参考<code>man kill</code></li>
+</ul>
+<h1 id="SSH"><a href="#SSH" class="headerlink" title="SSH"></a>SSH</h1><p>远程ssh到开发机是常见的操作，这里有一些比较零散的知识点记录。</p>
+<ul>
+<li>使用<code>ssh-copy-id $host_name</code>将当前机器的ssh public key拷贝到给定的远程host机器（之前我都是通过手动copy）</li>
+<li>将文件拷贝到远程机器的N种方法：<ul>
+<li>使用<code>ssh + tee</code>：<code>cat local_file | ssh remote_server tee server_file</code>，这是利用了<code>ssh remote_server</code>可以后接shell命令</li>
+<li>使用<code>scp</code>，这也是我最常用的命令了</li>
+<li>使用<code>rsync</code>，更强大的<code>scp</code>，可以跳过重复文件等</li>
+</ul>
+</li>
+<li>端口转发，例如在远程服务器的<code>8888</code>端口启动了jupyter notebook，可以使用<code>ssh -L 9999:localhost:8888 foobar@remote_server</code>将其转发到本机的<code>9999</code>端口，这样在本机浏览<code>localhost:9999</code>即可访问笔记本</li>
+</ul>
+<p><img src="/img/mit_missing_semester_05_local_port_forward.png" alt="local port forwarding"><br><img src="/img/mit_missing_semester_05_remote_port_forward.png" alt="remote port forwarding"></p>
+<h1 id="Exercise"><a href="#Exercise" class="headerlink" title="Exercise"></a>Exercise</h1><h2 id="创建alias"><a href="#创建alias" class="headerlink" title="创建alias"></a>创建alias</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">alias</span> dc=<span class="string">"cd"</span></span><br><span class="line"><span class="comment"># 列出最常用的10个命令</span></span><br><span class="line"><span class="comment">## 将第一列（表示序号）设为空字符串</span></span><br><span class="line"><span class="built_in">history</span> | awk <span class="string">'&#123;$1="";print substr($0,2)&#125;'</span> | sort | uniq -c | sort -n | tail -n 10</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>tool</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>TFRecord 简介</title>
     <url>/2020/04/03/tfrecord-introduction/</url>
     <content><![CDATA[<p>TFRecord是TensorFlow中常用的数据打包格式。通过将训练数据或测试数据打包成TFRecord文件，就可以配合TF中相关的DataLoader / Transformer等API实现数据的加载和处理，便于高效地训练和评估模型。</p>
