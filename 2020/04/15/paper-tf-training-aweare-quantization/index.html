@@ -1,0 +1,938 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="paper,model compression,model quantization,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="来呀，快活呀~" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="Google比较早的关于training-aware-quantization的模型量化的paper，不过提供了很多模型量化的基本知识。后面不管是TFLite还是TensorRT，都能在这篇文章中找到对应的基础知识。Arxiv: Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only In">
+<meta name="keywords" content="paper,model compression,model quantization">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文 - Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference">
+<meta property="og:url" content="https://xmfbit.github.io/2020/04/15/paper-tf-training-aweare-quantization/index.html">
+<meta property="og:site_name" content="来呀，快活呀~">
+<meta property="og:description" content="Google比较早的关于training-aware-quantization的模型量化的paper，不过提供了很多模型量化的基本知识。后面不管是TFLite还是TensorRT，都能在这篇文章中找到对应的基础知识。Arxiv: Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only In">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper_tf_taq_matmul.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper_tf_taq_conv_quantization.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper_tf_taq_train_inference.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/paper_tf_taq_conv_bn_folding_in_taining.png">
+<meta property="og:image" content="https://xmfbit.github.io/img/tf_paper_taq_quantize_with_clamp.png">
+<meta property="og:updated_time" content="2020-04-24T14:27:51.535Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="论文 - Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference">
+<meta name="twitter:description" content="Google比较早的关于training-aware-quantization的模型量化的paper，不过提供了很多模型量化的基本知识。后面不管是TFLite还是TensorRT，都能在这篇文章中找到对应的基础知识。Arxiv: Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only In">
+<meta name="twitter:image" content="https://xmfbit.github.io/img/paper_tf_taq_matmul.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xmfbit.github.io/2020/04/15/paper-tf-training-aweare-quantization/">
+
+
+
+
+
+  <title> 论文 - Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference | 来呀，快活呀~ </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89140122-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">来呀，快活呀~</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2020/04/15/paper-tf-training-aweare-quantization/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                论文 - Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-04-15T14:19:42+00:00">
+                2020-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Google比较早的关于training-aware-quantization的模型量化的paper，不过提供了很多模型量化的基本知识。后面不管是TFLite还是TensorRT，都能在这篇文章中找到对应的基础知识。Arxiv: <a href="https://arxiv.org/abs/1712.05877" target="_blank" rel="noopener">Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference</a></p>
+<a id="more"></a>
+<h2 id="Quantization-Scheme-如何量化"><a href="#Quantization-Scheme-如何量化" class="headerlink" title="Quantization Scheme - 如何量化"></a>Quantization Scheme - 如何量化</h2><p>在这个小节，我们更考虑如何在数学上去设计量化的conv操作。在下一个小节，会从更实际的角度来考虑一个CNN的量化。</p>
+<p>把量化值$q$映射到浮点数$r$的式子很简单，其中$S$和$Z$是量化参数，分别为零点（zero-point）和scaling factor：</p>
+<script type="math/tex; mode=display">r = S(q - Z)</script><p>$S$和$Z$作为量化参数，每个weight array或者activation array是共享的，不同的array之间不共享。</p>
+<p>这里的$S$决定了分辨率，也就是最小量化误差。而$Z$可以用来平衡掉数据偏离$0$的bias。</p>
+<p>有了上述变换规则， CNN中常见的矩阵相乘可以表示为下图。其中，$\alpha$的值为$1,2,3$，分别表示输入矩阵1，输入矩阵2，结果矩阵3。式4给出了在量化后的$Q$上计算原始浮点$R$的矩阵的方法。$\Sigma$内都是整数运算，只需要最后乘上一个scaling factor $M$即可，从而加速了计算。</p>
+<p><img src="/img/paper_tf_taq_matmul.png" alt="矩阵乘法"></p>
+<h2 id="CNN的量化-以Conv为例"><a href="#CNN的量化-以Conv为例" class="headerlink" title="CNN的量化 - 以Conv为例"></a>CNN的量化 - 以Conv为例</h2><p>以卷积op为例，说明在实际的CNN模型中量化是如何做的。</p>
+<h3 id="layer-fusion"><a href="#layer-fusion" class="headerlink" title="layer fusion"></a>layer fusion</h3><p>首先要做的是layer fusion，例如把常见的conv + bn + relu的3个op简化为一个op。relu这种op的fusion不多说，BN的fusion需要考虑权重，参见下个小节。</p>
+<p>卷积实际上还是在进行矩阵乘法。在相乘的时候，用<code>uint8</code>来存储两个操作数，用<code>int32</code>存储结果，以防止相加的时候溢出。如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int32 += uint8 * uint8</span><br></pre></td></tr></table></figure>
+<p>对于bias，也使用<code>int32</code>存储。作者在这里指出，使用较高精度存储bias，是很有必要的。因为bias的每个值都要加到对应channel的所有activation上去，所以它的比较小的量化误差也会对结果造成比较大的影响。综合起来，对于bias，我们使用$S = S_1S_2$（和conv的结果的scaling factor相同），且zero-point为$0$。</p>
+<p>如下图所示，当conv / +bias / relu等操作做完之后，再进行量化。最终完成了fusion之后的conv op的计算。</p>
+<p><img src="/img/paper_tf_taq_conv_quantization.png" alt="conv的计算"></p>
+<h2 id="Training-aware-Quantization"><a href="#Training-aware-Quantization" class="headerlink" title="Training-aware Quantization"></a>Training-aware Quantization</h2><p>在训练时，是使用float精度模拟量化模型，并使用float更新梯度。在inference的时候，直接在支持INT8的硬件上跑inference。这时候就是原生的量化模型在前向计算了。如下图所示：</p>
+<p><img src="/img/paper_tf_taq_train_inference.png" alt="train &amp;&amp; inference"></p>
+<p>这里作者首先分析了量化模型相对于原始精度模型可能的掉点原因：</p>
+<ul>
+<li>同一组weight或activation的不同channel之间的差异较大。因为我们上面已经说过，它们会共享同一个scaling factor。所以如果某个channel的weight特别小，就会造成相对误差很大。</li>
+<li>某些离群点(outlier)影响，把整个分布带偏。</li>
+</ul>
+<p>要使用float模拟定点量化模型前向传播，要特别注意量化究竟是在哪里发生的。要注意的是下面两种情况：</p>
+<ul>
+<li>对于weight来说，如果有BN的话，要先把BN和conv的weight做fusion，再量化，再前向计算，这里下面会详细说明一下</li>
+<li>对于activation来说，一般是激活函数之后，还有bypass的相加或concat之后（对ResNet这种结构）</li>
+</ul>
+<h3 id="BN的fusion"><a href="#BN的fusion" class="headerlink" title="BN的fusion"></a>BN的fusion</h3><p>前面提到，BN要和conv fusion到一起。按channel做如下操作即可：</p>
+<script type="math/tex; mode=display">w_{\text{fold}} = \frac{\gamma w}{\sqrt{\sigma^2 + \epsilon}}</script><p>再加上量化，训练时候的整个计算图如下所示：</p>
+<p><img src="/img/paper_tf_taq_conv_bn_folding_in_taining.png" alt="conv/bn folding"></p>
+<h3 id="带饱和的量化"><a href="#带饱和的量化" class="headerlink" title="带饱和的量化"></a>带饱和的量化</h3><p>为了避免outlier的影响，在量化之前要先进行一波饱和操作，然后将值域均匀地映射到定点数表示的范围，例如8bit量化为256个stage。</p>
+<p><img src="/img/tf_paper_taq_quantize_with_clamp.png" alt="quantization_with_clamp"></p>
+<p>不过新的问题出现了。对于weight，可以很容易地找到这样的$a$和$b$，但是对于activation，只有模型跑起来才能知道其范围。文章指出可以使用指数滑动平均来做（就是BN在训练时更新moving_mean和moving_variance的方式），要注意的点在于：</p>
+<ul>
+<li>滑动平均的系数应该定的很接近$1$，有利于变化比较平滑</li>
+<li>开始的若干步训练，可以暂时去掉activation的quantization，有利于网络稳定</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/paper/" rel="tag"># paper</a>
+          
+            <a href="/tags/model-compression/" rel="tag"># model compression</a>
+          
+            <a href="/tags/model-quantization/" rel="tag"># model quantization</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/14/paper-darts/" rel="next" title="论文 - DARTS">
+                <i class="fa fa-chevron-left"></i> 论文 - DARTS
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+        <div id="lv-container" data-id="city" data-uid="MTAyMC8yODMwOS80ODgx"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/liumengli.jpg" alt="一个脱离了高级趣味的人">
+          <p class="site-author-name" itemprop="name">一个脱离了高级趣味的人</p>
+          <p class="site-description motion-element" itemprop="description">相与枕藉乎舟中，不知东方之既白</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">88</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmfbit" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2629935075/" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quantization-Scheme-如何量化"><span class="nav-number">1.</span> <span class="nav-text">Quantization Scheme - 如何量化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CNN的量化-以Conv为例"><span class="nav-number">2.</span> <span class="nav-text">CNN的量化 - 以Conv为例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#layer-fusion"><span class="nav-number">2.1.</span> <span class="nav-text">layer fusion</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Training-aware-Quantization"><span class="nav-number">3.</span> <span class="nav-text">Training-aware Quantization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BN的fusion"><span class="nav-number">3.1.</span> <span class="nav-text">BN的fusion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#带饱和的量化"><span class="nav-number">3.2.</span> <span class="nav-text">带饱和的量化</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一个脱离了高级趣味的人</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+    
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

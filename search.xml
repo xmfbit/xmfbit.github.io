@@ -1,6 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>论文 - Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference</title>
+    <url>/2020/04/15/paper-tf-training-aweare-quantization/</url>
+    <content><![CDATA[<p>Google比较早的关于training-aware-quantization的模型量化的paper，不过提供了很多模型量化的基本知识。后面不管是TFLite还是TensorRT，都能在这篇文章中找到对应的基础知识。Arxiv: <a href="https://arxiv.org/abs/1712.05877" target="_blank" rel="noopener">Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference</a></p>
+<a id="more"></a>
+<h2 id="Quantization-Scheme-如何量化"><a href="#Quantization-Scheme-如何量化" class="headerlink" title="Quantization Scheme - 如何量化"></a>Quantization Scheme - 如何量化</h2><p>在这个小节，我们更考虑如何在数学上去设计量化的conv操作。在下一个小节，会从更实际的角度来考虑一个CNN的量化。</p>
+<p>把量化值$q$映射到浮点数$r$的式子很简单，其中$S$和$Z$是量化参数，分别为零点（zero-point）和scaling factor：</p>
+<script type="math/tex; mode=display">r = S(q - Z)</script><p>$S$和$Z$作为量化参数，每个weight array或者activation array是共享的，不同的array之间不共享。</p>
+<p>这里的$S$决定了分辨率，也就是最小量化误差。而$Z$可以用来平衡掉数据偏离$0$的bias。</p>
+<p>有了上述变换规则， CNN中常见的矩阵相乘可以表示为下图。其中，$\alpha$的值为$1,2,3$，分别表示输入矩阵1，输入矩阵2，结果矩阵3。式4给出了在量化后的$Q$上计算原始浮点$R$的矩阵的方法。$\Sigma$内都是整数运算，只需要最后乘上一个scaling factor $M$即可，从而加速了计算。</p>
+<p><img src="/img/paper_tf_taq_matmul.png" alt="矩阵乘法"></p>
+<h2 id="CNN的量化-以Conv为例"><a href="#CNN的量化-以Conv为例" class="headerlink" title="CNN的量化 - 以Conv为例"></a>CNN的量化 - 以Conv为例</h2><p>以卷积op为例，说明在实际的CNN模型中量化是如何做的。</p>
+<h3 id="layer-fusion"><a href="#layer-fusion" class="headerlink" title="layer fusion"></a>layer fusion</h3><p>首先要做的是layer fusion，例如把常见的conv + bn + relu的3个op简化为一个op。relu这种op的fusion不多说，BN的fusion需要考虑权重，参见下个小节。</p>
+<p>卷积实际上还是在进行矩阵乘法。在相乘的时候，用<code>uint8</code>来存储两个操作数，用<code>int32</code>存储结果，以防止相加的时候溢出。如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int32 += uint8 * uint8</span><br></pre></td></tr></table></figure>
+<p>对于bias，也使用<code>int32</code>存储。作者在这里指出，使用较高精度存储bias，是很有必要的。因为bias的每个值都要加到对应channel的所有activation上去，所以它的比较小的量化误差也会对结果造成比较大的影响。综合起来，对于bias，我们使用$S = S_1S_2$（和conv的结果的scaling factor相同），且zero-point为$0$。</p>
+<p>如下图所示，当conv / +bias / relu等操作做完之后，再进行量化。最终完成了fusion之后的conv op的计算。</p>
+<p><img src="/img/paper_tf_taq_conv_quantization.png" alt="conv的计算"></p>
+<h2 id="Training-aware-Quantization"><a href="#Training-aware-Quantization" class="headerlink" title="Training-aware Quantization"></a>Training-aware Quantization</h2><p>在训练时，是使用float精度模拟量化模型，并使用float更新梯度。在inference的时候，直接在支持INT8的硬件上跑inference。这时候就是原生的量化模型在前向计算了。如下图所示：</p>
+<p><img src="/img/paper_tf_taq_train_inference.png" alt="train &amp;&amp; inference"></p>
+<p>这里作者首先分析了量化模型相对于原始精度模型可能的掉点原因：</p>
+<ul>
+<li>同一组weight或activation的不同channel之间的差异较大。因为我们上面已经说过，它们会共享同一个scaling factor。所以如果某个channel的weight特别小，就会造成相对误差很大。</li>
+<li>某些离群点(outlier)影响，把整个分布带偏。</li>
+</ul>
+<p>要使用float模拟定点量化模型前向传播，要特别注意量化究竟是在哪里发生的。要注意的是下面两种情况：</p>
+<ul>
+<li>对于weight来说，如果有BN的话，要先把BN和conv的weight做fusion，再量化，再前向计算，这里下面会详细说明一下</li>
+<li>对于activation来说，一般是激活函数之后，还有bypass的相加或concat之后（对ResNet这种结构）</li>
+</ul>
+<h3 id="BN的fusion"><a href="#BN的fusion" class="headerlink" title="BN的fusion"></a>BN的fusion</h3><p>前面提到，BN要和conv fusion到一起。按channel做如下操作即可：</p>
+<script type="math/tex; mode=display">w_{\text{fold}} = \frac{\gamma w}{\sqrt{\sigma^2 + \epsilon}}</script><p>再加上量化，训练时候的整个计算图如下所示：</p>
+<p><img src="/img/paper_tf_taq_conv_bn_folding_in_taining.png" alt="conv/bn folding"></p>
+<h3 id="带饱和的量化"><a href="#带饱和的量化" class="headerlink" title="带饱和的量化"></a>带饱和的量化</h3><p>为了避免outlier的影响，在量化之前要先进行一波饱和操作，然后将值域均匀地映射到定点数表示的范围，例如8bit量化为256个stage。</p>
+<p><img src="/img/tf_paper_taq_quantize_with_clamp.png" alt="quantization_with_clamp"></p>
+<p>不过新的问题出现了。对于weight，可以很容易地找到这样的$a$和$b$，但是对于activation，只有模型跑起来才能知道其范围。文章指出可以使用指数滑动平均来做（就是BN在训练时更新moving_mean和moving_variance的方式），要注意的点在于：</p>
+<ul>
+<li>滑动平均的系数应该定的很接近$1$，有利于变化比较平滑</li>
+<li>开始的若干步训练，可以暂时去掉activation的quantization，有利于网络稳定</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>paper</tag>
+        <tag>model compression</tag>
+        <tag>model quantization</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>论文 - DARTS</title>
+    <url>/2020/04/14/paper-darts/</url>
+    <content><![CDATA[<p>NAS的文章很多了，这篇介绍DARTS：<a href="https://arxiv.org/abs/1806.09055" target="_blank" rel="noopener">DARTS: DIFFERENTIABLE ARCHITECTURE SEARCH</a></p>
+<p><img src="/img/paper_darts_basic_idea.png" alt="darts的基本思路"></p>
+<a id="more"></a>
+<h1 id="搜索空间"><a href="#搜索空间" class="headerlink" title="搜索空间"></a>搜索空间</h1><p>基本沿用前人工作的基本设定：</p>
+<ul>
+<li>每个cell是由$N$个有序的节点组成的DAG。其中，每个节点$x^{(i)}$表示一个feature map，节点之间的有向弧$E(i,j)$表示由$x^{(i)}$到$x^{(j)}$的某种操作（operation）$o^{(i,j)}$</li>
+<li>每个cell有两个输入，一个输出。两个输入分别是第$i-1$个和$i-2$个cell的输出（假设当前cell是第$i$个）。输出是cell内所有节点应用某种Reduction操作（如concat）得到的</li>
+<li>每个节点的值是由它前面的所有节点决定的：</li>
+</ul>
+<script type="math/tex; mode=display">x^{(j)} = \sum_{i<j}o^{(i,j)}x^{(i)}</script><ul>
+<li>特殊op“Zero”，表示两个节点之间其实没有连接。</li>
+</ul>
+<p>遵循上面的设定，网络结构的搜索，就转换为了搜索节点之间operation的问题。下面，我们就对这个问题建模，将它转换为一个可微分用梯度下降搜索的优化问题。</p>
+<h1 id="松弛"><a href="#松弛" class="headerlink" title="松弛"></a>松弛</h1><p>“松弛”是一种优化中常用的技巧。</p>
+<p>设搜索空间内的所有可能op的集合为$\mathcal{O}$。本来$x^{(i)}$到$x^{(j)}$的op是在这个集合中离散地取值，但是现在我们把它松弛为一个连续问题：</p>
+<script type="math/tex; mode=display">\bar{o} = \sum_{o\in\mathcal{O}}\frac{\exp(\alpha_o)}{\sum_{o^{\prime}\in\mathcal{O}}\exp(\alpha_{o^{\prime}})}o</script><p>其中，$\alpha$是一个长度为$|\mathcal{O}|$的向量，$\alpha_o$是里面对应于操作$o$的权重。</p>
+<p>当搜索过程结束后，选取$\mathcal{O}$中能够使得$\alpha$中分量最大的那个元素$o^\ast$就是最终两个节点的连接op：</p>
+<script type="math/tex; mode=display">o^{\ast} =\underset{o\in\mathcal{O}}{\operatorname{argmax}} \alpha_o</script><p>当然，除了网络结构，我们还需要去学习网络的权重参数$w$。所以整个问题是一个<a href="https://en.wikipedia.org/wiki/Bilevel_optimization" target="_blank" rel="noopener">bi-level</a>的优化问题，$\alpha$是upper-level变量，$w$是lower-level变量。PS：超参数搜索也有相关工作将其建模为bi-level的优化问题求解。</p>
+<p>也就是说，给定某个$\alpha$（也就是某个确定的网络结构），在训练集上得到最优的$w$，并将当前的网络结构和权重在验证集上做评估。那个在验证集上得到最好的结果对应的网络结构，就是我们要找的$\alpha$，而网络的权重$w$也对应得出。</p>
+<p><img src="/img/paper_darts_optimization_goal.png" alt="优化目标"></p>
+<p>也就是说，我们需要最小化模型在验证集上的损失函数；其中，$w$是$\alpha$的某个函数（在这里，$\alpha$是和某个网络结构一一对应的），需要满足训练集上的损失函数最小。</p>
+<h1 id="求解"><a href="#求解" class="headerlink" title="求解"></a>求解</h1><p>我们已经把DARTS抽象成了一个优化问题，下面考虑如何高效求解。</p>
+<p>显然，按照上面的想法，给定网络结构后，在训练集上得到最优的$w$，再去验证集上跑评估，是不现实的。一是搜索空间巨大，耗时太长；二是仍然无法根据当前的$\alpha$，得到下一步该向哪里走，难道仍然要用启发式或诸如进化算法等方法？这里作者指出，可以用如下的方式近似梯度：</p>
+<p><img src="/img/paper_darts_approximate_gd.png" alt="论文中使用的approximate gradient descent"></p>
+<p>为什么能这样近似我不懂，看起来括号里面的内容是把求解$w^\ast$的$N$步迭代只取了一步：</p>
+<script type="math/tex; mode=display">w^\ast = w - \sum_{N}\xi\frac{\partial\mathcal{L}_{\text{train}}(w,\alpha)}{\partial w}|_{w_i}</script><p>算法迭代步骤可以描述如下：</p>
+<p><img src="/img/paper_darts_alg_precedure.png" alt="迭代"></p>
+<p>不过上面的算法描述在实际中并不好用，因为$\alpha$的那一坨梯度一看就很不好求。我们可以通过链式求导法则将其展开。</p>
+<p>考虑函数$f(x, g(x))$对$x$的导数$\frac{df}{dx}$。首先令$y = g(x)$，有全微分：</p>
+<script type="math/tex; mode=display">df = \frac{\partial f}{\partial x}dx + \frac{\partial f}{\partial y}dy</script><p>而且，有$dy = \frac{dg}{dx} dx$。所以，</p>
+<script type="math/tex; mode=display">\frac{df}{dx} = \frac{\partial f}{\partial x} + \frac{\partial f}{\partial y} \frac{dg}{dx}</script><p>回归我们的问题，令$x = \alpha$，$w^\prime = g(\alpha) = w - \xi\nabla_w\mathcal{L}_{train}(w, \alpha)$。</p>
+<p>有</p>
+<script type="math/tex; mode=display">\frac{dw^\prime}{d\alpha} = -\xi \nabla^2_{w,\alpha}\mathcal{L}_{train}(w,\alpha)</script><p>将它代回上面$\frac{df}{dx}$，就得到了论文里面的形式：</p>
+<p><img src="/img/paper_darts_apply_chain_rule.png" alt="论文给出的形式"></p>
+<p>化简还没有结束。考虑到$\nabla<em>w\mathcal{L}</em>{train}$已经是一个$\mathbb{R}^n$的向量，再对$\alpha$求导，就是一个雅克比矩阵。</p>
+<p>对应的代码如下：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 更新 \alpha</span></span><br><span class="line">architect.step(input, target, input_search, target_search, lr, optimizer, unrolled=args.unrolled)</span><br><span class="line"><span class="comment"># 更新w</span></span><br><span class="line">optimizer.zero_grad()</span><br></pre></td></tr></table></figure>
+<p>下面进入<code>Architect</code>类的内部看下<code>step</code>的实现。当令$\xi=0$时，$w$不用前进一步，<code>architect.step</code>比较简单（对应于<code>unrolled=False</code>）:</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_backward_step</span><span class="params">(self, input_valid, target_valid)</span>:</span></span><br><span class="line">  <span class="comment"># loss = L_val(w, alpha)</span></span><br><span class="line">  loss = self.model._loss(input_valid, target_valid)</span><br><span class="line">  loss.backward()</span><br></pre></td></tr></table></figure>
+<p>当$\xi\neq 0$时，$w$要在train集合上前进一步，对应于<code>unrolled=True</code>：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_backward_step_unrolled</span><span class="params">(self, input_train, target_train, input_valid, target_valid, eta, network_optimizer)</span>:</span></span><br><span class="line">  <span class="comment"># 在train上更新w = w - \xi * dL_train(w, alpha) / dw</span></span><br><span class="line">  unrolled_model = self._compute_unrolled_model(input_train, target_train, eta, network_optimizer)</span><br><span class="line">  <span class="comment"># 在target上计算loss，然后对alpha求导</span></span><br><span class="line">  unrolled_loss = unrolled_model._loss(input_valid, target_valid)</span><br><span class="line"></span><br><span class="line">  unrolled_loss.backward()</span><br><span class="line">  dalpha = [v.grad <span class="keyword">for</span> v <span class="keyword">in</span> unrolled_model.arch_parameters()]</span><br><span class="line">  vector = [v.grad.data <span class="keyword">for</span> v <span class="keyword">in</span> unrolled_model.parameters()]</span><br><span class="line">  <span class="comment"># 用hessian矩阵更新alpha的梯度</span></span><br><span class="line">  implicit_grads = self._hessian_vector_product(vector, input_train, target_train)</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">for</span> g, ig <span class="keyword">in</span> zip(dalpha, implicit_grads):</span><br><span class="line">    g.data.sub_(eta, ig.data)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 更新alpha</span></span><br><span class="line">  <span class="keyword">for</span> v, g <span class="keyword">in</span> zip(self.model.arch_parameters(), dalpha):</span><br><span class="line">    <span class="keyword">if</span> v.grad <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">      v.grad = Variable(g.data)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      v.grad.data.copy_(g.data)</span><br></pre></td></tr></table></figure>
+<h1 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h1><h2 id="CNN-CIFAR10"><a href="#CNN-CIFAR10" class="headerlink" title="CNN @ CIFAR10"></a>CNN @ CIFAR10</h2><h3 id="operation-set"><a href="#operation-set" class="headerlink" title="operation set"></a>operation set</h3><p>选择$3\times 3$，$5\times 5$的kernel size大小的分离卷积和pooling等，再加上identity和zero。具体可以参考代码：<a href="https://github.com/quark0/darts/blob/master/cnn/operations.py" target="_blank" rel="noopener">darts/cnn/operations.py</a>。例如，$3\times 3$的分离卷积如下：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 给定input channel和stride，生成3x3分离卷积</span></span><br><span class="line"><span class="comment"># 'sep_conv_3x3' : lambda C, stride, affine: SepConv(C, C, 3, stride, 1, affine=affine),</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以看到是如下更小op的串联：</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># relu -&gt; 3x3 seperable conv -&gt; bn -&gt; relu -&gt; 3x3 seperable conv(stride=1) -&gt; bn</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SepConv</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, C_in, C_out, kernel_size, stride, padding, affine=True)</span>:</span></span><br><span class="line">    super(SepConv, self).__init__()</span><br><span class="line">    self.op = nn.Sequential(</span><br><span class="line">      nn.ReLU(inplace=<span class="literal">False</span>),</span><br><span class="line">      nn.Conv2d(C_in, C_in, kernel_size=kernel_size, stride=stride, padding=padding, groups=C_in, bias=<span class="literal">False</span>),</span><br><span class="line">      nn.Conv2d(C_in, C_in, kernel_size=<span class="number">1</span>, padding=<span class="number">0</span>, bias=<span class="literal">False</span>),</span><br><span class="line">      nn.BatchNorm2d(C_in, affine=affine),</span><br><span class="line">      nn.ReLU(inplace=<span class="literal">False</span>),</span><br><span class="line">      nn.Conv2d(C_in, C_in, kernel_size=kernel_size, stride=<span class="number">1</span>, padding=padding, groups=C_in, bias=<span class="literal">False</span>),</span><br><span class="line">      nn.Conv2d(C_in, C_out, kernel_size=<span class="number">1</span>, padding=<span class="number">0</span>, bias=<span class="literal">False</span>),</span><br><span class="line">      nn.BatchNorm2d(C_out, affine=affine),</span><br><span class="line">      )</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> self.op(x)</span><br></pre></td></tr></table></figure>
+<p>主要特点是：</p>
+<ul>
+<li>顺序为relu -&gt; conv -&gt; bn</li>
+<li>可分离卷积重复两次</li>
+</ul>
+<p>这也是前面NAS文章的惯常操作。</p>
+<h3 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h3><p>在Cell尺度上，每个cell由$N=7$个node组成。输入节点如前所述（有时候可能需要$1\times 1$节点），输出节点是该cell的所有中间节点（不包括input节点）在channel上的concat。</p>
+<p>在网络宏观尺度上，cell堆叠形成最后的网络。Cell也被分为<code>normal</code>和<code>reduce</code>两种。后者会对输入节点取stride为$2$，从而downsampling。在网络的$1/3$和$2/3$深度处为reduce cell，其他为normal cell。normal和reduce cell分别有一套共享的$\alpha$参数。从而，整个网络的结构可以被两组$\alpha_{\text{normal}}$和$\alpha_{\text{reduce}}$完全描述。</p>
+<p>下图直观地展示了在CIFAR10上搜索出来的cell结构：</p>
+<ul>
+<li>两个输入，一个输出，四个中间节点，它们通过concat操作成了输出</li>
+<li>每个中间节点入度都是2，也就是我们选取的是$\alpha$中top $K=2$的op</li>
+</ul>
+<p><img src="/img/paper_darts_net_arch_on_cifar10.png" alt="DARTS在CIFAR10上搜出的cell"></p>
+<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><p>在CIFAR10上，搜出的网络性能和之前基于RL或进化算法的SOTA方法是可比的，而且GPU小时数明显缩短。</p>
+<p><img src="/img/paper_darts_sota_comparision_cnn.png" alt="CNN搜索与SOTA比较"></p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li>PyTorch实现的DARTS：<a href="https://github.com/quark0/darts" target="_blank" rel="noopener">quark0/darts</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>paper</tag>
+        <tag>nas</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>MIT Missing Semester - Command-line Environment</title>
     <url>/2020/04/06/mit-missing-semester-05-commandline-env/</url>
     <content><![CDATA[<p>这是<a href="https://missing.csail.mit.edu/2020/command-line/" target="_blank" rel="noopener">MIT Missing Semester系列</a>的第五讲，主要关于shell下对于进程（Process)的控制。</p>
@@ -1202,8 +1320,8 @@
       <tags>
         <tag>deep learning</tag>
         <tag>paper</tag>
-        <tag>yolo</tag>
         <tag>detection</tag>
+        <tag>yolo</tag>
       </tags>
   </entry>
   <entry>
@@ -3518,8 +3636,8 @@ x, &\text{if}\ x > 0 \\\\
       <tags>
         <tag>deep learning</tag>
         <tag>paper</tag>
-        <tag>yolo</tag>
         <tag>detection</tag>
+        <tag>yolo</tag>
       </tags>
   </entry>
   <entry>
@@ -3856,6 +3974,38 @@ cx+dy+t_y\\\\
       </tags>
   </entry>
   <entry>
+    <title>Windows环境下使用Doxygen生成注释文档</title>
+    <url>/2016/12/16/use-doxygen/</url>
+    <content><![CDATA[<p>Doxygen 是一种很好用的代码注释生成工具，然而和很多国外的工具软件一样，在中文环境下，它的使用总是会出现一些问题，也就是中文注释文档出现乱码。经过调试，终于是解决了这个问题。</p>
+<p><img src="/img/doxygen_picture.png" alt="Doxygen"><br><a id="more"></a></p>
+<h2 id="安装-Doxygen"><a href="#安装-Doxygen" class="headerlink" title="安装 Doxygen"></a>安装 Doxygen</h2><p>Doxygen 在Windows平台下的安装比较简单，<a href="http://www.doxygen.nl/" target="_blank" rel="noopener">Doxygen的项目主页</a>提供了下载和安装的使用说明，可以下载它们的官方使用手册进行阅读。对于Windows，提供了源代码编译安装和直接安装程序安装两种方式，可以自行选择。</p>
+<p>安装成功后，使用命令行命令</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+<p>就可以查看帮助文档，对应参数含义一目了然，降低了入手难度。</p>
+<p>使用命令，</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen -g doxygen_filename</span><br></pre></td></tr></table></figure>
+<p>就可以在当前目录下建立一个doxygen配置文件，用文本编辑器打开就可以编辑里面的配置选项。</p>
+<p>使用命令，</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen doxygen_filename</span><br></pre></td></tr></table></figure>
+<p>就可以生成注释文档了。</p>
+<p>下面就来说一说对中文的支持。</p>
+<h2 id="生成-HTML-格式文档"><a href="#生成-HTML-格式文档" class="headerlink" title="生成 HTML 格式文档"></a>生成 HTML 格式文档</h2><p>中文之所以乱码，很多时候是由于编码和译码格式不同，所以我们需要先知道自己代码文件的编码方式。我的代码都是建立在Visual Studio上的，可以通过VS的高级保存选项查看自己代码文件的存储编码格式。对于中文版的VS，一般应该是GB2312。</p>
+<p>我们打开 Doxygen 的配置文件，将里面的 INPUT_ENCODING 改为我们代码文件的编码格式，这里就改成 GB2312。</p>
+<p>这样一来，编译出来的 HTML 页面就不会有中文乱码了。</p>
+<h2 id="生成Latex-格式文档"><a href="#生成Latex-格式文档" class="headerlink" title="生成Latex 格式文档"></a>生成Latex 格式文档</h2><p>生成 Latex 需要本机上安装有 Latex 的编译环境。如果是中文用户，推荐的是CTEX套件，可以到他们的网站上去下载。</p>
+<p>可以看到，Doxygen为Latex文件的编译生成了make文件，我们在命令行窗口中执行make命令就可以完成编译，然而这时候会发现编译出错，pdf文档无法生成。</p>
+<p>打开生成的refman.latex文档，添加宏包 CJKutf8。然后找到 <code>\begin{document}</code>一行，将其改为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\begin&#123;document&#125;</span><br><span class="line">\begin&#123;CJK&#125;&#123;UTF8&#125;&#123;gbsn&#125;</span><br></pre></td></tr></table></figure>
+<p>也就是说为正文提供了CJK环境，这样中文文本就可以正常编译了。</p>
+<p>相应的，我们要将结尾的 <code>\end{document)</code>改为：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\end&#123;CJK&#125;</span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样，运行make命令之后，就可以看到中文的注释文档了。</p>
+]]></content>
+      <tags>
+        <tag>tool</tag>
+        <tag>doxygen</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用 Visual Studio 编译 GSL 科学计算库</title>
     <url>/2016/12/16/gsl-with-vs/</url>
     <content><![CDATA[<p>GSL是一个GNU支持的科学计算库，提供了很丰富的数值计算方法。本文介绍了GSL库在Windows环境下使用VisualStudio进行编译构建的过程。</p>
@@ -3971,38 +4121,6 @@ cx+dy+t_y\\\\
 <script type="math/tex; mode=display">\mathbf{A}\mathbf{v} = \mathbf{y}</script>]]></content>
       <tags>
         <tag>扯淡</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Windows环境下使用Doxygen生成注释文档</title>
-    <url>/2016/12/16/use-doxygen/</url>
-    <content><![CDATA[<p>Doxygen 是一种很好用的代码注释生成工具，然而和很多国外的工具软件一样，在中文环境下，它的使用总是会出现一些问题，也就是中文注释文档出现乱码。经过调试，终于是解决了这个问题。</p>
-<p><img src="/img/doxygen_picture.png" alt="Doxygen"><br><a id="more"></a></p>
-<h2 id="安装-Doxygen"><a href="#安装-Doxygen" class="headerlink" title="安装 Doxygen"></a>安装 Doxygen</h2><p>Doxygen 在Windows平台下的安装比较简单，<a href="http://www.doxygen.nl/" target="_blank" rel="noopener">Doxygen的项目主页</a>提供了下载和安装的使用说明，可以下载它们的官方使用手册进行阅读。对于Windows，提供了源代码编译安装和直接安装程序安装两种方式，可以自行选择。</p>
-<p>安装成功后，使用命令行命令</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-<p>就可以查看帮助文档，对应参数含义一目了然，降低了入手难度。</p>
-<p>使用命令，</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen -g doxygen_filename</span><br></pre></td></tr></table></figure>
-<p>就可以在当前目录下建立一个doxygen配置文件，用文本编辑器打开就可以编辑里面的配置选项。</p>
-<p>使用命令，</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">doxygen doxygen_filename</span><br></pre></td></tr></table></figure>
-<p>就可以生成注释文档了。</p>
-<p>下面就来说一说对中文的支持。</p>
-<h2 id="生成-HTML-格式文档"><a href="#生成-HTML-格式文档" class="headerlink" title="生成 HTML 格式文档"></a>生成 HTML 格式文档</h2><p>中文之所以乱码，很多时候是由于编码和译码格式不同，所以我们需要先知道自己代码文件的编码方式。我的代码都是建立在Visual Studio上的，可以通过VS的高级保存选项查看自己代码文件的存储编码格式。对于中文版的VS，一般应该是GB2312。</p>
-<p>我们打开 Doxygen 的配置文件，将里面的 INPUT_ENCODING 改为我们代码文件的编码格式，这里就改成 GB2312。</p>
-<p>这样一来，编译出来的 HTML 页面就不会有中文乱码了。</p>
-<h2 id="生成Latex-格式文档"><a href="#生成Latex-格式文档" class="headerlink" title="生成Latex 格式文档"></a>生成Latex 格式文档</h2><p>生成 Latex 需要本机上安装有 Latex 的编译环境。如果是中文用户，推荐的是CTEX套件，可以到他们的网站上去下载。</p>
-<p>可以看到，Doxygen为Latex文件的编译生成了make文件，我们在命令行窗口中执行make命令就可以完成编译，然而这时候会发现编译出错，pdf文档无法生成。</p>
-<p>打开生成的refman.latex文档，添加宏包 CJKutf8。然后找到 <code>\begin{document}</code>一行，将其改为</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\begin&#123;document&#125;</span><br><span class="line">\begin&#123;CJK&#125;&#123;UTF8&#125;&#123;gbsn&#125;</span><br></pre></td></tr></table></figure>
-<p>也就是说为正文提供了CJK环境，这样中文文本就可以正常编译了。</p>
-<p>相应的，我们要将结尾的 <code>\end{document)</code>改为：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\end&#123;CJK&#125;</span><br><span class="line">\end&#123;document&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这样，运行make命令之后，就可以看到中文的注释文档了。</p>
-]]></content>
-      <tags>
-        <tag>tool</tag>
-        <tag>doxygen</tag>
       </tags>
   </entry>
   <entry>
