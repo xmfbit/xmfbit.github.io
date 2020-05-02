@@ -2,6 +2,7 @@ public/
 *.*~
 debug.log
 source/_post/.vscode
+package-lock.json
 
 .DS_Store
 Thumbs.db

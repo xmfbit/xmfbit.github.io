@@ -52,13 +52,21 @@ $$o^{\ast} =\underset{o\in\mathcal{O}}{\operatorname{argmax}} \alpha_o$$
 
 我们已经把DARTS抽象成了一个优化问题，下面考虑如何高效求解。
 
-显然，按照上面的想法，给定网络结构后，在训练集上得到最优的$w$，再去验证集上跑评估，是不现实的。一是搜索空间巨大，耗时太长；二是仍然无法根据当前的$\alpha$，得到下一步该向哪里走，难道仍然要用启发式或诸如进化算法等方法？这里作者指出，可以用如下的方式近似梯度：
+显然，按照上面的想法，给定网络结构后，在训练集上得到最优的$w$，再去验证集上跑评估，是不现实的。一是搜索空间巨大，耗时太长；二是仍然无法根据当前的$\alpha$，得到下一步该向哪里走，难道仍然要用启发式或诸如进化算法等方法？如果是求导，那这个链路也太长了，根本不现实。这里作者指出，可以用如下的方式近似梯度：
 
 ![论文中使用的approximate gradient descent](/img/paper_darts_approximate_gd.png)
 
-为什么能这样近似我不懂，看起来括号里面的内容是把求解$w^\ast$的$N$步迭代只取了一步：
+看起来括号里面的内容是把求解$w^\ast$的$N$步迭代只取了一步。
 
 $$w^\ast = w - \sum_{N}\xi\frac{\partial\mathcal{L}_{\text{train}}(w,\alpha)}{\partial w}|_{w_i}$$
+
+为什么能这样近似？似乎没有什么严密的理论支撑，作者对这个“瑕疵”的处理方法是：
+
+- 拿出CIFAR10和ImageNet以及PTB等数据集上的结果，证明算法在实际上是可以work的，而且效果很好
+- 后面给出了一个在简单优化问题上的讨论
+- 给出了关于超参数设置的经验技巧，最重要的还放出了源码
+
+这无疑让整个文章的可信度大大增强。
 
 算法迭代步骤可以描述如下：
 
@@ -84,9 +92,11 @@ $$\frac{dw^\prime}{d\alpha} = -\xi \nabla^2_{w,\alpha}\mathcal{L}_{train}(w,\alp
 
 ![论文给出的形式](/img/paper_darts_apply_chain_rule.png)
 
-化简还没有结束。考虑到$\nabla_w\mathcal{L}_{train}$已经是一个$\mathbb{R}^n$的向量，再对$\alpha$求导，就是一个雅克比矩阵。
+化简还没有结束。考虑到$\nabla\_w\mathcal{L}\_{train}$已经是一个$\mathbb{R}^n$的向量，再对$\alpha$求导，就是一个雅克比矩阵。再和后面那个梯度向量相乘，导致计算量很大。这里作者采用了差分近似微分的方法：
 
-对应的代码如下：
+![差分近似微分](/img/paper_darts_diff_as_gradient.png)
+
+下面是作者的具体计算代码：
 
 ``` py
 # 更新 \alpha
@@ -116,7 +126,7 @@ def _backward_step_unrolled(self, input_train, target_train, input_valid, target
   unrolled_loss.backward()
   dalpha = [v.grad for v in unrolled_model.arch_parameters()]
   vector = [v.grad.data for v in unrolled_model.parameters()]
-  # 用hessian矩阵更新alpha的梯度
+  # 就是那个差分替代微分的式子
   implicit_grads = self._hessian_vector_product(vector, input_train, target_train)
   
   for g, ig in zip(dalpha, implicit_grads):
@@ -130,7 +140,45 @@ def _backward_step_unrolled(self, input_train, target_train, input_valid, target
       v.grad.data.copy_(g.data)
 ```
 
+差分的计算具体是这里。注意到作者提到了两个超参数的经验值：
+
+![经验值设置](/img/paper_darts_hyper_param_exp_value.png)
+
+``` py
+def _hessian_vector_product(self, vector, input, target, r=1e-2):
+  # R = \epsilon，按照上面的经验值公式求取
+  R = r / _concat(vector).norm()
+  # 这是前面那一项
+  for p, v in zip(self.model.parameters(), vector):
+    p.data.add_(R, v)
+  loss = self.model._loss(input, target)
+  grads_p = torch.autograd.grad(loss, self.model.arch_parameters())
+
+  # 这是后面那一项
+  for p, v in zip(self.model.parameters(), vector):
+    p.data.sub_(2*R, v)
+  loss = self.model._loss(input, target)
+  grads_n = torch.autograd.grad(loss, self.model.arch_parameters())
+
+  # 别忘把w复原
+  for p, v in zip(self.model.parameters(), vector):
+    p.data.add_(R, v)
+
+  # 最后的近似结果
+  return [(x-y).div_(2*R) for x, y in zip(grads_p, grads_n)]
+```
+
 # Experiment
+
+## 算法收敛的讨论
+
+这里并没有数学上的证明保证方法的收敛性。作者也没有回避这一点，并指出，\xi 的选取对于是否收敛很重要。总之，实验效果很好，说明这个近似是可以work的。
+
+> While we are not currently aware of the convergence guarantees for our optimization algorithm, in practice it is able to reach a fixed point with a suitable choice of ξ
+
+作者对其做在简单问题下的收敛做了讨论。
+
+![简单问题上的讨论](/img/paper_darts_convergence_discussion.png)
 
 ## CNN @ CIFAR10
 
@@ -184,11 +232,27 @@ class SepConv(nn.Module):
 
 ![DARTS在CIFAR10上搜出的cell](/img/paper_darts_net_arch_on_cifar10.png)
 
-## 实验结果
+### 实验结果
 
-在CIFAR10上，搜出的网络性能和之前基于RL或进化算法的SOTA方法是可比的，而且GPU小时数明显缩短。
+在CIFAR10上，搜出的网络性能和之前基于RL或进化算法的SOTA方法是可比的，而且GPU小时数明显缩短。DARTS方法和ENAS是少数能够在<10 GPU*days的计算资源下做出比较好结果的方法。其中DARTS又比ENAS有较好的TestError。作者对此也做了说明：
+
+> DARTS outperformed ENAS (Pham et al., 2018b) by discovering cells with comparable error rates but lessparameters. The longer search time is due to the fact that we have repeated the search process fourtimes for cell selection. This practice is less important for convolutional cells however, because theperformance of discovered architectures does not strongly depend on initialization
 
 ![CNN搜索与SOTA比较](/img/paper_darts_sota_comparision_cnn.png)
+
+## ImageNet
+
+![在ImageNet上的结果](/img/paper_darts_result_imagenet.png)
+
+## 讨论
+
+文章的主要工作：
+- 将NAS问题通过松弛建模为一个关于模型结构的优化问题
+- 提出了一个不错的解决该优化问题的梯度下降解法
+- 在相关任务上证明了方法的有效性
+- 给大家在堆GPU资源用强化学习 / 进化算法之外，指出了一条可行的NAS求解之路
+
+文章的作者应该是有比较多的数学优化方面的知识。引入权重向量并softmax求取top K op应该是还算让人容易想到，但后面的优化求解就很容易出错劝退。
 
 # 参考资料
 
