@@ -72,10 +72,17 @@
 <p><img src="/img/paper_darts_optimization_goal.png" alt="优化目标"></p>
 <p>也就是说，我们需要最小化模型在验证集上的损失函数；其中，$w$是$\alpha$的某个函数（在这里，$\alpha$是和某个网络结构一一对应的），需要满足训练集上的损失函数最小。</p>
 <h1 id="求解"><a href="#求解" class="headerlink" title="求解"></a>求解</h1><p>我们已经把DARTS抽象成了一个优化问题，下面考虑如何高效求解。</p>
-<p>显然，按照上面的想法，给定网络结构后，在训练集上得到最优的$w$，再去验证集上跑评估，是不现实的。一是搜索空间巨大，耗时太长；二是仍然无法根据当前的$\alpha$，得到下一步该向哪里走，难道仍然要用启发式或诸如进化算法等方法？这里作者指出，可以用如下的方式近似梯度：</p>
+<p>显然，按照上面的想法，给定网络结构后，在训练集上得到最优的$w$，再去验证集上跑评估，是不现实的。一是搜索空间巨大，耗时太长；二是仍然无法根据当前的$\alpha$，得到下一步该向哪里走，难道仍然要用启发式或诸如进化算法等方法？如果是求导，那这个链路也太长了，根本不现实。这里作者指出，可以用如下的方式近似梯度：</p>
 <p><img src="/img/paper_darts_approximate_gd.png" alt="论文中使用的approximate gradient descent"></p>
-<p>为什么能这样近似我不懂，看起来括号里面的内容是把求解$w^\ast$的$N$步迭代只取了一步：</p>
-<script type="math/tex; mode=display">w^\ast = w - \sum_{N}\xi\frac{\partial\mathcal{L}_{\text{train}}(w,\alpha)}{\partial w}|_{w_i}</script><p>算法迭代步骤可以描述如下：</p>
+<p>看起来括号里面的内容是把求解$w^\ast$的$N$步迭代只取了一步。</p>
+<script type="math/tex; mode=display">w^\ast = w - \sum_{N}\xi\frac{\partial\mathcal{L}_{\text{train}}(w,\alpha)}{\partial w}|_{w_i}</script><p>为什么能这样近似？似乎没有什么严密的理论支撑，作者对这个“瑕疵”的处理方法是：</p>
+<ul>
+<li>拿出CIFAR10和ImageNet以及PTB等数据集上的结果，证明算法在实际上是可以work的，而且效果很好</li>
+<li>后面给出了一个在简单优化问题上的讨论</li>
+<li>给出了关于超参数设置的经验技巧，最重要的还放出了源码</li>
+</ul>
+<p>这无疑让整个文章的可信度大大增强。</p>
+<p>算法迭代步骤可以描述如下：</p>
 <p><img src="/img/paper_darts_alg_precedure.png" alt="迭代"></p>
 <p>不过上面的算法描述在实际中并不好用，因为$\alpha$的那一坨梯度一看就很不好求。我们可以通过链式求导法则将其展开。</p>
 <p>考虑函数$f(x, g(x))$对$x$的导数$\frac{df}{dx}$。首先令$y = g(x)$，有全微分：</p>
@@ -84,14 +91,24 @@
 <p>有</p>
 <script type="math/tex; mode=display">\frac{dw^\prime}{d\alpha} = -\xi \nabla^2_{w,\alpha}\mathcal{L}_{train}(w,\alpha)</script><p>将它代回上面$\frac{df}{dx}$，就得到了论文里面的形式：</p>
 <p><img src="/img/paper_darts_apply_chain_rule.png" alt="论文给出的形式"></p>
-<p>化简还没有结束。考虑到$\nabla<em>w\mathcal{L}</em>{train}$已经是一个$\mathbb{R}^n$的向量，再对$\alpha$求导，就是一个雅克比矩阵。</p>
-<p>对应的代码如下：</p>
+<p>化简还没有结束。考虑到$\nabla_w\mathcal{L}_{train}$已经是一个$\mathbb{R}^n$的向量，再对$\alpha$求导，就是一个雅克比矩阵。再和后面那个梯度向量相乘，导致计算量很大。这里作者采用了差分近似微分的方法：</p>
+<p><img src="/img/paper_darts_diff_as_gradient.png" alt="差分近似微分"></p>
+<p>下面是作者的具体计算代码：</p>
 <figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 更新 \alpha</span></span><br><span class="line">architect.step(input, target, input_search, target_search, lr, optimizer, unrolled=args.unrolled)</span><br><span class="line"><span class="comment"># 更新w</span></span><br><span class="line">optimizer.zero_grad()</span><br></pre></td></tr></table></figure>
 <p>下面进入<code>Architect</code>类的内部看下<code>step</code>的实现。当令$\xi=0$时，$w$不用前进一步，<code>architect.step</code>比较简单（对应于<code>unrolled=False</code>）:</p>
 <figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_backward_step</span><span class="params">(self, input_valid, target_valid)</span>:</span></span><br><span class="line">  <span class="comment"># loss = L_val(w, alpha)</span></span><br><span class="line">  loss = self.model._loss(input_valid, target_valid)</span><br><span class="line">  loss.backward()</span><br></pre></td></tr></table></figure>
 <p>当$\xi\neq 0$时，$w$要在train集合上前进一步，对应于<code>unrolled=True</code>：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_backward_step_unrolled</span><span class="params">(self, input_train, target_train, input_valid, target_valid, eta, network_optimizer)</span>:</span></span><br><span class="line">  <span class="comment"># 在train上更新w = w - \xi * dL_train(w, alpha) / dw</span></span><br><span class="line">  unrolled_model = self._compute_unrolled_model(input_train, target_train, eta, network_optimizer)</span><br><span class="line">  <span class="comment"># 在target上计算loss，然后对alpha求导</span></span><br><span class="line">  unrolled_loss = unrolled_model._loss(input_valid, target_valid)</span><br><span class="line"></span><br><span class="line">  unrolled_loss.backward()</span><br><span class="line">  dalpha = [v.grad <span class="keyword">for</span> v <span class="keyword">in</span> unrolled_model.arch_parameters()]</span><br><span class="line">  vector = [v.grad.data <span class="keyword">for</span> v <span class="keyword">in</span> unrolled_model.parameters()]</span><br><span class="line">  <span class="comment"># 用hessian矩阵更新alpha的梯度</span></span><br><span class="line">  implicit_grads = self._hessian_vector_product(vector, input_train, target_train)</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">for</span> g, ig <span class="keyword">in</span> zip(dalpha, implicit_grads):</span><br><span class="line">    g.data.sub_(eta, ig.data)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 更新alpha</span></span><br><span class="line">  <span class="keyword">for</span> v, g <span class="keyword">in</span> zip(self.model.arch_parameters(), dalpha):</span><br><span class="line">    <span class="keyword">if</span> v.grad <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">      v.grad = Variable(g.data)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      v.grad.data.copy_(g.data)</span><br></pre></td></tr></table></figure>
-<h1 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h1><h2 id="CNN-CIFAR10"><a href="#CNN-CIFAR10" class="headerlink" title="CNN @ CIFAR10"></a>CNN @ CIFAR10</h2><h3 id="operation-set"><a href="#operation-set" class="headerlink" title="operation set"></a>operation set</h3><p>选择$3\times 3$，$5\times 5$的kernel size大小的分离卷积和pooling等，再加上identity和zero。具体可以参考代码：<a href="https://github.com/quark0/darts/blob/master/cnn/operations.py" target="_blank" rel="noopener">darts/cnn/operations.py</a>。例如，$3\times 3$的分离卷积如下：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_backward_step_unrolled</span><span class="params">(self, input_train, target_train, input_valid, target_valid, eta, network_optimizer)</span>:</span></span><br><span class="line">  <span class="comment"># 在train上更新w = w - \xi * dL_train(w, alpha) / dw</span></span><br><span class="line">  unrolled_model = self._compute_unrolled_model(input_train, target_train, eta, network_optimizer)</span><br><span class="line">  <span class="comment"># 在target上计算loss，然后对alpha求导</span></span><br><span class="line">  unrolled_loss = unrolled_model._loss(input_valid, target_valid)</span><br><span class="line"></span><br><span class="line">  unrolled_loss.backward()</span><br><span class="line">  dalpha = [v.grad <span class="keyword">for</span> v <span class="keyword">in</span> unrolled_model.arch_parameters()]</span><br><span class="line">  vector = [v.grad.data <span class="keyword">for</span> v <span class="keyword">in</span> unrolled_model.parameters()]</span><br><span class="line">  <span class="comment"># 就是那个差分替代微分的式子</span></span><br><span class="line">  implicit_grads = self._hessian_vector_product(vector, input_train, target_train)</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">for</span> g, ig <span class="keyword">in</span> zip(dalpha, implicit_grads):</span><br><span class="line">    g.data.sub_(eta, ig.data)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 更新alpha</span></span><br><span class="line">  <span class="keyword">for</span> v, g <span class="keyword">in</span> zip(self.model.arch_parameters(), dalpha):</span><br><span class="line">    <span class="keyword">if</span> v.grad <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">      v.grad = Variable(g.data)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      v.grad.data.copy_(g.data)</span><br></pre></td></tr></table></figure>
+<p>差分的计算具体是这里。注意到作者提到了两个超参数的经验值：</p>
+<p><img src="/img/paper_darts_hyper_param_exp_value.png" alt="经验值设置"></p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_hessian_vector_product</span><span class="params">(self, vector, input, target, r=<span class="number">1e-2</span>)</span>:</span></span><br><span class="line">  <span class="comment"># R = \epsilon，按照上面的经验值公式求取</span></span><br><span class="line">  R = r / _concat(vector).norm()</span><br><span class="line">  <span class="comment"># 这是前面那一项</span></span><br><span class="line">  <span class="keyword">for</span> p, v <span class="keyword">in</span> zip(self.model.parameters(), vector):</span><br><span class="line">    p.data.add_(R, v)</span><br><span class="line">  loss = self.model._loss(input, target)</span><br><span class="line">  grads_p = torch.autograd.grad(loss, self.model.arch_parameters())</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 这是后面那一项</span></span><br><span class="line">  <span class="keyword">for</span> p, v <span class="keyword">in</span> zip(self.model.parameters(), vector):</span><br><span class="line">    p.data.sub_(<span class="number">2</span>*R, v)</span><br><span class="line">  loss = self.model._loss(input, target)</span><br><span class="line">  grads_n = torch.autograd.grad(loss, self.model.arch_parameters())</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 别忘把w复原</span></span><br><span class="line">  <span class="keyword">for</span> p, v <span class="keyword">in</span> zip(self.model.parameters(), vector):</span><br><span class="line">    p.data.add_(R, v)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 最后的近似结果</span></span><br><span class="line">  <span class="keyword">return</span> [(x-y).div_(<span class="number">2</span>*R) <span class="keyword">for</span> x, y <span class="keyword">in</span> zip(grads_p, grads_n)]</span><br></pre></td></tr></table></figure>
+<h1 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h1><h2 id="算法收敛的讨论"><a href="#算法收敛的讨论" class="headerlink" title="算法收敛的讨论"></a>算法收敛的讨论</h2><p>这里并没有数学上的证明保证方法的收敛性。作者也没有回避这一点，并指出，\xi 的选取对于是否收敛很重要。总之，实验效果很好，说明这个近似是可以work的。</p>
+<blockquote>
+<p>While we are not currently aware of the convergence guarantees for our optimization algorithm, in practice it is able to reach a fixed point with a suitable choice of ξ</p>
+</blockquote>
+<p>作者对其做在简单问题下的收敛做了讨论。</p>
+<p><img src="/img/paper_darts_convergence_discussion.png" alt="简单问题上的讨论"></p>
+<h2 id="CNN-CIFAR10"><a href="#CNN-CIFAR10" class="headerlink" title="CNN @ CIFAR10"></a>CNN @ CIFAR10</h2><h3 id="operation-set"><a href="#operation-set" class="headerlink" title="operation set"></a>operation set</h3><p>选择$3\times 3$，$5\times 5$的kernel size大小的分离卷积和pooling等，再加上identity和zero。具体可以参考代码：<a href="https://github.com/quark0/darts/blob/master/cnn/operations.py" target="_blank" rel="noopener">darts/cnn/operations.py</a>。例如，$3\times 3$的分离卷积如下：</p>
 <figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 给定input channel和stride，生成3x3分离卷积</span></span><br><span class="line"><span class="comment"># 'sep_conv_3x3' : lambda C, stride, affine: SepConv(C, C, 3, stride, 1, affine=affine),</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以看到是如下更小op的串联：</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># relu -&gt; 3x3 seperable conv -&gt; bn -&gt; relu -&gt; 3x3 seperable conv(stride=1) -&gt; bn</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SepConv</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, C_in, C_out, kernel_size, stride, padding, affine=True)</span>:</span></span><br><span class="line">    super(SepConv, self).__init__()</span><br><span class="line">    self.op = nn.Sequential(</span><br><span class="line">      nn.ReLU(inplace=<span class="literal">False</span>),</span><br><span class="line">      nn.Conv2d(C_in, C_in, kernel_size=kernel_size, stride=stride, padding=padding, groups=C_in, bias=<span class="literal">False</span>),</span><br><span class="line">      nn.Conv2d(C_in, C_in, kernel_size=<span class="number">1</span>, padding=<span class="number">0</span>, bias=<span class="literal">False</span>),</span><br><span class="line">      nn.BatchNorm2d(C_in, affine=affine),</span><br><span class="line">      nn.ReLU(inplace=<span class="literal">False</span>),</span><br><span class="line">      nn.Conv2d(C_in, C_in, kernel_size=kernel_size, stride=<span class="number">1</span>, padding=padding, groups=C_in, bias=<span class="literal">False</span>),</span><br><span class="line">      nn.Conv2d(C_in, C_out, kernel_size=<span class="number">1</span>, padding=<span class="number">0</span>, bias=<span class="literal">False</span>),</span><br><span class="line">      nn.BatchNorm2d(C_out, affine=affine),</span><br><span class="line">      )</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> self.op(x)</span><br></pre></td></tr></table></figure>
 <p>主要特点是：</p>
 <ul>
@@ -107,8 +124,20 @@
 <li>每个中间节点入度都是2，也就是我们选取的是$\alpha$中top $K=2$的op</li>
 </ul>
 <p><img src="/img/paper_darts_net_arch_on_cifar10.png" alt="DARTS在CIFAR10上搜出的cell"></p>
-<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><p>在CIFAR10上，搜出的网络性能和之前基于RL或进化算法的SOTA方法是可比的，而且GPU小时数明显缩短。</p>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p>在CIFAR10上，搜出的网络性能和之前基于RL或进化算法的SOTA方法是可比的，而且GPU小时数明显缩短。DARTS方法和ENAS是少数能够在&lt;10 GPU*days的计算资源下做出比较好结果的方法。其中DARTS又比ENAS有较好的TestError。作者对此也做了说明：</p>
+<blockquote>
+<p>DARTS outperformed ENAS (Pham et al., 2018b) by discovering cells with comparable error rates but lessparameters. The longer search time is due to the fact that we have repeated the search process fourtimes for cell selection. This practice is less important for convolutional cells however, because theperformance of discovered architectures does not strongly depend on initialization</p>
+</blockquote>
 <p><img src="/img/paper_darts_sota_comparision_cnn.png" alt="CNN搜索与SOTA比较"></p>
+<h2 id="ImageNet"><a href="#ImageNet" class="headerlink" title="ImageNet"></a>ImageNet</h2><p><img src="/img/paper_darts_result_imagenet.png" alt="在ImageNet上的结果"></p>
+<h2 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h2><p>文章的主要工作：</p>
+<ul>
+<li>将NAS问题通过松弛建模为一个关于模型结构的优化问题</li>
+<li>提出了一个不错的解决该优化问题的梯度下降解法</li>
+<li>在相关任务上证明了方法的有效性</li>
+<li>给大家在堆GPU资源用强化学习 / 进化算法之外，指出了一条可行的NAS求解之路</li>
+</ul>
+<p>文章的作者应该是有比较多的数学优化方面的知识。引入权重向量并softmax求取top K op应该是还算让人容易想到，但后面的优化求解就很容易出错劝退。</p>
 <h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
 <li>PyTorch实现的DARTS：<a href="https://github.com/quark0/darts" target="_blank" rel="noopener">quark0/darts</a></li>
 </ul>
@@ -1320,8 +1349,8 @@
       <tags>
         <tag>deep learning</tag>
         <tag>paper</tag>
-        <tag>detection</tag>
         <tag>yolo</tag>
+        <tag>detection</tag>
       </tags>
   </entry>
   <entry>
@@ -3636,8 +3665,8 @@ x, &\text{if}\ x > 0 \\\\
       <tags>
         <tag>deep learning</tag>
         <tag>paper</tag>
-        <tag>detection</tag>
         <tag>yolo</tag>
+        <tag>detection</tag>
       </tags>
   </entry>
   <entry>
