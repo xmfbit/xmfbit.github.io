@@ -321,6 +321,7 @@
 <p><img src="/img/travis_pane.png" alt="travis dashboard"></p>
 <p>另外，如果你在hexo中也用了<code>landscape</code>主题，可能会报fail。解决方法很粗暴，直接删除这个文件就行了：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rm themes/landscape/README.md</span><br></pre></td></tr></table></figure>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>我发现travis有两个网站，分别是travis-ci.com和travis-ci.org。这两个网站有什么区别？一句话解释：这两个网站都是可用的travis-ci网站，但目前要用.com那个。具体解释见这个帖子：<a href="https://devops.stackexchange.com/questions/1201/whats-the-difference-between-travis-ci-org-and-travis-ci-com" target="_blank" rel="noopener">What’s the difference between travis-ci.org and travis-ci.com?</a></p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
 <li><a href="https://hexo.io/docs/github-pages" target="_blank" rel="noopener">官方教程</a></li>
 </ul>

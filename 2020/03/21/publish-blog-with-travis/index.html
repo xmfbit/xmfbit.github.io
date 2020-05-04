@@ -98,7 +98,7 @@
 <meta property="og:image" content="https://xmfbit.github.io/img/what_is_ci.jpg">
 <meta property="og:image" content="https://xmfbit.github.io/img/caffe_build_status.png">
 <meta property="og:image" content="https://xmfbit.github.io/img/travis_pane.png">
-<meta property="og:updated_time" content="2020-05-04T14:20:05.703Z">
+<meta property="og:updated_time" content="2020-05-04T14:38:02.776Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用 travis 发布博客">
 <meta name="twitter:description" content="我的博客之前是通过手动调用hexo generate生成public，并更新到master分支的。最近试了下使用travis直接发布，发现省事了不少。官方的文档其实还是挺全的，不过也碰到了一些坑，记录在这里。">
@@ -397,6 +397,7 @@
 <p><img src="/img/travis_pane.png" alt="travis dashboard"></p>
 <p>另外，如果你在hexo中也用了<code>landscape</code>主题，可能会报fail。解决方法很粗暴，直接删除这个文件就行了：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm themes/landscape/README.md</span><br></pre></td></tr></table></figure>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>我发现travis有两个网站，分别是travis-ci.com和travis-ci.org。这两个网站有什么区别？一句话解释：这两个网站都是可用的travis-ci网站，但目前要用.com那个。具体解释见这个帖子：<a href="https://devops.stackexchange.com/questions/1201/whats-the-difference-between-travis-ci-org-and-travis-ci-com" target="_blank" rel="noopener">What’s the difference between travis-ci.org and travis-ci.com?</a></p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
 <li><a href="https://hexo.io/docs/github-pages" target="_blank" rel="noopener">官方教程</a></li>
 </ul>
@@ -613,7 +614,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Travis-简介"><span class="nav-number">1.</span> <span class="nav-text">Travis 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-Travis"><span class="nav-number">2.</span> <span class="nav-text">配置 Travis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试"><span class="nav-number">3.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Travis-简介"><span class="nav-number">1.</span> <span class="nav-text">Travis 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-Travis"><span class="nav-number">2.</span> <span class="nav-text">配置 Travis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试"><span class="nav-number">3.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
