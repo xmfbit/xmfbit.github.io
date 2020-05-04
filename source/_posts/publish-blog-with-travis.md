@@ -87,6 +87,10 @@ deploy:
 rm themes/landscape/README.md
 ```
 
+## 注意
+
+我发现travis有两个网站，分别是travis-ci.com和travis-ci.org。这两个网站有什么区别？一句话解释：这两个网站都是可用的travis-ci网站，但目前要用.com那个。具体解释见这个帖子：[What's the difference between travis-ci.org and travis-ci.com?](https://devops.stackexchange.com/questions/1201/whats-the-difference-between-travis-ci-org-and-travis-ci-com)
+
 ## 参考资料
 
 - [官方教程](https://hexo.io/docs/github-pages)
