@@ -26,3 +26,4 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         target_branch: 'gh-pages'
         target_path: 'public'
+        jekyll_src: '.'
