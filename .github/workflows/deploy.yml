@@ -23,7 +23,9 @@ jobs:
             ${{ runner.OS }}-npm-cache
       - name: Install Dependencies
         run: npm install
-      - name: Deploy
+      - name: Deploy hexo
+        run: npm run deploy
+      - name: Deploy gh
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
