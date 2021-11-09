@@ -24,7 +24,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Deploy hexo
-        run: npm run deploy
+        run: hexo generate --deploy
       - name: Deploy gh
         uses: peaceiris/actions-gh-pages@v3
         with:
