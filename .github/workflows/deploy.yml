@@ -1,34 +1,28 @@
-name: Jekyll Deploy
+name: Testing the GitHub Pages publication
 
 on:
-  push:
+  push
     branches:
       # deploy on updates on main
-      - hexo-main
-  schedule:
-    # redeploy every morning to update unpublished pages
-    - cron: "0 2 * * *"
+      - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
+  jekyll:
+    runs-on: ubuntu-16.04
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Cache gems
-        uses: actions/cache@v1
-        with:
-          path: vendor/gems
-          key: ${{ runner.os }}-build-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+    # Use GitHub Actions' cache to shorten build times and decrease load on servers
+    - uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
 
-      - name: Build & Deploy to GitHub Pages
-        uses: DavidS/jekyll-deploy@main
-        with:
-          target-branch: master
-        env:
-          JEKYLL_ENV: production
-          GH_PAGES_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
+    # Specify the target branch (optional)
+    - uses: helaili/jekyll-action@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        target_branch: 'gh-pages'
+        target_path: 'public'
