@@ -4,7 +4,7 @@ on:
   push:
     branches:
       # deploy on updates on main
-      - main
+      - hexo-main
 
 jobs:
   jekyll:
