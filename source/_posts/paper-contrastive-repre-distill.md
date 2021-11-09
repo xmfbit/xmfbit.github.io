@@ -8,7 +8,9 @@ tags:
     - contrastive learning
 ---
 
+![Contrastive Learning Distillation](/img/paper_contrastive_learning_distillation_cover.png)
 
+<!-- more -->
 # 预备知识
 
 补充一些关于信息论的预备知识。
