@@ -286,6 +286,130 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2020/07/11/mit-missing-semester-06-git/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="一个脱离了高级趣味的人">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/avatar/liumengli.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="来呀，快活呀~">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2020/07/11/mit-missing-semester-06-git/" itemprop="url">
+                  MIT Missing Semester - Git
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-07-11T22:24:45+00:00">
+                2020-07-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p><a href="https://missing.csail.mit.edu/2020/version-control/" target="_blank" rel="noopener">这一讲</a>是关于最流行的版本控制（version control system）工具git的介绍。</p>
+<p><img src="/img/mit_missing_semester_06_git_logo.png" alt="git"></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/07/11/mit-missing-semester-06-git/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2020/05/05/paper-contrastive-repre-distill/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -365,20 +489,14 @@
 
       
         
-          
-            <h1 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h1><p>补充一些关于信息论的预备知识。</p>
-<h2 id="信息量"><a href="#信息量" class="headerlink" title="信息量"></a><a href="https://en.wikipedia.org/wiki/Information_content" target="_blank" rel="noopener">信息量</a></h2><p>随机变量$X$取值$x$的信息量定义为：</p>
-<script type="math/tex; mode=display">I_X(x) = -\log P_X(x)</script><p>要想形式化地理解为何信息量是如上所示的对数函数，可以从下面几个公理（axiom）出发：</p>
-<ul>
-<li>An event with probability 100% is perfectly unsurprising and yields no information.</li>
-<li>The less probable an event is, the more surprising it is and the more information it yields.</li>
-<li>If two independent events are measured separately, the total amount of information is the sum of the self-informations of the individual events.</li>
-</ul>
-<p>其中，最后一条意味着$f(xy) = f(x)f(y)$，而前面两条得到常数项和单调递减。</p>
-<h2 id="信息熵"><a href="#信息熵" class="headerlink" title="信息熵)"></a><a href="https://en.wikipedia.org/wiki/Entropy_(information_theory" target="_blank" rel="noopener">信息熵</a>)</h2><p>由上可知，随机变量的信息量也是一个随机变量。随机变量$X$的信息熵，又叫做自信息（self information)，是其信息量的期望。这里假定其为离散随机变量，将期望符号展开：</p>
-<script type="math/tex; mode=display">H(X) = E[I(X)] = E[-\log P(X)] = -\sum P(x)\log P(x)</script><h2 id="互信息"><a href="#互信息" class="headerlink" title="互信息"></a><a href="https://en.wikipedia.org/wiki/Mutual_information" target="_blank" rel="noopener">互信息</a></h2><p>两个随机变量$X$和$Y$，它们的互信息（mutual information）是它们联合概率密度函数和边缘概率密度函数的乘积的KL散度：</p>
-<script type="math/tex; mode=display">MI(X;Y) = D_{KL}(P_{X,Y}||P_XP_Y) = E_{P_{X,Y}}[\log\frac{P_{X, Y}}{P_X P_Y}] = \sum_X\sum_Y P_{X,Y}\log\frac{P_{X,Y}}{P_X P_Y}</script>
-          
+          <p><img src="/img/paper_contrastive_learning_distillation_cover.png" alt="Contrastive Learning Distillation"></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/05/05/paper-contrastive-repre-distill/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1401,137 +1519,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xmfbit.github.io/2019/11/24/caffe-compiling-debian9/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="一个脱离了高级趣味的人">
-    <meta itemprop="description" content>
-    <meta itemprop="image" content="/avatar/liumengli.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="来呀，快活呀~">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="来呀，快活呀~" src>
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2019/11/24/caffe-compiling-debian9/" itemprop="url">
-                  Debian9 编译Caffe的一个坑
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-24T19:12:48+00:00">
-                2019-11-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>记录一个编译Caffe的坑。环境，Debian 9 + GCC 6.3.0，出现的问题：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">In file included from /usr/local/cuda/include/cuda_runtime.h:120:0,</span><br><span class="line">                 from &lt;command-line&gt;:0:</span><br><span class="line">/usr/local/cuda/include/crt/common_functions.h:74:24: error: token &quot;&quot;__CUDACC_VER__ is no longer supported.  Use __CUDACC_VER_MAJOR__, __CUDACC_VER_MINOR__, and __CUDACC_VER</span><br><span class="line">_BUILD__ instead.&quot;&quot; is not valid in preprocessor expressions</span><br><span class="line"> #define __CUDACC_VER__ &quot;__CUDACC_VER__ is no longer supported.  Use __CUDACC_VER_MAJOR__, __CUDACC_VER_MINOR__, and __CUDACC_VER_BUILD__ instead.&quot;</span><br></pre></td></tr></table></figure>
-<p>如果你和我一样，自从从Github clone Caffe后很长时间没有与master合并过，就有可能出现这个问题。</p>
-<p>解决方法：这个问题应该是和boost有关，最初我看到的解决方法是将boost升级到1.65.1。不过感觉好麻烦，后来找到了这个<a href="https://github.com/NVIDIA/caffe/issues/408" target="_blank" rel="noopener">github issue</a>，修改<code>include/caffe/common.hpp</code>即可。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2019/11/24/caffe-compiling-debian9/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1572,7 +1564,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">90</span>
+                <span class="site-state-item-count">91</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1583,7 +1575,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-count">36</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
